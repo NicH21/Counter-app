@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Counter</title>
+</head>
+<body style="text-align:center; font-family:Arial; margin-top:100px">
+
+<h1>Press the Button</h1>
+
+<button onclick="increment()" style="font-size:40px;padding:30px">
+  +1
+</button>
+
+<h2 id="count">0</h2>
+
+<script>
+async function increment() {
+    await fetch("https://YOUR-FIREBASE-URL/counter.json", {
+        method: "PATCH",
+        body: JSON.stringify({ value: Date.now() })
+    });
+}
+</script>
+
+</body>
+</html>
