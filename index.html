@@ -6,21 +6,40 @@
 </head>
 <body style="text-align:center; font-family:Arial; margin-top:100px">
 
-<h1>Press the Button</h1>
+<h1>Live Counter</h1>
 
-<button onclick="increment()" style="font-size:40px;padding:30px">
+<button onclick="increment()" style="font-size:40px;padding:20px">
   +1
 </button>
 
 <h2 id="count">0</h2>
 
 <script>
-async function increment() {
-    await fetch("https://YOUR-FIREBASE-URL/counter.json", {
-        method: "PATCH",
-        body: JSON.stringify({ value: Date.now() })
-    });
+const url = "https://counterapp-5297b-default-rtdb.firebaseio.com/counter.json";
+
+// load value
+async function load() {
+    let res = await fetch(url);
+    let value = await res.json();
+    document.getElementById("count").innerText = value;
 }
+
+// increment
+async function increment() {
+    let res = await fetch(url);
+    let value = await res.json();
+
+    value = (value || 0) + 1;
+
+    await fetch(url, {
+        method: "PUT",
+        body: JSON.stringify(value)
+    });
+
+    document.getElementById("count").innerText = value;
+}
+
+load();
 </script>
 
 </body>
