@@ -2,67 +2,38 @@
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Team Counter</title>
+  <title>Choose Team</title>
 </head>
 
-<body style="font-family: Arial; text-align:center; margin-top:50px">
+<body style="font-family: Arial; text-align:center; margin-top:80px">
 
-<h1>Team Control Panel</h1>
+<h1>Choose Your Team</h1>
 
-<!-- Buttons -->
-<button onclick="update('teamA')" style="font-size:20px; margin:10px;">
-  Team A +1
+<button id="teamA" onclick="choose('teamA')" style="font-size:20px; margin:10px;">
+  Team A
 </button>
 
-<button onclick="update('teamB')" style="font-size:20px; margin:10px;">
-  Team B +1
+<button id="teamB" onclick="choose('teamB')" style="font-size:20px; margin:10px;">
+  Team B
 </button>
 
-<button onclick="update('teamC')" style="font-size:20px; margin:10px;">
-  Team C +1
+<button id="teamC" onclick="choose('teamC')" style="font-size:20px; margin:10px;">
+  Team C
 </button>
-
-<hr>
-
-<!-- Display -->
-<h2 id="teamA">Team A: 0</h2>
-<h2 id="teamB">Team B: 0</h2>
-<h2 id="teamC">Team C: 0</h2>
 
 <script>
-const url = "https://counterapp-5297b-default-rtdb.firebaseio.com/teams";
-
-async function update(team) {
-
-    let res = await fetch(url + ".json");
-    let data = await res.json();
-
-    if (!data) data = {};
-
-    let value = data[team] || 0;
-    value++;
-
-    await fetch(url + "/" + team + ".json", {
-        method: "PUT",
-        body: JSON.stringify(value)
-    });
-
-    load();
-}
-// load all values
-async function load() {
-    let res = await fetch(url);
-    let data = await res.json();
-
-    if (!data) return;
-
-    document.getElementById("teamA").innerText = "Team A: " + (data.teamA || 0);
-    document.getElementById("teamB").innerText = "Team B: " + (data.teamB || 0);
-    document.getElementById("teamC").innerText = "Team C: " + (data.teamC || 0);
+function choose(team) {
+    localStorage.setItem("myTeam", team);
+    window.location.href = "team.html";
 }
 
-setInterval(load, 1000);
-load();
+// disable already selected team
+let saved = localStorage.getItem("myTeam");
+
+if (saved) {
+    document.getElementById(saved).disabled = true;
+    document.getElementById(saved).innerText = saved + " (Selected)";
+}
 </script>
 
 </body>
