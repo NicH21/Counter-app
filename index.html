@@ -25,19 +25,47 @@
 </button>
 
 <script>
- // localStorage.removeItem("myTeam");
-function choose(team) {
-    localStorage.setItem("myTeam", team);
-   window.location.href = "./teams.html";
+
+const url = "https://counterapp-5297b-default-rtdb.firebaseio.com/selectedTeams";
+
+// choose team + lock it in Firebase
+async function choose(team) {
+
+    // mark team as taken in Firebase (GLOBAL for all devices)
+    await fetch(url + "/" + team + ".json", {
+        method: "PUT",
+        body: JSON.stringify(true)
+    });
+
+    window.location.href = "./teams.html";
 }
 
-// disable already selected team
-let saved = localStorage.getItem("myTeam");
+// load team availability from Firebase
+async function loadTeams() {
 
-if (saved) {
-    document.getElementById(saved).disabled = true;
-    document.getElementById(saved).innerText = saved + " (Selected)";
+    let res = await fetch(url + ".json");
+    let data = await res.json();
+
+    if (!data) return;
+
+    if (data.teamA === true) {
+        document.getElementById("teamA").disabled = true;
+        document.getElementById("teamA").innerText = "Team A (Taken)";
+    }
+
+    if (data.teamB === true) {
+        document.getElementById("teamB").disabled = true;
+        document.getElementById("teamB").innerText = "Team B (Taken)";
+    }
+
+    if (data.teamC === true) {
+        document.getElementById("teamC").disabled = true;
+        document.getElementById("teamC").innerText = "Team C (Taken)";
+    }
 }
+
+loadTeams();
+
 </script>
 
 </body>
