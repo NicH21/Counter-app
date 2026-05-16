@@ -2,43 +2,68 @@
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Counter</title>
+  <title>Team Counter</title>
 </head>
-<body style="text-align:center; font-family:Arial; margin-top:100px">
 
-<h1>Live Counter</h1>
+<body style="font-family: Arial; text-align:center; margin-top:50px">
 
-<button onclick="increment()" style="font-size:40px;padding:20px">
-  +1
+<h1>Team Control Panel</h1>
+
+<!-- Buttons -->
+<button onclick="update('teamA')" style="font-size:20px; margin:10px;">
+  Team A +1
 </button>
 
-<h2 id="count">0</h2>
+<button onclick="update('teamB')" style="font-size:20px; margin:10px;">
+  Team B +1
+</button>
+
+<button onclick="update('teamC')" style="font-size:20px; margin:10px;">
+  Team C +1
+</button>
+
+<hr>
+
+<!-- Display -->
+<h2 id="teamA">Team A: 0</h2>
+<h2 id="teamB">Team B: 0</h2>
+<h2 id="teamC">Team C: 0</h2>
 
 <script>
-const url = "https://counterapp-5297b-default-rtdb.firebaseio.com/counter.json";
+const url = "https://counterapp-5297b-default-rtdb.firebaseio.com/teams";
 
-// load value
-async function load() {
+// update team score
+async function update(team) {
     let res = await fetch(url);
-    let value = await res.json();
-    document.getElementById("count").innerText = value;
-}
+    let data = await res.json();
 
-// increment
-async function increment() {
-    let res = await fetch(url);
-    let value = await res.json();
+    if (!data) data = {};
 
-    value = (value || 0) + 1;
+    if (!data[team]) data[team] = 0;
+
+    data[team]++;
 
     await fetch(url, {
         method: "PUT",
-        body: JSON.stringify(value)
+        body: JSON.stringify(data)
     });
 
-    document.getElementById("count").innerText = value;
+    load(); // refresh display instantly
 }
 
+// load all values
+async function load() {
+    let res = await fetch(url);
+    let data = await res.json();
+
+    if (!data) return;
+
+    document.getElementById("teamA").innerText = "Team A: " + (data.teamA || 0);
+    document.getElementById("teamB").innerText = "Team B: " + (data.teamB || 0);
+    document.getElementById("teamC").innerText = "Team C: " + (data.teamC || 0);
+}
+
+setInterval(load, 1000);
 load();
 </script>
 
