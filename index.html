@@ -4,69 +4,46 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Choose Team</title>
 </head>
-
 <body style="font-family: Arial; text-align:center; margin-top:80px">
-
 <h1>Choose Your Team</h1>
-
-<button id="teamA" onclick="choose('teamA')" style="font-size:20px; margin:10px;">
-  Team A
-
-</button>
-
-<button id="teamB" onclick="choose('teamB')" style="font-size:20px; margin:10px;">
-  Team B
+<button id="teamA" onclick="choose('teamA')" style="font-size:20px; margin:10px;">Team A</button>
+<button id="teamB" onclick="choose('teamB')" style="font-size:20px; margin:10px;">Team B</button>
+<button id="teamC" onclick="choose('teamC')" style="font-size:20px; margin:10px;">Team C</button>
  
-</button>
-
-<button id="teamC" onclick="choose('teamC')" style="font-size:20px; margin:10px;">
-  Team C
- 
-</button>
-
 <script>
-
 const url = "https://counterapp-5297b-default-rtdb.firebaseio.com/selectedTeams";
-
-// choose team + lock it in Firebase
+ 
 async function choose(team) {
-
-    // mark team as taken in Firebase (GLOBAL for all devices)
-    await fetch(url + "/" + team + ".json", {
-        method: "PUT",
-        body: JSON.stringify(true)
-    });
-
-    window.location.href = "./teams.html";
+  // Save chosen team locally BEFORE redirecting
+  localStorage.setItem("myTeam", team);
+ 
+  // Mark team as taken in Firebase
+  await fetch(url + "/" + team + ".json", {
+    method: "PUT",
+    body: JSON.stringify(true)
+  });
+ 
+  window.location.href = "./teams.html";
 }
-
-// load team availability from Firebase
+ 
 async function loadTeams() {
-
-    let res = await fetch(url + ".json");
-    let data = await res.json();
-
-    if (!data) return;
-
-    if (data.teamA === true) {
-        document.getElementById("teamA").disabled = true;
-        document.getElementById("teamA").innerText = "Team A (Taken)";
+  let res = await fetch(url + ".json");
+  let data = await res.json();
+  if (!data) return;
+ 
+  ["teamA", "teamB", "teamC"].forEach(team => {
+    if (data[team] === true) {
+      const btn = document.getElementById(team);
+      const label = team.replace("team", "Team ");
+      btn.disabled = true;
+      btn.innerText = label + " (Taken)";
     }
-
-    if (data.teamB === true) {
-        document.getElementById("teamB").disabled = true;
-        document.getElementById("teamB").innerText = "Team B (Taken)";
-    }
-
-    if (data.teamC === true) {
-        document.getElementById("teamC").disabled = true;
-        document.getElementById("teamC").innerText = "Team C (Taken)";
-    }
+  });
 }
-
+ 
+// Poll every 2 seconds so all devices see changes live
 loadTeams();
-
+setInterval(loadTeams, 2000);
 </script>
-
 </body>
 </html>
