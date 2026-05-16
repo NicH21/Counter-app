@@ -12,36 +12,39 @@
  
 <script>
 const url = "https://counterapp-5297b-default-rtdb.firebaseio.com/selectedTeams";
-localStorage.removeItem("myTeam"); 
-async function choose(team) {
-  // Save chosen team locally BEFORE redirecting
-  localStorage.setItem("myTeam", team);
+localStorage.removeItem("myTeam");
  
-  // Mark team as taken in Firebase
+async function choose(team) {
+  localStorage.setItem("myTeam", team);
   await fetch(url + "/" + team + ".json", {
     method: "PUT",
     body: JSON.stringify(true)
   });
- 
   window.location.href = "./teams.html";
 }
  
 async function loadTeams() {
   let res = await fetch(url + ".json");
   let data = await res.json();
-  if (!data) return;
  
+  // Reset all buttons first
+  ["teamA", "teamB", "teamC"].forEach(team => {
+    const btn = document.getElementById(team);
+    btn.disabled = false;
+    btn.innerText = "Team " + team.replace("team", "");
+  });
+ 
+  // Then disable only the taken ones
+  if (!data) return;
   ["teamA", "teamB", "teamC"].forEach(team => {
     if (data[team] === true) {
       const btn = document.getElementById(team);
-      const label = team.replace("team", "Team ");
       btn.disabled = true;
-      btn.innerText = label + " (Taken)";
+      btn.innerText = "Team " + team.replace("team", "") + " (Taken)";
     }
   });
 }
  
-// Poll every 2 seconds so all devices see changes live
 loadTeams();
 setInterval(loadTeams, 2000);
 </script>
