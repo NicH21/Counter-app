@@ -12,7 +12,7 @@
  
 <script>
 const url = "https://counterapp-5297b-default-rtdb.firebaseio.com/selectedTeams";
- 
+localStorage.removeItem("myTeam"); 
 async function choose(team) {
   // Save chosen team locally BEFORE redirecting
   localStorage.setItem("myTeam", team);
