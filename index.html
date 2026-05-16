@@ -22,6 +22,7 @@
 </button>
 
 <script>
+  localStorage.removeItem("myTeam");
 function choose(team) {
     localStorage.setItem("myTeam", team);
    window.location.href = "./teams.html";
