@@ -30,27 +30,25 @@
 <h2 id="teamC">Team C: 0</h2>
 
 <script>
-const url = "https://counterapp-5297b-default-rtdb.firebaseio.com/teams.json";
+const url = "https://counterapp-5297b-default-rtdb.firebaseio.com/teams";
 
-// update team score
 async function update(team) {
-    let res = await fetch(url);
+
+    let res = await fetch(url + ".json");
     let data = await res.json();
 
     if (!data) data = {};
 
-    if (!data[team]) data[team] = 0;
+    let value = data[team] || 0;
+    value++;
 
-    data[team]++;
-
-    await fetch(url, {
+    await fetch(url + "/" + team + ".json", {
         method: "PUT",
-        body: JSON.stringify(data)
+        body: JSON.stringify(value)
     });
 
-    load(); // refresh display instantly
+    load();
 }
-
 // load all values
 async function load() {
     let res = await fetch(url);
