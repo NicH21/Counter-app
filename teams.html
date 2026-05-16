@@ -4,57 +4,40 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Team Page</title>
 </head>
-
 <body style="font-family: Arial; text-align:center; margin-top:50px">
-
 <h1 id="title">Loading...</h1>
-
 <h2 id="score">0</h2>
-
-<button onclick="update()" style="font-size:20px; margin:10px;">
-  +1 Point
-</button>
-
+<button onclick="update()" style="font-size:20px; margin:10px;">+1 Point</button>
+ 
 <script>
-
 const url = "https://counterapp-5297b-default-rtdb.firebaseio.com/teams";
-
 let team = localStorage.getItem("myTeam");
-
+ 
 if (!team) {
-    window.location.href = "index.html";
+  window.location.href = "index.html";
 }
-
+ 
 document.getElementById("title").innerText = "Team: " + team;
-
-// increase score
+ 
 async function update() {
-
-    let res = await fetch(url + "/" + team + ".json");
-    let value = await res.json();
-
-    value = (value || 0) + 1;
-
-    await fetch(url + "/" + team + ".json", {
-        method: "PUT",
-        body: JSON.stringify(value)
-    });
-
-    load();
+  let res = await fetch(url + "/" + team + ".json");
+  let value = await res.json();
+  value = (value || 0) + 1;
+  await fetch(url + "/" + team + ".json", {
+    method: "PUT",
+    body: JSON.stringify(value)
+  });
+  load();
 }
-
-// load score
+ 
 async function load() {
-    let res = await fetch(url + "/" + team + ".json");
-    let value = await res.json();
-
-    document.getElementById("score").innerText = value || 0;
+  let res = await fetch(url + "/" + team + ".json");
+  let value = await res.json();
+  document.getElementById("score").innerText = value || 0;
 }
-
+ 
 setInterval(load, 1000);
 load();
-
 </script>
-
 </body>
 </html>
