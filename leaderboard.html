@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Leaderboard</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0f0f1a;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 30px 20px;
+    }
+
+    h1 {
+      font-size: 2em;
+      margin-bottom: 30px;
+      letter-spacing: 2px;
+      color: #f0c040;
+    }
+
+    /* PODIUM */
+    .podium {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+
+    .place {
+      background: #1e1e2e;
+      border-radius: 12px;
+      padding: 20px 24px;
+      width: 140px;
+      transition: transform 0.3s;
+    }
+
+    .place.first  { border: 2px solid gold;   order: 2; min-height: 180px; }
+    .place.second { border: 2px solid silver; order: 1; min-height: 150px; }
+    .place.third  { border: 2px solid #cd7f32; order: 3; min-height: 130px; }
+
+    .medal { font-size: 2em; }
+    .place-name {
+      font-size: 1.3em;
+      font-weight: bold;
+      margin: 8px 0 4px;
+      transition: color 0.3s, font-size 0.3s;
+    }
+    .place-score {
+      font-size: 1.6em;
+      font-weight: bold;
+      color: #aef;
+    }
+
+    .animate .place-name {
+      color: gold;
+      font-size: 1.7em;
+    }
+
+    /* STATS TABLE */
+    .stats {
+      background: #1e1e2e;
+      border-radius: 12px;
+      padding: 20px;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .stats h2 {
+      margin-bottom: 16px;
+      color: #aaa;
+      font-size: 1em;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #333;
+      font-size: 1.1em;
+    }
+
+    .stat-row:last-child { border-bottom: none; }
+    .stat-label { color: #ccc; }
+    .stat-value { font-weight: bold; color: #f0c040; }
+
+    .live-dot {
+      display: inline-block;
+      width: 10px; height: 10px;
+      background: #4f4;
+      border-radius: 50%;
+      margin-right: 6px;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.2; }
+    }
+  </style>
+</head>
+<body>
+
+<h1>🏆 Leaderboard</h1>
+
+<div class="podium">
+  <div class="place second" id="place2">
+    <div class="medal">🥈</div>
+    <div class="place-name" id="name2">—</div>
+    <div class="place-score" id="score2">0</div>
+  </div>
+  <div class="place first" id="place1">
+    <div class="medal">🥇</div>
+    <div class="place-name" id="name1">—</div>
+    <div class="place-score" id="score1">0</div>
+  </div>
+  <div class="place third" id="place3">
+    <div class="medal">🥉</div>
+    <div class="place-name" id="name3">—</div>
+    <div class="place-score" id="score3">0</div>
+  </div>
+</div>
+
+<div class="stats">
+  <h2><span class="live-dot"></span>Live Scores</h2>
+  <div class="stat-row">
+    <span class="stat-label">Team A</span>
+    <span class="stat-value" id="statA">0</span>
+  </div>
+  <div class="stat-row">
+    <span class="stat-label">Team B</span>
+    <span class="stat-value" id="statB">0</span>
+  </div>
+  <div class="stat-row">
+    <span class="stat-label">Team C</span>
+    <span class="stat-value" id="statC">0</span>
+  </div>
+</div>
+
+<script>
+  const url = "https://counterapp-5297b-default-rtdb.firebaseio.com/teams.json";
+  let prev = { 1: "", 2: "", 3: "" };
+
+  async function load() {
+    try {
+      let res = await fetch(url);
+      let data = await res.json();
+      if (!data) return;
+
+      // Update raw stats
+      document.getElementById("statA").innerText = data.teamA || 0;
+      document.getElementById("statB").innerText = data.teamB || 0;
+      document.getElementById("statC").innerText = data.teamC || 0;
+
+      // Sort teams
+      const sorted = Object.entries(data)
+        .map(([k, v]) => ({ name: k.replace("team", "Team "), score: v }))
+        .sort((a, b) => b.score - a.score);
+
+      // Update podium positions
+      [1, 2, 3].forEach(i => {
+        const entry = sorted[i - 1];
+        if (!entry) return;
+
+        const nameEl = document.getElementById("name" + i);
+        const scoreEl = document.getElementById("score" + i);
+        const placeEl = document.getElementById("place" + i);
+
+        // Animate if position changed
+        if (prev[i] && prev[i] !== entry.name) {
+          placeEl.classList.add("animate");
+          setTimeout(() => placeEl.classList.remove("animate"), 600);
+        }
+
+        nameEl.innerText = entry.name;
+        scoreEl.innerText = entry.score;
+        prev[i] = entry.name;
+      });
+
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  load();
+  setInterval(load, 500);
+</script>
+</body>
+</html>
