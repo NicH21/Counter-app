@@ -3,71 +3,64 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Choose Team</title>
+  <style>
+    .glow-btn {
+        position: relative;
+        font-size: 30px;
+        margin-bottom: 20px;
+        padding: 12px 24px;
+        border-radius: 12px;
+        background: #111;
+        color: white;
+        cursor: pointer;
+        overflow: hidden;
+        border: 2px solid #00aaff;
+        box-shadow: 0 0 10px rgba(0,170,255,0.7);
+        z-index: 1;
+    }
+    .glow-btn::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -120%;
+        width: 60%;
+        height: 100%;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(0, 170, 255, 0.9),
+            transparent
+        );
+        transform: skewX(-25deg);
+        animation: shine 2s linear infinite;
+        z-index: 0;
+    }
+    .glow-btn span {
+        position: relative;
+        z-index: 2;
+    }
+    @keyframes shine {
+        0% { left: -120%; }
+        100% { left: 150%; }
+    }
+  </style>
 </head>
 <body style="font-family: Arial; text-align:center; margin-top:80px">
+
 <h1>Choose Your Team</h1>
 <button id="teamA" onclick="choose('teamA')" style="font-size:20px; margin:10px;">Team A</button>
 <button id="teamB" onclick="choose('teamB')" style="font-size:20px; margin:10px;">Team B</button>
 <button id="teamC" onclick="choose('teamC')" style="font-size:20px; margin:10px;">Team C</button>
-  <button class="glow-btn" onclick="window.location.href='./leaderboard.html'">
+
+<br><br>
+<button class="glow-btn" onclick="window.location.href='./leaderboard.html'">
   <span>📊 View Leaderboard</span>
 </button>
 
-<style>
-.glow-btn {
-    position: relative;
-    font-size: 30px;
-    margin-bottom: 20px;
-    padding: 12px 24px;
-    border-radius: 12px;
-    background: #111;
-    color: white;
-    cursor: pointer;
-    overflow: hidden;
-    border: 2px solid #00aaff;
-    box-shadow: 0 0 10px rgba(0,170,255,0.7);
-    z-index: 1;
-}
-
-/* Moving blue light */
-.glow-btn::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -120%;
-    width: 60%;
-    height: 100%;
-    background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(0, 170, 255, 0.9),
-        transparent
-    );
-    transform: skewX(-25deg);
-    animation: shine 2s linear infinite;
-    z-index: -1;
-}
-
-/* Keep text above glow */
-.glow-btn span {
-    position: relative;
-    z-index: 2;
-}
-
-@keyframes shine {
-    0% {
-        left: -120%;
-    }
-    100% {
-        left: 150%;
-    }
-}
-</style>
- 
 <script>
 const url = "https://counterapp-5297b-default-rtdb.firebaseio.com/selectedTeams";
 localStorage.removeItem("myTeam");
- 
+
 async function choose(team) {
   localStorage.setItem("myTeam", team);
   await fetch(url + "/" + team + ".json", {
@@ -76,18 +69,18 @@ async function choose(team) {
   });
   window.location.href = "./teams.html";
 }
- 
+
 async function loadTeams() {
   let res = await fetch(url + ".json");
   let data = await res.json();
- 
+
   // Reset all buttons first
   ["teamA", "teamB", "teamC"].forEach(team => {
     const btn = document.getElementById(team);
     btn.disabled = false;
     btn.innerText = "Team " + team.replace("team", "");
   });
- 
+
   // Then disable only the taken ones
   if (!data) return;
   ["teamA", "teamB", "teamC"].forEach(team => {
@@ -98,9 +91,10 @@ async function loadTeams() {
     }
   });
 }
- 
+
 loadTeams();
 setInterval(loadTeams, 2000);
 </script>
+
 </body>
 </html>
