@@ -9,9 +9,57 @@
 <button id="teamA" onclick="choose('teamA')" style="font-size:20px; margin:10px;">Team A</button>
 <button id="teamB" onclick="choose('teamB')" style="font-size:20px; margin:10px;">Team B</button>
 <button id="teamC" onclick="choose('teamC')" style="font-size:20px; margin:10px;">Team C</button>
-  <button onclick="window.location.href='./leaderboard.html'" style="font-size:16px; margin-bottom:20px;">
+  <button class="glow-btn" onclick="window.location.href='./leaderboard.html'">
   📊 View Leaderboard
 </button>
+
+<style>
+.glow-btn {
+    position: relative;
+    font-size: 30px;
+    margin-bottom: 20px;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 12px;
+    background: #111;
+    color: white;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+/* Moving blue light */
+.glow-btn::before {
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: -100%;
+    width: 50%;
+    height: 120%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(0, 170, 255, 0.9),
+        transparent
+    );
+    transform: skewX(-25deg);
+    animation: shine 2s linear infinite;
+}
+
+/* Blue border glow */
+.glow-btn {
+    box-shadow: 0 0 10px rgba(0,170,255,0.5);
+    border: 2px solid #00aaff;
+}
+
+@keyframes shine {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 150%;
+    }
+}
+</style>
  
 <script>
 const url = "https://counterapp-5297b-default-rtdb.firebaseio.com/selectedTeams";
