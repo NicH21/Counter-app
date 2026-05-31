@@ -3,39 +3,117 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Team Page</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: linear-gradient(180deg, #020b18 0%, #053a5f 60%, #0a6fa8 100%);
+      min-height: 100vh;
+      color: white;
+      font-family: 'Nunito', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      gap: 20px;
+    }
+    .team-name {
+      font-family: 'Bangers', cursive;
+      font-size: clamp(48px, 12vw, 80px);
+      letter-spacing: 4px;
+      color: #a8e4ff;
+      text-shadow: 0 0 30px rgba(0,229,255,0.5), 0 4px 0 rgba(0,0,0,0.4);
+    }
+    .score {
+      font-family: 'Bangers', cursive;
+      font-size: clamp(80px, 22vw, 140px);
+      letter-spacing: 2px;
+      color: #f0c040;
+      text-shadow: 0 0 40px rgba(240,192,64,0.5), 0 4px 0 rgba(0,0,0,0.4);
+      line-height: 1;
+    }
+    .point-btn {
+      font-family: 'Bangers', cursive;
+      font-size: 32px;
+      letter-spacing: 3px;
+      padding: 18px 60px;
+      border-radius: 16px;
+      border: 2px solid var(--tc, #00e5ff);
+      background: rgba(5,20,40,0.8);
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 0 20px color-mix(in srgb, var(--tc, #00e5ff) 40%, transparent);
+      transition: transform 0.1s, box-shadow 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .point-btn::before {
+      content:"";
+      position:absolute;top:0;left:-120%;width:60%;height:100%;
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent);
+      transform:skewX(-20deg);
+      animation:shine 2s linear infinite;
+    }
+    @keyframes shine{0%{left:-120%}100%{left:160%}}
+    .point-btn:hover { transform: scale(1.05); }
+    .point-btn:active { transform: scale(0.96); }
+    .back-btn {
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 10px 24px;
+      border-radius: 10px;
+      border: 1px solid rgba(0,229,255,0.3);
+      cursor: pointer;
+      background: rgba(5,20,40,0.6);
+      color: #a8e4ff;
+      letter-spacing: 1px;
+      transition: background 0.2s;
+    }
+    .back-btn:hover { background: rgba(0,229,255,0.1); }
+  </style>
 </head>
-<body style="font-family: Arial; text-align:center; margin-top:50px">
-<h1 id="title">Loading...</h1>
-<h2 id="score">0</h2>
-<button onclick="update()" style="font-size:20px; margin:10px;">+1 Point</button>
- 
+<body>
+
+<div class="team-name" id="title">Loading...</div>
+<div class="score" id="score">0</div>
+<button class="point-btn" id="pointBtn" onclick="update()"><span>+1 POINT</span></button>
+<button class="back-btn" onclick="window.location.href='./leaderboard.html'">📊 Leaderboard</button>
+
 <script>
+const COLORS = {
+  team1:'#ff6b6b', team2:'#ffd93d', team3:'#6bcb77', team4:'#4d96ff',
+  team5:'#ff922b', team6:'#cc5de8', team7:'#20c997', team8:'#f06595'
+};
+const EMOJIS = {
+  team1:'🔴', team2:'⚡', team3:'🌿', team4:'💧',
+  team5:'🔥', team6:'💜', team7:'🌊', team8:'🌸'
+};
+
 const url = "https://counterapp-5297b-default-rtdb.firebaseio.com/teams";
 let team = localStorage.getItem("myTeam");
- 
-if (!team) {
-  window.location.href = "index.html";
-}
- 
-document.getElementById("title").innerText = "Team: " + team;
- 
+
+if (!team) { window.location.href = "index.html"; }
+
+const num = team.replace('team','');
+document.getElementById("title").innerText = `${EMOJIS[team] || ''} Team ${num}`;
+document.getElementById("pointBtn").style.setProperty('--tc', COLORS[team] || '#00e5ff');
+
 async function update() {
   let res = await fetch(url + "/" + team + ".json");
   let value = await res.json();
   value = (value || 0) + 1;
-  await fetch(url + "/" + team + ".json", {
-    method: "PUT",
-    body: JSON.stringify(value)
-  });
-  load();
+  await fetch(url + "/" + team + ".json", { method: "PUT", body: JSON.stringify(value) });
+  document.getElementById("score").innerText = value;
 }
- 
+
 async function load() {
   let res = await fetch(url + "/" + team + ".json");
   let value = await res.json();
   document.getElementById("score").innerText = value || 0;
 }
- 
+
 setInterval(load, 1000);
 load();
 </script>
