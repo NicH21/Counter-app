@@ -1,100 +1,569 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Choose Team</title>
+  <title>Choose Your Team</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
   <style>
-    .glow-btn {
-        position: relative;
-        font-size: 30px;
-        margin-bottom: 20px;
-        padding: 12px 24px;
-        border-radius: 12px;
-        background: #111;
-        color: white;
-        cursor: pointer;
-        overflow: hidden;
-        border: 2px solid #00aaff;
-        box-shadow: 0 0 10px rgba(0,170,255,0.7);
-        z-index: 1;
+    :root {
+      --deep: #020b18;
+      --mid: #053a5f;
+      --surface: #0a6fa8;
+      --foam: #a8e4ff;
+      --accent: #00e5ff;
+      --danger: #ff4040;
+      --taken: #334455;
     }
-    .glow-btn::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: -120%;
-        width: 60%;
-        height: 100%;
-        background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(0, 170, 255, 0.9),
-            transparent
-        );
-        transform: skewX(-25deg);
-        animation: shine 2s linear infinite;
-        z-index: 0;
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--deep);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
-    .glow-btn span {
-        position: relative;
-        z-index: 2;
+
+    /* ── OCEAN BACKGROUND ── */
+    .ocean-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      background: linear-gradient(180deg, #020b18 0%, #053a5f 55%, #0a6fa8 100%);
     }
-    @keyframes shine {
-        0% { left: -120%; }
-        100% { left: 150%; }
+
+    /* Bubbles */
+    .bubbles { position: absolute; inset: 0; pointer-events: none; }
+    .bubble {
+      position: absolute;
+      bottom: -60px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, rgba(168,228,255,0.6), rgba(10,111,168,0.1));
+      border: 1px solid rgba(168,228,255,0.3);
+      animation: riseUp linear infinite;
+    }
+
+    @keyframes riseUp {
+      0%   { transform: translateX(0) translateY(0) scale(1); opacity: 0.7; }
+      50%  { transform: translateX(20px) translateY(-50vh) scale(1.05); opacity: 0.5; }
+      100% { transform: translateX(-10px) translateY(-105vh) scale(0.8); opacity: 0; }
+    }
+
+    /* Caustic light rays */
+    .rays { position: absolute; top: 0; left: 0; width: 100%; height: 60%; pointer-events: none; overflow: hidden; }
+    .ray {
+      position: absolute;
+      top: -20%;
+      width: 60px;
+      height: 120%;
+      background: linear-gradient(180deg, rgba(0,229,255,0.07) 0%, transparent 100%);
+      transform-origin: top center;
+      animation: sway ease-in-out infinite;
+      border-radius: 50%;
+    }
+    @keyframes sway {
+      0%,100% { transform: rotate(-8deg) scaleX(1); }
+      50%      { transform: rotate(8deg) scaleX(1.3); }
+    }
+
+    /* Seafloor */
+    .seafloor {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 80px;
+      background: radial-gradient(ellipse at 50% 100%, #0d2236 60%, transparent 100%);
+      z-index: 1;
+    }
+
+    /* ── SURFACE WAVES ── */
+    .waves-wrap {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 90px;
+      z-index: 3;
+      overflow: hidden;
+    }
+    .wave-svg { width: 200%; animation: waveScroll 6s linear infinite; }
+    .wave-svg2 { width: 200%; animation: waveScroll 9s linear infinite reverse; opacity: 0.5; margin-top: -40px; }
+    @keyframes waveScroll {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ── SHARK ── */
+    .shark-wrap {
+      position: fixed;
+      z-index: 4;
+      pointer-events: none;
+      animation: sharkSwim 14s ease-in-out infinite;
+      bottom: 18%;
+    }
+    @keyframes sharkSwim {
+      0%   { left: -200px; transform: scaleX(1) translateY(0px); }
+      10%  { transform: scaleX(1) translateY(-30px); }
+      20%  { transform: scaleX(1) translateY(10px); }
+      45%  { left: 110vw; transform: scaleX(1) translateY(-20px); }
+      46%  { left: 110vw; transform: scaleX(-1) translateY(-20px); }
+      55%  { transform: scaleX(-1) translateY(10px); }
+      70%  { transform: scaleX(-1) translateY(-25px); }
+      90%  { left: -200px; transform: scaleX(-1) translateY(5px); }
+      91%  { left: -200px; transform: scaleX(1) translateY(5px); }
+      100% { left: -200px; transform: scaleX(1) translateY(0px); }
+    }
+
+    .shark-svg { width: 260px; filter: drop-shadow(0 0 14px rgba(168,228,255,0.55)) drop-shadow(0 2px 8px rgba(0,0,0,0.4)); }
+
+    /* fin wiggle */
+    .shark-fin { transform-origin: bottom center; animation: finWiggle 0.6s ease-in-out infinite alternate; }
+    @keyframes finWiggle { 0% { transform: rotate(-4deg); } 100% { transform: rotate(4deg); } }
+    .shark-tail { transform-origin: left center; animation: tailWag 0.5s ease-in-out infinite alternate; }
+    @keyframes tailWag { 0% { transform: rotate(-12deg); } 100% { transform: rotate(12deg); } }
+
+    /* ── CONTENT ── */
+    .content {
+      position: relative;
+      z-index: 5;
+      width: 100%;
+      max-width: 700px;
+      padding: 110px 24px 100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .mako-logo {
+      width: clamp(220px, 55vw, 380px);
+      margin-bottom: 10px;
+      filter: drop-shadow(0 0 20px rgba(0,229,255,0.4)) drop-shadow(0 4px 16px rgba(0,0,0,0.6));
+      animation: logoFloat 4s ease-in-out infinite;
+    }
+    @keyframes logoFloat {
+      0%,100% { transform: translateY(0px); }
+      50%      { transform: translateY(-8px); }
+    }
+    .title {
+      font-family: 'Bangers', cursive;
+      font-size: clamp(52px, 10vw, 88px);
+      letter-spacing: 4px;
+      color: var(--foam);
+      text-shadow:
+        0 0 30px var(--accent),
+        0 4px 0 var(--mid),
+        0 8px 30px rgba(0,0,0,0.6);
+      line-height: 1;
+      margin-bottom: 6px;
+      animation: titlePulse 3s ease-in-out infinite;
+    }
+    @keyframes titlePulse {
+      0%,100% { text-shadow: 0 0 30px var(--accent), 0 4px 0 var(--mid), 0 8px 30px rgba(0,0,0,0.6); }
+      50%      { text-shadow: 0 0 60px var(--accent), 0 0 80px rgba(0,229,255,0.3), 0 4px 0 var(--mid); }
+    }
+    .subtitle {
+      font-size: 16px;
+      color: rgba(168,228,255,0.65);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 44px;
+    }
+
+    /* Grid */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      width: 100%;
+      margin-bottom: 32px;
+    }
+    @media (max-width: 520px) {
+      .team-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .team-btn {
+      position: relative;
+      font-family: 'Bangers', cursive;
+      font-size: 22px;
+      letter-spacing: 2px;
+      padding: 18px 10px;
+      border-radius: 16px;
+      cursor: pointer;
+      border: 2px solid rgba(0,229,255,0.5);
+      background: linear-gradient(145deg, rgba(5,58,95,0.9), rgba(2,11,24,0.95));
+      color: var(--foam);
+      overflow: hidden;
+      transition: transform 0.15s, box-shadow 0.2s, border-color 0.2s;
+      box-shadow: 0 0 12px rgba(0,229,255,0.2), inset 0 1px 0 rgba(168,228,255,0.1);
+    }
+    .team-btn::before {
+      content: "";
+      position: absolute; top: 0; left: -120%; width: 60%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0,229,255,0.5), transparent);
+      transform: skewX(-20deg);
+      animation: shine 2.5s linear infinite;
+    }
+    .team-btn span { position: relative; z-index: 2; }
+    @keyframes shine { 0% { left: -120%; } 100% { left: 160%; } }
+
+    .team-btn:hover:not(:disabled) {
+      transform: translateY(-4px) scale(1.04);
+      border-color: var(--accent);
+      box-shadow: 0 0 28px rgba(0,229,255,0.55), inset 0 1px 0 rgba(168,228,255,0.15);
+    }
+    .team-btn:active:not(:disabled) { transform: scale(0.97); }
+    .team-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      border-color: rgba(51,68,85,0.5);
+      box-shadow: none;
+      animation: none;
+    }
+    .team-btn:disabled::before { display: none; }
+
+    /* colour accents per team */
+    .t1 { --tc: #ff6b6b; } .t2 { --tc: #ffd93d; } .t3 { --tc: #6bcb77; } .t4 { --tc: #4d96ff; }
+    .t5 { --tc: #ff922b; } .t6 { --tc: #cc5de8; } .t7 { --tc: #20c997; } .t8 { --tc: #f06595; }
+    .team-btn.t1, .team-btn.t2, .team-btn.t3, .team-btn.t4,
+    .team-btn.t5, .team-btn.t6, .team-btn.t7, .team-btn.t8 {
+      border-color: var(--tc);
+      box-shadow: 0 0 14px color-mix(in srgb, var(--tc) 40%, transparent), inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+    .team-btn.t1:hover:not(:disabled), .team-btn.t2:hover:not(:disabled),
+    .team-btn.t3:hover:not(:disabled), .team-btn.t4:hover:not(:disabled),
+    .team-btn.t5:hover:not(:disabled), .team-btn.t6:hover:not(:disabled),
+    .team-btn.t7:hover:not(:disabled), .team-btn.t8:hover:not(:disabled) {
+      box-shadow: 0 0 36px color-mix(in srgb, var(--tc) 70%, transparent), inset 0 1px 0 rgba(255,255,255,0.12);
+    }
+    .team-emoji { display: block; font-size: 26px; margin-bottom: 4px; }
+
+    /* Leaderboard button */
+    .lb-btn {
+      position: relative;
+      font-family: 'Bangers', cursive;
+      font-size: 28px;
+      letter-spacing: 3px;
+      padding: 16px 48px;
+      border-radius: 16px;
+      background: #080f1a;
+      color: white;
+      cursor: pointer;
+      overflow: hidden;
+      border: 2px solid #00aaff;
+      box-shadow: 0 0 18px rgba(0,170,255,0.6), 0 0 40px rgba(0,170,255,0.2);
+      transition: transform 0.15s, box-shadow 0.2s;
+      margin-top: 8px;
+    }
+    .lb-btn::before {
+      content: "";
+      position: absolute; top: 0; left: -120%; width: 60%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0,170,255,0.9), transparent);
+      transform: skewX(-25deg);
+      animation: shine 2s linear infinite;
+    }
+    .lb-btn span { position: relative; z-index: 2; }
+    .lb-btn:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 0 32px rgba(0,170,255,0.9), 0 0 60px rgba(0,170,255,0.3); }
+
+    /* ── SPLASH CANVAS ── */
+    #splashCanvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 20;
     }
   </style>
 </head>
-<body style="font-family: Arial; text-align:center; margin-top:80px">
+<body>
 
-<h1>Choose Your Team</h1>
-<button id="teamA" onclick="choose('teamA')" style="font-size:20px; margin:10px;">Team A</button>
-<button id="teamB" onclick="choose('teamB')" style="font-size:20px; margin:10px;">Team B</button>
-<button id="teamC" onclick="choose('teamC')" style="font-size:20px; margin:10px;">Team C</button>
+<!-- Ocean background -->
+<div class="ocean-bg">
+  <div class="rays" id="rays"></div>
+  <div class="bubbles" id="bubbles"></div>
+</div>
+<div class="seafloor"></div>
 
-<br><br>
-<button class="glow-btn" onclick="window.location.href='./leaderboard.html'">
-  <span>📊 View Leaderboard</span>
-</button>
+<!-- Surface waves -->
+<div class="waves-wrap">
+  <svg class="wave-svg" viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0,40 C120,70 240,10 360,40 C480,70 600,10 720,40 C840,70 960,10 1080,40 C1200,70 1320,10 1440,40 L1440,0 L0,0 Z" fill="#020b18"/>
+    <path d="M0,55 C120,80 240,25 360,55 C480,80 600,25 720,55 C840,80 960,25 1080,55 C1200,80 1320,25 1440,55 L1440,0 L0,0 Z" fill="rgba(2,11,24,0.6)"/>
+  </svg>
+  <svg class="wave-svg2" viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0,40 C180,15 300,65 480,40 C660,15 780,65 960,40 C1140,15 1260,65 1440,40 L1440,0 L0,0 Z" fill="rgba(5,58,95,0.4)"/>
+  </svg>
+</div>
+
+<!-- Shark -->
+<div class="shark-wrap">
+  <!-- Mako-style shark matching the logo silhouette -->
+  <svg class="shark-svg" viewBox="0 0 260 130" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="sharkGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#d0eaf5"/>
+        <stop offset="55%" stop-color="#a8cfe0"/>
+        <stop offset="100%" stop-color="#7ab0c8"/>
+      </linearGradient>
+      <linearGradient id="bellyGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#eef8ff"/>
+        <stop offset="100%" stop-color="#c8e8f5"/>
+      </linearGradient>
+      <filter id="sharkGlow">
+        <feGaussianBlur stdDeviation="3" result="blur"/>
+        <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+      </filter>
+    </defs>
+
+    <!-- TAIL (left side, forked like the logo) -->
+    <g class="shark-tail">
+      <!-- Upper tail lobe -->
+      <path d="M48,62 L8,30 L30,62 Z" fill="url(#sharkGrad)"/>
+      <!-- Lower tail lobe -->
+      <path d="M48,68 L12,98 L35,68 Z" fill="url(#sharkGrad)"/>
+      <!-- Tail join -->
+      <ellipse cx="42" cy="65" rx="10" ry="8" fill="url(#sharkGrad)"/>
+    </g>
+
+    <!-- MAIN BODY -->
+    <path d="M45,55 C60,42 90,38 130,40 C165,42 200,48 225,58 C242,64 250,70 248,76
+             C240,88 200,90 160,88 C120,86 80,84 55,78 C40,74 35,68 45,55 Z"
+          fill="url(#sharkGrad)"/>
+
+    <!-- BELLY (lighter underside) -->
+    <path d="M60,72 C85,78 130,82 175,80 C200,79 225,76 238,72
+             C230,84 195,88 155,88 C110,88 72,84 55,78 Z"
+          fill="url(#bellyGrad)" opacity="0.85"/>
+
+    <!-- DORSAL FIN (tall, swept-back like Mako logo) -->
+    <g class="shark-fin">
+      <path d="M138,40 C145,18 162,6 170,10 C165,20 158,32 155,40 Z"
+            fill="url(#sharkGrad)"/>
+    </g>
+
+    <!-- PECTORAL FIN (lower, swept back) -->
+    <path d="M170,78 C188,90 210,100 205,96 C195,94 178,86 168,82 Z"
+          fill="url(#sharkGrad)" opacity="0.9"/>
+
+    <!-- SMALL SECOND DORSAL FIN -->
+    <path d="M95,40 C100,30 108,26 112,28 C108,34 102,38 98,40 Z"
+          fill="url(#sharkGrad)" opacity="0.8"/>
+
+    <!-- ANAL FIN (small, bottom rear) -->
+    <path d="M90,86 C94,96 100,100 98,98 C93,94 88,90 86,86 Z"
+          fill="url(#sharkGrad)" opacity="0.75"/>
+
+    <!-- HEAD / SNOUT (pointed, aggressive Mako shape) -->
+    <path d="M220,48 C235,52 252,60 255,68 C252,76 235,80 220,82
+             C230,74 235,68 235,65 C235,62 230,56 220,48 Z"
+          fill="url(#sharkGrad)"/>
+    <!-- Snout tip -->
+    <path d="M248,62 C254,64 258,66 257,68 C256,70 252,72 248,72
+             C252,70 254,68 254,66 Z"
+          fill="#ddeef8"/>
+
+    <!-- EYE -->
+    <circle cx="232" cy="60" r="5.5" fill="#0a1a2e"/>
+    <circle cx="233.5" cy="58.5" r="1.8" fill="rgba(255,255,255,0.7)"/>
+
+    <!-- MOUTH (slightly open, fierce) -->
+    <path d="M244,68 Q250,74 255,70" stroke="#0a1a2e" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    <!-- Teeth -->
+    <polygon points="245,69 247,75 249,69" fill="white"/>
+    <polygon points="249,69 251,75 253,70" fill="white"/>
+
+    <!-- GILL SLITS (3 lines like the logo) -->
+    <path d="M213,52 Q211,65 213,78" stroke="#7ab0c8" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    <path d="M205,50 Q203,65 205,80" stroke="#7ab0c8" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    <path d="M197,49 Q195,65 197,81" stroke="#7ab0c8" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+
+    <!-- LATERAL LINE -->
+    <path d="M55,63 Q130,60 210,62" stroke="rgba(255,255,255,0.3)" stroke-width="1" fill="none" stroke-dasharray="4,6"/>
+  </svg>
+</div>
+
+<!-- Splash canvas -->
+<canvas id="splashCanvas"></canvas>
+
+<!-- Main content -->
+<div class="content">
+  <img src="./mako_logo.png" alt="Mako Aquatics" class="mako-logo"/>
+  <h1 class="title">TEAM BATTLE</h1>
+  <p class="subtitle">Choose your squad — dive in!</p>
+
+  <div class="team-grid" id="teamGrid">
+    <button id="team1" class="team-btn t1" onclick="choose('team1')">
+      <span><span class="team-emoji">🔴</span>Team 1</span>
+    </button>
+    <button id="team2" class="team-btn t2" onclick="choose('team2')">
+      <span><span class="team-emoji">⚡</span>Team 2</span>
+    </button>
+    <button id="team3" class="team-btn t3" onclick="choose('team3')">
+      <span><span class="team-emoji">🌿</span>Team 3</span>
+    </button>
+    <button id="team4" class="team-btn t4" onclick="choose('team4')">
+      <span><span class="team-emoji">💧</span>Team 4</span>
+    </button>
+    <button id="team5" class="team-btn t5" onclick="choose('team5')">
+      <span><span class="team-emoji">🔥</span>Team 5</span>
+    </button>
+    <button id="team6" class="team-btn t6" onclick="choose('team6')">
+      <span><span class="team-emoji">💜</span>Team 6</span>
+    </button>
+    <button id="team7" class="team-btn t7" onclick="choose('team7')">
+      <span><span class="team-emoji">🌊</span>Team 7</span>
+    </button>
+    <button id="team8" class="team-btn t8" onclick="choose('team8')">
+      <span><span class="team-emoji">🌸</span>Team 8</span>
+    </button>
+  </div>
+
+  <button class="lb-btn" onclick="window.location.href='./leaderboard.html'">
+    <span>📊 LEADERBOARD</span>
+  </button>
+</div>
 
 <script>
+/* ── BUBBLES ── */
+const bubblesEl = document.getElementById('bubbles');
+for (let i = 0; i < 28; i++) {
+  const b = document.createElement('div');
+  b.className = 'bubble';
+  const size = 6 + Math.random() * 22;
+  b.style.cssText = `
+    width:${size}px; height:${size}px;
+    left:${Math.random()*100}%;
+    animation-duration:${8+Math.random()*12}s;
+    animation-delay:-${Math.random()*14}s;
+  `;
+  bubblesEl.appendChild(b);
+}
+
+/* ── LIGHT RAYS ── */
+const raysEl = document.getElementById('rays');
+for (let i = 0; i < 7; i++) {
+  const r = document.createElement('div');
+  r.className = 'ray';
+  r.style.cssText = `
+    left:${5 + i*14}%;
+    animation-duration:${4+Math.random()*4}s;
+    animation-delay:-${Math.random()*4}s;
+    opacity:${0.4+Math.random()*0.5};
+  `;
+  raysEl.appendChild(r);
+}
+
+/* ── SPLASH ── */
+const canvas = document.getElementById('splashCanvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+function spawnSplash(x, y, color) {
+  const count = 55;
+  for (let i = 0; i < count; i++) {
+    const angle = (Math.PI * 2 / count) * i + (Math.random() - 0.5) * 0.5;
+    const speed = 3 + Math.random() * 9;
+    particles.push({
+      x, y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - Math.random() * 6,
+      radius: 3 + Math.random() * 5,
+      alpha: 1,
+      color: color || '#a8e4ff',
+      gravity: 0.3
+    });
+  }
+  // extra foam drops
+  for (let i = 0; i < 18; i++) {
+    particles.push({
+      x: x + (Math.random()-0.5)*60,
+      y: y + (Math.random()-0.5)*30,
+      vx: (Math.random()-0.5)*5,
+      vy: -Math.random()*7,
+      radius: 2 + Math.random()*4,
+      alpha: 0.85,
+      color: '#ffffff',
+      gravity: 0.25
+    });
+  }
+}
+
+function animateSplash() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles = particles.filter(p => p.alpha > 0.02);
+  for (const p of particles) {
+    ctx.save();
+    ctx.globalAlpha = p.alpha;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.radius, 0, Math.PI*2);
+    ctx.fillStyle = p.color;
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = p.color;
+    ctx.fill();
+    ctx.restore();
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += p.gravity;
+    p.vx *= 0.97;
+    p.alpha -= 0.022;
+    p.radius *= 0.98;
+  }
+  requestAnimationFrame(animateSplash);
+}
+animateSplash();
+
+/* ── TEAM COLORS for splash ── */
+const teamColors = {
+  team1:'#ff6b6b', team2:'#ffd93d', team3:'#6bcb77', team4:'#4d96ff',
+  team5:'#ff922b', team6:'#cc5de8', team7:'#20c997', team8:'#f06595'
+};
+
+/* ── FIREBASE ── */
 const url = "https://counterapp-5297b-default-rtdb.firebaseio.com/selectedTeams";
+const teams = ['team1','team2','team3','team4','team5','team6','team7','team8'];
 localStorage.removeItem("myTeam");
 
 async function choose(team) {
+  const btn = document.getElementById(team);
+  if (btn.disabled) return;
+  const rect = btn.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  spawnSplash(cx, cy, teamColors[team]);
   localStorage.setItem("myTeam", team);
   await fetch(url + "/" + team + ".json", {
     method: "PUT",
     body: JSON.stringify(true)
   });
-  window.location.href = "./teams.html";
+  setTimeout(() => { window.location.href = "./teams.html"; }, 600);
 }
 
 async function loadTeams() {
-  let res = await fetch(url + ".json");
-  let data = await res.json();
-
-  // Reset all buttons first
-  ["teamA", "teamB", "teamC"].forEach(team => {
-    const btn = document.getElementById(team);
-    btn.disabled = false;
-    btn.innerText = "Team " + team.replace("team", "");
-  });
-
-  // Then disable only the taken ones
-  if (!data) return;
-  ["teamA", "teamB", "teamC"].forEach(team => {
-    if (data[team] === true) {
+  try {
+    const res = await fetch(url + ".json");
+    const data = await res.json();
+    teams.forEach(team => {
       const btn = document.getElementById(team);
-      btn.disabled = true;
-      btn.innerText = "Team " + team.replace("team", "") + " (Taken)";
-    }
-  });
+      const num = team.replace('team','');
+      if (data && data[team] === true) {
+        btn.disabled = true;
+        btn.querySelector('span').innerHTML = `<span class="team-emoji">🚫</span>Team ${num} <br><small style="font-size:13px;opacity:0.7">Taken</small>`;
+      } else {
+        btn.disabled = false;
+      }
+    });
+  } catch(e) {}
 }
 
 loadTeams();
 setInterval(loadTeams, 2000);
 </script>
-
 </body>
 </html>
