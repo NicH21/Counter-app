@@ -136,7 +136,40 @@
       align-items: center;
     }
 
-   
+    .mako-logo {
+      width: clamp(220px, 55vw, 380px);
+      margin-bottom: 10px;
+      filter: drop-shadow(0 0 20px rgba(0,229,255,0.4)) drop-shadow(0 4px 16px rgba(0,0,0,0.6));
+      animation: logoFloat 4s ease-in-out infinite;
+    }
+    @keyframes logoFloat {
+      0%,100% { transform: translateY(0px); }
+      50%      { transform: translateY(-8px); }
+    }
+    .title {
+      font-family: 'Bangers', cursive;
+      font-size: clamp(52px, 10vw, 88px);
+      letter-spacing: 4px;
+      color: var(--foam);
+      text-shadow:
+        0 0 30px var(--accent),
+        0 4px 0 var(--mid),
+        0 8px 30px rgba(0,0,0,0.6);
+      line-height: 1;
+      margin-bottom: 6px;
+      animation: titlePulse 3s ease-in-out infinite;
+    }
+    @keyframes titlePulse {
+      0%,100% { text-shadow: 0 0 30px var(--accent), 0 4px 0 var(--mid), 0 8px 30px rgba(0,0,0,0.6); }
+      50%      { text-shadow: 0 0 60px var(--accent), 0 0 80px rgba(0,229,255,0.3), 0 4px 0 var(--mid); }
+    }
+    .subtitle {
+      font-size: 16px;
+      color: rgba(168,228,255,0.65);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 44px;
+    }
 
     /* Grid */
     .team-grid {
@@ -354,8 +387,7 @@
 
 <!-- Main content -->
 <div class="content">
-  <img src="./mako_logo.png" alt="Mako Aquatics" class="mako-logo"/>
-  <h1 class="title">TEAM BATTLE</h1>
+  <h1 class="title">🌊 TEAM BATTLE</h1>
   <p class="subtitle">Choose your squad — dive in!</p>
 
   <div class="team-grid" id="teamGrid">
