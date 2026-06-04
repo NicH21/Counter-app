@@ -239,6 +239,16 @@
     }
     .team-emoji { display: block; font-size: 26px; margin-bottom: 4px; }
 
+    /* ── BOTTOM BUTTON ROW ── */
+    .bottom-btns {
+      display: flex;
+      gap: 14px;
+      margin-top: 8px;
+      width: 100%;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
     /* Leaderboard button */
     .lb-btn {
       position: relative;
@@ -254,7 +264,8 @@
       border: 2px solid #00aaff;
       box-shadow: 0 0 18px rgba(0,170,255,0.6), 0 0 40px rgba(0,170,255,0.2);
       transition: transform 0.15s, box-shadow 0.2s;
-      margin-top: 8px;
+      flex: 1;
+      min-width: 200px;
     }
     .lb-btn::before {
       content: "";
@@ -265,6 +276,131 @@
     }
     .lb-btn span { position: relative; z-index: 2; }
     .lb-btn:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 0 32px rgba(0,170,255,0.9), 0 0 60px rgba(0,170,255,0.3); }
+
+    /* Admin button */
+    .admin-btn {
+      position: relative;
+      font-family: 'Bangers', cursive;
+      font-size: 28px;
+      letter-spacing: 3px;
+      padding: 16px 48px;
+      border-radius: 16px;
+      background: #080f1a;
+      color: white;
+      cursor: pointer;
+      overflow: hidden;
+      border: 2px solid #ff4040;
+      box-shadow: 0 0 18px rgba(255,64,64,0.5), 0 0 40px rgba(255,64,64,0.15);
+      transition: transform 0.15s, box-shadow 0.2s;
+      flex: 1;
+      min-width: 200px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .admin-btn::before {
+      content: "";
+      position: absolute; top: 0; left: -120%; width: 60%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,64,64,0.7), transparent);
+      transform: skewX(-25deg);
+      animation: shine 2.8s linear infinite;
+    }
+    .admin-btn span { position: relative; z-index: 2; }
+    .admin-btn:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 0 32px rgba(255,64,64,0.8), 0 0 60px rgba(255,64,64,0.3); }
+
+    /* ── ADMIN PIN MODAL ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(2,11,24,0.85);
+      backdrop-filter: blur(6px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: linear-gradient(145deg, rgba(5,20,40,0.98), rgba(2,11,24,0.98));
+      border: 2px solid rgba(255,64,64,0.4);
+      border-radius: 20px;
+      padding: 36px 32px 28px;
+      width: 90%;
+      max-width: 340px;
+      text-align: center;
+      box-shadow: 0 0 40px rgba(255,64,64,0.25), 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .modal h2 {
+      font-family: 'Bangers', cursive;
+      font-size: 36px;
+      letter-spacing: 3px;
+      color: #ff4040;
+      text-shadow: 0 0 20px rgba(255,64,64,0.4);
+      margin-bottom: 6px;
+    }
+    .modal p {
+      font-size: 13px;
+      color: rgba(168,228,255,0.5);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+    .pin-dots {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .pin-dot {
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,64,64,0.5);
+      background: transparent;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .pin-dot.filled { background: #ff4040; border-color: #ff4040; box-shadow: 0 0 8px rgba(255,64,64,0.6); }
+    .pin-pad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .pin-key {
+      font-family: 'Bangers', cursive;
+      font-size: 26px;
+      padding: 14px 0;
+      border-radius: 12px;
+      border: 1.5px solid rgba(0,229,255,0.2);
+      background: rgba(5,30,55,0.8);
+      color: var(--foam);
+      cursor: pointer;
+      transition: transform 0.1s, background 0.15s, border-color 0.15s, box-shadow 0.15s;
+    }
+    .pin-key:hover { background: rgba(0,229,255,0.12); border-color: rgba(0,229,255,0.5); box-shadow: 0 0 12px rgba(0,229,255,0.3); }
+    .pin-key:active { transform: scale(0.93); }
+    .pin-key.del { border-color: rgba(255,107,107,0.3); color: #ff6b6b; font-size: 20px; }
+    .pin-key.del:hover { background: rgba(255,64,64,0.12); border-color: rgba(255,64,64,0.5); }
+    .pin-error {
+      font-size: 13px;
+      color: #ff6b6b;
+      letter-spacing: 1px;
+      height: 18px;
+      margin-bottom: 8px;
+    }
+    .modal-cancel {
+      font-family: 'Nunito', sans-serif;
+      font-size: 13px; font-weight: 700;
+      padding: 9px 24px;
+      border-radius: 9px;
+      border: 1px solid rgba(168,228,255,0.2);
+      background: transparent;
+      color: rgba(168,228,255,0.5);
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: background 0.2s, color 0.2s;
+    }
+    .modal-cancel:hover { background: rgba(168,228,255,0.08); color: #a8e4ff; }
 
     /* ── SPLASH CANVAS ── */
     #splashCanvas {
@@ -297,7 +433,6 @@
 
 <!-- Shark -->
 <div class="shark-wrap">
-  <!-- Mako-style shark matching the logo silhouette -->
   <svg class="shark-svg" viewBox="0 0 260 130" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <linearGradient id="sharkGrad" x1="0" y1="0" x2="0" y2="1">
@@ -314,76 +449,64 @@
         <feComposite in="SourceGraphic" in2="blur" operator="over"/>
       </filter>
     </defs>
-
-    <!-- TAIL (left side, forked like the logo) -->
     <g class="shark-tail">
-      <!-- Upper tail lobe -->
       <path d="M48,62 L8,30 L30,62 Z" fill="url(#sharkGrad)"/>
-      <!-- Lower tail lobe -->
       <path d="M48,68 L12,98 L35,68 Z" fill="url(#sharkGrad)"/>
-      <!-- Tail join -->
       <ellipse cx="42" cy="65" rx="10" ry="8" fill="url(#sharkGrad)"/>
     </g>
-
-    <!-- MAIN BODY -->
-    <path d="M45,55 C60,42 90,38 130,40 C165,42 200,48 225,58 C242,64 250,70 248,76
-             C240,88 200,90 160,88 C120,86 80,84 55,78 C40,74 35,68 45,55 Z"
-          fill="url(#sharkGrad)"/>
-
-    <!-- BELLY (lighter underside) -->
-    <path d="M60,72 C85,78 130,82 175,80 C200,79 225,76 238,72
-             C230,84 195,88 155,88 C110,88 72,84 55,78 Z"
-          fill="url(#bellyGrad)" opacity="0.85"/>
-
-    <!-- DORSAL FIN (tall, swept-back like Mako logo) -->
+    <path d="M45,55 C60,42 90,38 130,40 C165,42 200,48 225,58 C242,64 250,70 248,76 C240,88 200,90 160,88 C120,86 80,84 55,78 C40,74 35,68 45,55 Z" fill="url(#sharkGrad)"/>
+    <path d="M60,72 C85,78 130,82 175,80 C200,79 225,76 238,72 C230,84 195,88 155,88 C110,88 72,84 55,78 Z" fill="url(#bellyGrad)" opacity="0.85"/>
     <g class="shark-fin">
-      <path d="M138,40 C145,18 162,6 170,10 C165,20 158,32 155,40 Z"
-            fill="url(#sharkGrad)"/>
+      <path d="M138,40 C145,18 162,6 170,10 C165,20 158,32 155,40 Z" fill="url(#sharkGrad)"/>
     </g>
-
-    <!-- PECTORAL FIN (lower, swept back) -->
-    <path d="M170,78 C188,90 210,100 205,96 C195,94 178,86 168,82 Z"
-          fill="url(#sharkGrad)" opacity="0.9"/>
-
-    <!-- SMALL SECOND DORSAL FIN -->
-    <path d="M95,40 C100,30 108,26 112,28 C108,34 102,38 98,40 Z"
-          fill="url(#sharkGrad)" opacity="0.8"/>
-
-    <!-- ANAL FIN (small, bottom rear) -->
-    <path d="M90,86 C94,96 100,100 98,98 C93,94 88,90 86,86 Z"
-          fill="url(#sharkGrad)" opacity="0.75"/>
-
-    <!-- HEAD / SNOUT (pointed, aggressive Mako shape) -->
-    <path d="M220,48 C235,52 252,60 255,68 C252,76 235,80 220,82
-             C230,74 235,68 235,65 C235,62 230,56 220,48 Z"
-          fill="url(#sharkGrad)"/>
-    <!-- Snout tip -->
-    <path d="M248,62 C254,64 258,66 257,68 C256,70 252,72 248,72
-             C252,70 254,68 254,66 Z"
-          fill="#ddeef8"/>
-
-    <!-- EYE -->
+    <path d="M170,78 C188,90 210,100 205,96 C195,94 178,86 168,82 Z" fill="url(#sharkGrad)" opacity="0.9"/>
+    <path d="M95,40 C100,30 108,26 112,28 C108,34 102,38 98,40 Z" fill="url(#sharkGrad)" opacity="0.8"/>
+    <path d="M90,86 C94,96 100,100 98,98 C93,94 88,90 86,86 Z" fill="url(#sharkGrad)" opacity="0.75"/>
+    <path d="M220,48 C235,52 252,60 255,68 C252,76 235,80 220,82 C230,74 235,68 235,65 C235,62 230,56 220,48 Z" fill="url(#sharkGrad)"/>
+    <path d="M248,62 C254,64 258,66 257,68 C256,70 252,72 248,72 C252,70 254,68 254,66 Z" fill="#ddeef8"/>
     <circle cx="232" cy="60" r="5.5" fill="#0a1a2e"/>
     <circle cx="233.5" cy="58.5" r="1.8" fill="rgba(255,255,255,0.7)"/>
-
-    <!-- MOUTH (slightly open, fierce) -->
     <path d="M244,68 Q250,74 255,70" stroke="#0a1a2e" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-    <!-- Teeth -->
     <polygon points="245,69 247,75 249,69" fill="white"/>
     <polygon points="249,69 251,75 253,70" fill="white"/>
-
-    <!-- GILL SLITS (3 lines like the logo) -->
     <path d="M213,52 Q211,65 213,78" stroke="#7ab0c8" stroke-width="1.8" fill="none" stroke-linecap="round"/>
     <path d="M205,50 Q203,65 205,80" stroke="#7ab0c8" stroke-width="1.8" fill="none" stroke-linecap="round"/>
     <path d="M197,49 Q195,65 197,81" stroke="#7ab0c8" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-
-    <!-- LATERAL LINE -->
     <path d="M55,63 Q130,60 210,62" stroke="rgba(255,255,255,0.3)" stroke-width="1" fill="none" stroke-dasharray="4,6"/>
   </svg>
 </div>
 
 <!-- Splash canvas -->
 <canvas id="splashCanvas"></canvas>
+
+<!-- ── ADMIN PIN MODAL ── -->
+<div class="modal-overlay" id="adminModal">
+  <div class="modal">
+    <h2>⚙️ ADMIN</h2>
+    <p>Enter PIN to continue</p>
+    <div class="pin-dots" id="pinDots">
+      <div class="pin-dot" id="dot0"></div>
+      <div class="pin-dot" id="dot1"></div>
+      <div class="pin-dot" id="dot2"></div>
+      <div class="pin-dot" id="dot3"></div>
+    </div>
+    <div class="pin-pad">
+      <button class="pin-key" onclick="pinKey('1')">1</button>
+      <button class="pin-key" onclick="pinKey('2')">2</button>
+      <button class="pin-key" onclick="pinKey('3')">3</button>
+      <button class="pin-key" onclick="pinKey('4')">4</button>
+      <button class="pin-key" onclick="pinKey('5')">5</button>
+      <button class="pin-key" onclick="pinKey('6')">6</button>
+      <button class="pin-key" onclick="pinKey('7')">7</button>
+      <button class="pin-key" onclick="pinKey('8')">8</button>
+      <button class="pin-key" onclick="pinKey('9')">9</button>
+      <button class="pin-key" onclick="pinKey('0')" style="grid-column:2">0</button>
+      <button class="pin-key del" onclick="pinDel()">⌫</button>
+    </div>
+    <div class="pin-error" id="pinError"></div>
+    <button class="modal-cancel" onclick="closeAdminModal()">Cancel</button>
+  </div>
+</div>
 
 <!-- Main content -->
 <div class="content">
@@ -417,9 +540,14 @@
     </button>
   </div>
 
-  <button class="lb-btn" onclick="window.location.href='./leaderboard.html'">
-    <span>📊 LEADERBOARD</span>
-  </button>
+  <div class="bottom-btns">
+    <button class="lb-btn" onclick="window.location.href='./leaderboard.html'">
+      <span>📊 LEADERBOARD</span>
+    </button>
+    <button class="admin-btn" onclick="openAdminModal()">
+      <span>⚙️ ADMIN</span>
+    </button>
+  </div>
 </div>
 
 <script>
@@ -429,12 +557,7 @@ for (let i = 0; i < 28; i++) {
   const b = document.createElement('div');
   b.className = 'bubble';
   const size = 6 + Math.random() * 22;
-  b.style.cssText = `
-    width:${size}px; height:${size}px;
-    left:${Math.random()*100}%;
-    animation-duration:${8+Math.random()*12}s;
-    animation-delay:-${Math.random()*14}s;
-  `;
+  b.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;animation-duration:${8+Math.random()*12}s;animation-delay:-${Math.random()*14}s;`;
   bubblesEl.appendChild(b);
 }
 
@@ -443,12 +566,7 @@ const raysEl = document.getElementById('rays');
 for (let i = 0; i < 7; i++) {
   const r = document.createElement('div');
   r.className = 'ray';
-  r.style.cssText = `
-    left:${5 + i*14}%;
-    animation-duration:${4+Math.random()*4}s;
-    animation-delay:-${Math.random()*4}s;
-    opacity:${0.4+Math.random()*0.5};
-  `;
+  r.style.cssText = `left:${5+i*14}%;animation-duration:${4+Math.random()*4}s;animation-delay:-${Math.random()*4}s;opacity:${0.4+Math.random()*0.5};`;
   raysEl.appendChild(r);
 }
 
@@ -457,10 +575,7 @@ const canvas = document.getElementById('splashCanvas');
 const ctx = canvas.getContext('2d');
 let particles = [];
 
-function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
+function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
 
@@ -469,28 +584,10 @@ function spawnSplash(x, y, color) {
   for (let i = 0; i < count; i++) {
     const angle = (Math.PI * 2 / count) * i + (Math.random() - 0.5) * 0.5;
     const speed = 3 + Math.random() * 9;
-    particles.push({
-      x, y,
-      vx: Math.cos(angle) * speed,
-      vy: Math.sin(angle) * speed - Math.random() * 6,
-      radius: 3 + Math.random() * 5,
-      alpha: 1,
-      color: color || '#a8e4ff',
-      gravity: 0.3
-    });
+    particles.push({ x, y, vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed - Math.random()*6, radius: 3+Math.random()*5, alpha: 1, color: color||'#a8e4ff', gravity: 0.3 });
   }
-  // extra foam drops
   for (let i = 0; i < 18; i++) {
-    particles.push({
-      x: x + (Math.random()-0.5)*60,
-      y: y + (Math.random()-0.5)*30,
-      vx: (Math.random()-0.5)*5,
-      vy: -Math.random()*7,
-      radius: 2 + Math.random()*4,
-      alpha: 0.85,
-      color: '#ffffff',
-      gravity: 0.25
-    });
+    particles.push({ x: x+(Math.random()-0.5)*60, y: y+(Math.random()-0.5)*30, vx: (Math.random()-0.5)*5, vy: -Math.random()*7, radius: 2+Math.random()*4, alpha: 0.85, color: '#ffffff', gravity: 0.25 });
   }
 }
 
@@ -498,31 +595,16 @@ function animateSplash() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   particles = particles.filter(p => p.alpha > 0.02);
   for (const p of particles) {
-    ctx.save();
-    ctx.globalAlpha = p.alpha;
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, p.radius, 0, Math.PI*2);
-    ctx.fillStyle = p.color;
-    ctx.shadowBlur = 10;
-    ctx.shadowColor = p.color;
-    ctx.fill();
-    ctx.restore();
-    p.x += p.vx;
-    p.y += p.vy;
-    p.vy += p.gravity;
-    p.vx *= 0.97;
-    p.alpha -= 0.022;
-    p.radius *= 0.98;
+    ctx.save(); ctx.globalAlpha = p.alpha; ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI*2);
+    ctx.fillStyle = p.color; ctx.shadowBlur = 10; ctx.shadowColor = p.color; ctx.fill(); ctx.restore();
+    p.x += p.vx; p.y += p.vy; p.vy += p.gravity; p.vx *= 0.97; p.alpha -= 0.022; p.radius *= 0.98;
   }
   requestAnimationFrame(animateSplash);
 }
 animateSplash();
 
-/* ── TEAM COLORS for splash ── */
-const teamColors = {
-  team1:'#ff6b6b', team2:'#ffd93d', team3:'#6bcb77', team4:'#4d96ff',
-  team5:'#ff922b', team6:'#cc5de8', team7:'#20c997', team8:'#f06595'
-};
+/* ── TEAM COLORS ── */
+const teamColors = { team1:'#ff6b6b', team2:'#ffd93d', team3:'#6bcb77', team4:'#4d96ff', team5:'#ff922b', team6:'#cc5de8', team7:'#20c997', team8:'#f06595' };
 
 /* ── FIREBASE ── */
 const url = "https://counterapp-5297b-default-rtdb.firebaseio.com/selectedTeams";
@@ -533,14 +615,9 @@ async function choose(team) {
   const btn = document.getElementById(team);
   if (btn.disabled) return;
   const rect = btn.getBoundingClientRect();
-  const cx = rect.left + rect.width / 2;
-  const cy = rect.top + rect.height / 2;
-  spawnSplash(cx, cy, teamColors[team]);
+  spawnSplash(rect.left + rect.width/2, rect.top + rect.height/2, teamColors[team]);
   localStorage.setItem("myTeam", team);
-  await fetch(url + "/" + team + ".json", {
-    method: "PUT",
-    body: JSON.stringify(true)
-  });
+  await fetch(url + "/" + team + ".json", { method: "PUT", body: JSON.stringify(true) });
   setTimeout(() => { window.location.href = "./teams.html"; }, 600);
 }
 
@@ -563,6 +640,60 @@ async function loadTeams() {
 
 loadTeams();
 setInterval(loadTeams, 2000);
+
+/* ── ADMIN PIN ── */
+const ADMIN_PIN = '1234'; // ← change this to your PIN
+let pinEntry = '';
+
+function openAdminModal() {
+  pinEntry = '';
+  updatePinUI();
+  document.getElementById('pinError').textContent = '';
+  document.getElementById('adminModal').classList.add('open');
+}
+
+function closeAdminModal() {
+  document.getElementById('adminModal').classList.remove('open');
+  pinEntry = '';
+  updatePinUI();
+}
+
+function updatePinUI() {
+  for (let i = 0; i < 4; i++) {
+    document.getElementById('dot' + i).classList.toggle('filled', i < pinEntry.length);
+  }
+}
+
+function pinKey(digit) {
+  if (pinEntry.length >= 4) return;
+  pinEntry += digit;
+  updatePinUI();
+  if (pinEntry.length === 4) {
+    setTimeout(checkPin, 120);
+  }
+}
+
+function pinDel() {
+  pinEntry = pinEntry.slice(0, -1);
+  updatePinUI();
+  document.getElementById('pinError').textContent = '';
+}
+
+function checkPin() {
+  if (pinEntry === ADMIN_PIN) {
+    closeAdminModal();
+    window.location.href = './admin.html';
+  } else {
+    document.getElementById('pinError').textContent = 'Incorrect PIN — try again';
+    pinEntry = '';
+    updatePinUI();
+  }
+}
+
+// Close modal on overlay click
+document.getElementById('adminModal').addEventListener('click', function(e) {
+  if (e.target === this) closeAdminModal();
+});
 </script>
 </body>
 </html>
