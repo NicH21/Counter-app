@@ -6,257 +6,109 @@
   <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Nunito', sans-serif;
-      background: linear-gradient(180deg, #020b18 0%, #053a5f 60%, #0a6fa8 100%);
-      min-height: 100vh;
-      color: white;
-      padding: 36px 16px 80px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .bubble {
-      position: fixed; bottom: -60px; border-radius: 50%;
-      background: radial-gradient(circle at 35% 35%, rgba(168,228,255,0.5), rgba(10,111,168,0.1));
-      border: 1px solid rgba(168,228,255,0.25);
-      animation: riseUp linear infinite; pointer-events: none; z-index: 0;
-    }
+    body { font-family: 'Nunito', sans-serif; background: linear-gradient(180deg, #020b18 0%, #053a5f 60%, #0a6fa8 100%); min-height: 100vh; color: white; padding: 36px 16px 80px; display: flex; flex-direction: column; align-items: center; }
+    .bubble { position: fixed; bottom: -60px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, rgba(168,228,255,0.5), rgba(10,111,168,0.1)); border: 1px solid rgba(168,228,255,0.25); animation: riseUp linear infinite; pointer-events: none; z-index: 0; }
     @keyframes riseUp { 0%{transform:translateY(0);opacity:0.7} 100%{transform:translateY(-110vh);opacity:0} }
+    .content { position: relative; z-index: 1; width: 100%; max-width: 680px; }
+    h1 { font-family: 'Bangers', cursive; font-size: clamp(40px,9vw,66px); letter-spacing: 4px; color: #ff4040; text-shadow: 0 0 28px rgba(255,64,64,0.45), 0 4px 0 rgba(0,0,0,0.4); text-align: center; margin-bottom: 4px; }
+    .subtitle { text-align: center; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: rgba(168,228,255,0.55); margin-bottom: 32px; }
+    .card { background: rgba(5,20,40,0.75); backdrop-filter: blur(8px); border-radius: 18px; border: 1px solid rgba(0,229,255,0.15); padding: 24px 24px 20px; margin-bottom: 20px; }
+    .card-title { font-size: 11px; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(168,228,255,0.5); margin-bottom: 18px; }
 
-    .content { position: relative; z-index: 1; width: 100%; max-width: 600px; }
-
-    h1 {
-      font-family: 'Bangers', cursive;
-      font-size: clamp(40px, 9vw, 66px);
-      letter-spacing: 4px;
-      color: #ff4040;
-      text-shadow: 0 0 28px rgba(255,64,64,0.45), 0 4px 0 rgba(0,0,0,0.4);
-      text-align: center;
-      margin-bottom: 4px;
-    }
-    .subtitle {
-      text-align: center;
-      font-size: 13px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: rgba(168,228,255,0.55);
-      margin-bottom: 32px;
-    }
-
-    /* ── SECTION CARD ── */
-    .card {
-      background: rgba(5,20,40,0.75);
-      backdrop-filter: blur(8px);
-      border-radius: 18px;
-      border: 1px solid rgba(0,229,255,0.15);
-      padding: 24px 24px 20px;
-      margin-bottom: 20px;
-    }
-    .card-title {
-      font-size: 11px;
-      letter-spacing: 2.5px;
-      text-transform: uppercase;
-      color: rgba(168,228,255,0.5);
-      margin-bottom: 18px;
-    }
-
-    /* ── TIMER SECTION ── */
-    .timer-display {
-      font-family: 'Bangers', cursive;
-      font-size: clamp(60px, 16vw, 96px);
-      letter-spacing: 6px;
-      color: #f0c040;
-      text-align: center;
-      text-shadow: 0 0 30px rgba(240,192,64,0.4);
-      margin-bottom: 18px;
-      line-height: 1;
-    }
+    /* TIMER */
+    .timer-display { font-family: 'Bangers', cursive; font-size: clamp(60px,16vw,96px); letter-spacing: 6px; color: #f0c040; text-align: center; text-shadow: 0 0 30px rgba(240,192,64,0.4); margin-bottom: 18px; line-height: 1; }
     .timer-display.running { color: #6bcb77; text-shadow: 0 0 30px rgba(107,203,119,0.4); }
     .timer-display.paused  { color: #ffd93d; text-shadow: 0 0 30px rgba(255,217,61,0.35); }
     .timer-display.ended   { color: #ff6b6b; text-shadow: 0 0 30px rgba(255,107,107,0.4); }
-
-    .timer-status {
-      text-align: center;
-      font-size: 13px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      margin-bottom: 22px;
-      height: 18px;
-    }
-    .status-dot {
-      display: inline-block; width: 8px; height: 8px;
-      border-radius: 50%; margin-right: 7px; vertical-align: middle;
-    }
-    .dot-run  { background: #6bcb77; animation: blink 1s infinite; }
-    .dot-stop { background: #ffd93d; }
-    .dot-end  { background: #ff6b6b; }
+    .timer-status { text-align: center; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 22px; height: 18px; }
+    .status-dot { display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;vertical-align:middle; }
+    .dot-run { background:#6bcb77; animation:blink 1s infinite; } .dot-stop { background:#ffd93d; } .dot-end { background:#ff6b6b; }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
-
-    /* Duration picker */
-    .duration-row {
-      display: flex; align-items: center; gap: 10px;
-      margin-bottom: 20px; flex-wrap: wrap;
-    }
-    .duration-row label { font-size: 14px; color: rgba(168,228,255,0.7); white-space: nowrap; }
-    .duration-row input[type="number"] {
-      width: 80px; padding: 8px 10px; border-radius: 10px;
-      border: 1px solid rgba(0,229,255,0.3); background: rgba(2,11,24,0.7);
-      color: white; font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 700;
-      text-align: center;
-    }
-    .duration-row span { font-size: 14px; color: rgba(168,228,255,0.5); }
-
-    /* Control buttons */
-    .btn-row { display: flex; gap: 12px; flex-wrap: wrap; }
-    .ctrl-btn {
-      font-family: 'Bangers', cursive;
-      font-size: 22px;
-      letter-spacing: 2px;
-      padding: 14px 28px;
-      border-radius: 14px;
-      border: 2px solid;
-      cursor: pointer;
-      background: rgba(2,11,24,0.85);
-      color: white;
-      transition: transform 0.12s, box-shadow 0.2s;
-      flex: 1;
-      min-width: 120px;
-      position: relative; overflow: hidden;
-    }
-    .ctrl-btn::before {
-      content:""; position:absolute; top:0; left:-120%; width:60%; height:100%;
-      background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);
-      transform:skewX(-20deg); animation:shine 2.5s linear infinite;
-    }
+    .duration-row { display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap; }
+    .duration-row label { font-size:14px;color:rgba(168,228,255,0.7);white-space:nowrap; }
+    .duration-row input[type="number"] { width:80px;padding:8px 10px;border-radius:10px;border:1px solid rgba(0,229,255,0.3);background:rgba(2,11,24,0.7);color:white;font-family:'Nunito',sans-serif;font-size:16px;font-weight:700;text-align:center; }
+    .duration-row span { font-size:14px;color:rgba(168,228,255,0.5); }
+    .btn-row { display:flex;gap:12px;flex-wrap:wrap; }
+    .ctrl-btn { font-family:'Bangers',cursive;font-size:22px;letter-spacing:2px;padding:14px 28px;border-radius:14px;border:2px solid;cursor:pointer;background:rgba(2,11,24,0.85);color:white;transition:transform 0.12s,box-shadow 0.2s;flex:1;min-width:120px;position:relative;overflow:hidden; }
+    .ctrl-btn::before { content:"";position:absolute;top:0;left:-120%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);transform:skewX(-20deg);animation:shine 2.5s linear infinite; }
     @keyframes shine { 0%{left:-120%} 100%{left:160%} }
-    .ctrl-btn:hover { transform: translateY(-3px) scale(1.03); }
-    .ctrl-btn:active { transform: scale(0.97); }
-    .ctrl-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+    .ctrl-btn:hover { transform:translateY(-3px) scale(1.03); }
+    .ctrl-btn:active { transform:scale(0.97); }
+    .ctrl-btn:disabled { opacity:0.35;cursor:not-allowed;transform:none; }
+    .btn-start{border-color:#6bcb77;box-shadow:0 0 16px rgba(107,203,119,0.3)}.btn-start:hover{box-shadow:0 0 30px rgba(107,203,119,0.6)}
+    .btn-pause{border-color:#ffd93d;box-shadow:0 0 16px rgba(255,217,61,0.3)}.btn-pause:hover{box-shadow:0 0 30px rgba(255,217,61,0.6)}
+    .btn-resume{border-color:#4d96ff;box-shadow:0 0 16px rgba(77,150,255,0.3)}.btn-resume:hover{box-shadow:0 0 30px rgba(77,150,255,0.6)}
+    .btn-reset{border-color:#ff6b6b;box-shadow:0 0 16px rgba(255,107,107,0.3)}.btn-reset:hover{box-shadow:0 0 30px rgba(255,107,107,0.6)}
 
-    .btn-start  { border-color: #6bcb77; box-shadow: 0 0 16px rgba(107,203,119,0.3); }
-    .btn-start:hover  { box-shadow: 0 0 30px rgba(107,203,119,0.6); }
-    .btn-pause  { border-color: #ffd93d; box-shadow: 0 0 16px rgba(255,217,61,0.3); }
-    .btn-pause:hover  { box-shadow: 0 0 30px rgba(255,217,61,0.6); }
-    .btn-resume { border-color: #4d96ff; box-shadow: 0 0 16px rgba(77,150,255,0.3); }
-    .btn-resume:hover { box-shadow: 0 0 30px rgba(77,150,255,0.6); }
-    .btn-reset  { border-color: #ff6b6b; box-shadow: 0 0 16px rgba(255,107,107,0.3); }
-    .btn-reset:hover  { box-shadow: 0 0 30px rgba(255,107,107,0.6); }
+    /* SCORE GRID */
+    .team-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; }
+    @media(max-width:480px){.team-grid{grid-template-columns:1fr}}
+    .team-score-row { background:rgba(2,11,24,0.6);border-radius:12px;border:1px solid rgba(255,255,255,0.07);padding:12px 14px;display:flex;align-items:center;gap:10px; }
+    .team-label { font-size:14px;font-weight:900;color:#a8e4ff;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+    .score-val { font-family:'Bangers',cursive;font-size:22px;color:#f0c040;min-width:36px;text-align:center; }
+    .sc-btn { font-family:'Bangers',cursive;font-size:18px;width:32px;height:32px;border-radius:8px;border:1px solid;background:rgba(2,11,24,0.8);color:white;cursor:pointer;transition:transform 0.1s;display:flex;align-items:center;justify-content:center;flex-shrink:0; }
+    .sc-btn:hover{transform:scale(1.15)} .sc-btn.plus{border-color:#6bcb77;color:#6bcb77} .sc-btn.minus{border-color:#ff6b6b;color:#ff6b6b}
 
-    /* ── SCORE MANAGEMENT ── */
-    .team-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-    @media (max-width: 400px) { .team-grid { grid-template-columns: 1fr; } }
+    /* SLOT GRID */
+    .slot-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:10px; }
+    @media(max-width:480px){.slot-grid{grid-template-columns:repeat(2,1fr)}}
+    .slot-btn { font-family:'Bangers',cursive;font-size:15px;letter-spacing:1px;padding:10px 6px;border-radius:12px;border:1.5px solid;background:rgba(2,11,24,0.7);color:white;cursor:pointer;transition:transform 0.12s,opacity 0.2s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+    .slot-btn:hover{transform:scale(1.03)} .slot-btn.taken{opacity:0.4;cursor:default;transform:none}
 
-    .team-score-row {
-      background: rgba(2,11,24,0.6);
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.07);
-      padding: 12px 14px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .team-label { font-size: 14px; font-weight: 900; color: #a8e4ff; flex: 1; white-space: nowrap; }
-    .score-val {
-      font-family: 'Bangers', cursive;
-      font-size: 22px; color: #f0c040;
-      min-width: 36px; text-align: center;
-    }
-    .sc-btn {
-      font-family: 'Bangers', cursive;
-      font-size: 18px;
-      width: 32px; height: 32px;
-      border-radius: 8px;
-      border: 1px solid;
-      background: rgba(2,11,24,0.8);
-      color: white;
-      cursor: pointer;
-      transition: transform 0.1s;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-    }
-    .sc-btn:hover { transform: scale(1.15); }
-    .sc-btn.plus  { border-color: #6bcb77; color: #6bcb77; }
-    .sc-btn.minus { border-color: #ff6b6b; color: #ff6b6b; }
+    /* ── TEAM NAMES EDITOR ── */
+    .names-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; }
+    @media(max-width:480px){.names-grid{grid-template-columns:1fr}}
+    .name-row { background:rgba(2,11,24,0.6);border-radius:12px;border:1px solid rgba(255,255,255,0.07);padding:12px 14px;display:flex;align-items:center;gap:10px; }
+    .name-emoji { font-size:20px; flex-shrink:0; }
+    .name-input { flex:1;background:rgba(5,30,55,0.8);border:1px solid rgba(0,229,255,0.25);border-radius:8px;padding:7px 10px;color:#a8e4ff;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;outline:none;transition:border-color 0.2s; }
+    .name-input:focus { border-color:rgba(0,229,255,0.7); }
+    .save-names-btn { font-family:'Bangers',cursive;font-size:20px;letter-spacing:2px;padding:12px 28px;border-radius:14px;border:2px solid #6bcb77;box-shadow:0 0 16px rgba(107,203,119,0.3);cursor:pointer;background:rgba(2,11,24,0.85);color:white;transition:transform 0.12s,box-shadow 0.2s;width:100%;margin-top:14px; }
+    .save-names-btn:hover { transform:translateY(-2px);box-shadow:0 0 30px rgba(107,203,119,0.6); }
 
-    /* ── TEAM SLOTS ── */
-    .slot-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; }
-    .slot-btn {
-      font-family: 'Bangers', cursive;
-      font-size: 17px;
-      letter-spacing: 1px;
-      padding: 11px 8px;
-      border-radius: 12px;
-      border: 1.5px solid;
-      background: rgba(2,11,24,0.7);
-      color: white;
-      cursor: pointer;
-      transition: transform 0.12s, opacity 0.2s;
-    }
-    .slot-btn:hover { transform: scale(1.03); }
-    .slot-btn.taken { opacity: 0.4; cursor: default; transform: none; }
+    /* ── ROSTER EDITOR ── */
+    .roster-tabs { display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px; }
+    .rtab { font-family:'Bangers',cursive;font-size:15px;letter-spacing:1px;padding:8px 14px;border-radius:10px;border:1.5px solid rgba(0,229,255,0.2);background:rgba(2,11,24,0.7);color:rgba(168,228,255,0.6);cursor:pointer;transition:background 0.2s,border-color 0.2s,color 0.2s; }
+    .rtab.active { background:rgba(0,229,255,0.15);border-color:rgba(0,229,255,0.7);color:#a8e4ff; }
+    .rtab:hover:not(.active) { background:rgba(0,229,255,0.07); }
+    .roster-panel { display:none; }
+    .roster-panel.active { display:block; }
+    .roster-panel h3 { font-family:'Bangers',cursive;font-size:20px;letter-spacing:2px;margin-bottom:12px;color:#a8e4ff; }
+    .member-list { display:flex;flex-direction:column;gap:8px;margin-bottom:12px; }
+    .member-row { display:flex;align-items:center;gap:8px; }
+    .member-input { flex:1;background:rgba(5,30,55,0.8);border:1px solid rgba(0,229,255,0.2);border-radius:8px;padding:8px 12px;color:#a8e4ff;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;outline:none;transition:border-color 0.2s; }
+    .member-input:focus { border-color:rgba(0,229,255,0.6); }
+    .member-del { width:30px;height:30px;border-radius:8px;border:1px solid rgba(255,107,107,0.4);background:rgba(2,11,24,0.8);color:#ff6b6b;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:transform 0.1s,background 0.15s;flex-shrink:0; }
+    .member-del:hover { background:rgba(255,64,64,0.15);transform:scale(1.1); }
+    .add-member-btn { font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;padding:8px 16px;border-radius:9px;border:1px solid rgba(107,203,119,0.4);background:transparent;color:#6bcb77;cursor:pointer;transition:background 0.2s; }
+    .add-member-btn:hover { background:rgba(107,203,119,0.1); }
+    .save-roster-btn { font-family:'Bangers',cursive;font-size:19px;letter-spacing:2px;padding:11px 24px;border-radius:12px;border:2px solid #6bcb77;box-shadow:0 0 12px rgba(107,203,119,0.3);cursor:pointer;background:rgba(2,11,24,0.85);color:white;transition:transform 0.12s,box-shadow 0.2s;margin-top:4px; }
+    .save-roster-btn:hover { transform:translateY(-2px);box-shadow:0 0 24px rgba(107,203,119,0.6); }
 
-    /* ── NAV LINKS ── */
-    .nav-row {
-      display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
-      margin-top: 10px;
-    }
-    .nav-link {
-      font-family: 'Nunito', sans-serif;
-      font-size: 14px; font-weight: 700;
-      padding: 11px 24px; border-radius: 10px;
-      border: 1px solid rgba(0,229,255,0.3);
-      cursor: pointer; background: rgba(5,20,40,0.7);
-      color: #a8e4ff; letter-spacing: 1px;
-      transition: background 0.2s, border-color 0.2s;
-      text-decoration: none; display: inline-block;
-    }
-    .nav-link:hover { background: rgba(0,229,255,0.1); border-color: rgba(0,229,255,0.6); }
-
-    /* Toast */
-    .toast {
-      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-      background: rgba(5,20,40,0.95);
-      border: 1px solid rgba(0,229,255,0.3);
-      border-radius: 12px; padding: 12px 28px;
-      font-size: 14px; font-weight: 700; color: #a8e4ff;
-      z-index: 100; opacity: 0; transition: opacity 0.3s;
-      pointer-events: none; white-space: nowrap;
-    }
-    .toast.show { opacity: 1; }
+    /* NAV */
+    .nav-row { display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:10px; }
+    .nav-link { font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;padding:11px 24px;border-radius:10px;border:1px solid rgba(0,229,255,0.3);cursor:pointer;background:rgba(5,20,40,0.7);color:#a8e4ff;letter-spacing:1px;transition:background 0.2s,border-color 0.2s;text-decoration:none;display:inline-block; }
+    .nav-link:hover { background:rgba(0,229,255,0.1);border-color:rgba(0,229,255,0.6); }
+    .toast { position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:rgba(5,20,40,0.95);border:1px solid rgba(0,229,255,0.3);border-radius:12px;padding:12px 28px;font-size:14px;font-weight:700;color:#a8e4ff;z-index:100;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap; }
+    .toast.show { opacity:1; }
   </style>
 </head>
 <body>
-
-<!-- Bubbles -->
-<script>
-for(let i=0;i<14;i++){
-  const b=document.createElement('div');b.className='bubble';
-  const s=6+Math.random()*18;
-  b.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;animation-duration:${9+Math.random()*10}s;animation-delay:-${Math.random()*12}s`;
-  document.body.appendChild(b);
-}
-</script>
+<script>for(let i=0;i<14;i++){const b=document.createElement('div');b.className='bubble';const s=6+Math.random()*18;b.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;animation-duration:${9+Math.random()*10}s;animation-delay:-${Math.random()*12}s`;document.body.appendChild(b);}</script>
 
 <div class="content">
   <h1>⚙️ ADMIN</h1>
   <p class="subtitle">Game control panel</p>
 
-  <!-- ── TIMER ── -->
+  <!-- TIMER -->
   <div class="card">
     <div class="card-title">⏱ Match Timer</div>
-
     <div class="timer-display" id="timerDisplay">2:00:00</div>
-    <div class="timer-status" id="timerStatus">
-      <span class="status-dot dot-stop"></span> Stopped
-    </div>
-
+    <div class="timer-status" id="timerStatus"><span class="status-dot dot-stop"></span> Stopped</div>
     <div class="duration-row">
       <label>Duration:</label>
       <input type="number" id="durationHr" value="2" min="0" max="23"> <span>hr</span>
       <input type="number" id="durationMin" value="0" min="0" max="59"> <span>min</span>
     </div>
-
     <div class="btn-row">
       <button class="ctrl-btn btn-start"  id="btnStart"  onclick="startTimer()">▶ START</button>
       <button class="ctrl-btn btn-pause"  id="btnPause"  onclick="pauseTimer()" disabled>⏸ PAUSE</button>
@@ -265,22 +117,34 @@ for(let i=0;i<14;i++){
     </div>
   </div>
 
-  <!-- ── SCORE MANAGEMENT ── -->
+  <!-- SCORE MANAGEMENT -->
   <div class="card">
     <div class="card-title">🏆 Score Management</div>
     <div class="team-grid" id="scoreGrid">Loading...</div>
   </div>
 
-  <!-- ── TEAM SLOTS ── -->
+  <!-- TEAM NAMES -->
+  <div class="card">
+    <div class="card-title">✏️ Team Names</div>
+    <div class="names-grid" id="namesGrid">Loading...</div>
+    <button class="save-names-btn" onclick="saveTeamNames()">💾 SAVE NAMES</button>
+  </div>
+
+  <!-- TEAM ROSTERS -->
+  <div class="card">
+    <div class="card-title">👥 Team Rosters</div>
+    <div class="roster-tabs" id="rosterTabs"></div>
+    <div id="rosterPanels"></div>
+  </div>
+
+  <!-- TEAM SLOTS -->
   <div class="card">
     <div class="card-title">🚀 Team Slot Control</div>
     <div class="slot-grid" id="slotGrid"></div>
-    <p style="font-size:12px;color:rgba(168,228,255,0.4);margin-top:12px;text-align:center">
-      Click a taken slot to free it up for a new player
-    </p>
+    <p style="font-size:12px;color:rgba(168,228,255,0.4);margin-top:12px;text-align:center">Click a taken slot to free it up</p>
   </div>
 
-  <!-- ── RESET ALL ── -->
+  <!-- DANGER ZONE -->
   <div class="card">
     <div class="card-title">⚠️ Danger Zone</div>
     <div class="btn-row">
@@ -289,7 +153,6 @@ for(let i=0;i<14;i++){
     </div>
   </div>
 
-  <!-- ── NAV ── -->
   <div class="nav-row">
     <a class="nav-link" href="./index.html">🏠 Home</a>
     <a class="nav-link" href="./leaderboard.html">📊 Leaderboard</a>
@@ -300,197 +163,195 @@ for(let i=0;i<14;i++){
 
 <script>
 const FB = "https://counterapp-5297b-default-rtdb.firebaseio.com";
-const TEAMS = ['team1','team2','team3','team4','team5','team6','team7','team8'];
-const COLORS = {team1:'#ff6b6b',team2:'#ffd93d',team3:'#6bcb77',team4:'#4d96ff',team5:'#ff922b',team6:'#cc5de8',team7:'#20c997',team8:'#f06595'};
-const EMOJIS = {team1:'🔴',team2:'⚡',team3:'🌿',team4:'💧',team5:'🔥',team6:'💜',team7:'🌊',team8:'🌸'};
+const TEAMS = ['team1','team2','team3','team4','team5','team6','team7','team8','team9','team10','team11','team12'];
+const COLORS = {team1:'#ff6b6b',team2:'#ffd93d',team3:'#6bcb77',team4:'#4d96ff',team5:'#ff922b',team6:'#cc5de8',team7:'#20c997',team8:'#f06595',team9:'#74c0fc',team10:'#ff8787',team11:'#a9e34b',team12:'#ffa94d'};
+const EMOJIS = {team1:'🔴',team2:'⚡',team3:'🌿',team4:'💧',team5:'🔥',team6:'💜',team7:'🌊',team8:'🌸',team9:'🩵',team10:'🎯',team11:'🍏',team12:'🧡'};
 
-/* ─── TOAST ─── */
-function toast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 2200);
-}
-
-/* ─── TIMER ─── */
-let timerInterval = null;
-
-function fmtTime(s) {
-  const h = Math.floor(s / 3600);
-  const m = Math.floor((s % 3600) / 60);
-  const sec = s % 60;
-  return `${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
-}
-
-function updateTimerUI(state, remaining) {
-  const disp = document.getElementById('timerDisplay');
-  const status = document.getElementById('timerStatus');
-  const btnStart = document.getElementById('btnStart');
-  const btnPause = document.getElementById('btnPause');
-  const btnResume = document.getElementById('btnResume');
-
-  disp.textContent = fmtTime(Math.max(0, remaining));
-  disp.className = 'timer-display';
-
-  btnStart.disabled = false; btnPause.disabled = true; btnResume.disabled = true;
-
-  if (state === 'running') {
-    disp.classList.add('running');
-    status.innerHTML = '<span class="status-dot dot-run"></span> Running';
-    btnStart.disabled = true; btnPause.disabled = false;
-  } else if (state === 'paused') {
-    disp.classList.add('paused');
-    status.innerHTML = '<span class="status-dot dot-stop"></span> Paused';
-    btnResume.disabled = false;
-  } else if (state === 'ended') {
-    disp.classList.add('ended');
-    status.innerHTML = '<span class="status-dot dot-end"></span> Time\'s Up!';
-    btnStart.disabled = false;
-  } else {
-    status.innerHTML = '<span class="status-dot dot-stop"></span> Stopped';
-  }
-}
-
-async function fetchTimer() {
-  const res = await fetch(FB + '/timer.json');
-  return (await res.json()) || {};
-}
-
-async function syncTimerUI() {
-  const t = await fetchTimer();
-  if (!t.state || t.state === 'stopped') { updateTimerUI('stopped', t.remaining || 0); return; }
-  let remaining = t.remaining || 0;
-  if (t.state === 'running' && t.serverTime) {
-    const elapsed = Math.floor((Date.now() - t.serverTime) / 1000);
-    remaining = Math.max(0, remaining - elapsed);
-  }
-  updateTimerUI(t.state === 'running' && remaining <= 0 ? 'ended' : t.state, remaining);
-}
-
-async function startTimer() {
-  const h = parseInt(document.getElementById('durationHr').value) || 0;
-  const m = parseInt(document.getElementById('durationMin').value) || 0;
-  const total = h * 3600 + m * 60;
-  if (total <= 0) { toast('Set a duration first!'); return; }
-  await fetch(FB + '/timer.json', {
-    method: 'PUT',
-    body: JSON.stringify({ state: 'running', remaining: total, serverTime: Date.now(), total })
-  });
-  toast('▶ Timer started');
-}
-
-async function pauseTimer() {
-  const t = await fetchTimer();
-  let remaining = t.remaining || 0;
-  if (t.state === 'running' && t.serverTime)
-    remaining = Math.max(0, remaining - Math.floor((Date.now() - t.serverTime) / 1000));
-  await fetch(FB + '/timer.json', {
-    method: 'PUT',
-    body: JSON.stringify({ state: 'paused', remaining, serverTime: null, total: t.total })
-  });
-  toast('⏸ Timer paused');
-}
-
-async function resumeTimer() {
-  const t = await fetchTimer();
-  await fetch(FB + '/timer.json', {
-    method: 'PUT',
-    body: JSON.stringify({ state: 'running', remaining: t.remaining || 0, serverTime: Date.now(), total: t.total })
-  });
-  toast('▶ Timer resumed');
-}
-
-async function resetTimer() {
-  const h = parseInt(document.getElementById('durationHr').value) || 0;
-  const m = parseInt(document.getElementById('durationMin').value) || 0;
-  const total = h * 3600 + m * 60;
-  await fetch(FB + '/timer.json', {
-    method: 'PUT',
-    body: JSON.stringify({ state: 'stopped', remaining: total, serverTime: null, total })
-  });
-  toast('↺ Timer reset');
-}
-
-/* ─── SCORES ─── */
 let scores = {};
+let teamNames = {};
+let rosters = {};
+let activeRosterTab = 'team1';
 
-async function loadScores() {
-  const res = await fetch(FB + '/teams.json');
-  const data = (await res.json()) || {};
-  scores = {};
-  TEAMS.forEach(k => { scores[k] = data[k] || 0; });
-  renderScoreGrid();
+/* TOAST */
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2200);}
+
+/* ── TIMER ── */
+function fmtTime(s){const h=Math.floor(s/3600);const m=Math.floor((s%3600)/60);const sec=s%60;return`${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;}
+function updateTimerUI(state,remaining){
+  const disp=document.getElementById('timerDisplay');const status=document.getElementById('timerStatus');
+  const btnStart=document.getElementById('btnStart');const btnPause=document.getElementById('btnPause');const btnResume=document.getElementById('btnResume');
+  disp.textContent=fmtTime(Math.max(0,remaining));disp.className='timer-display';
+  btnStart.disabled=false;btnPause.disabled=true;btnResume.disabled=true;
+  if(state==='running'){disp.classList.add('running');status.innerHTML='<span class="status-dot dot-run"></span> Running';btnStart.disabled=true;btnPause.disabled=false;}
+  else if(state==='paused'){disp.classList.add('paused');status.innerHTML='<span class="status-dot dot-stop"></span> Paused';btnResume.disabled=false;}
+  else if(state==='ended'){disp.classList.add('ended');status.innerHTML='<span class="status-dot dot-end"></span> Time\'s Up!';}
+  else{status.innerHTML='<span class="status-dot dot-stop"></span> Stopped';}
 }
+async function fetchTimer(){const res=await fetch(FB+'/timer.json');return(await res.json())||{};}
+async function syncTimerUI(){const t=await fetchTimer();if(!t.state||t.state==='stopped'){updateTimerUI('stopped',t.remaining||0);return;}let remaining=t.remaining||0;if(t.state==='running'&&t.serverTime){const elapsed=Math.floor((Date.now()-t.serverTime)/1000);remaining=Math.max(0,remaining-elapsed);}updateTimerUI(t.state==='running'&&remaining<=0?'ended':t.state,remaining);}
+async function startTimer(){const h=parseInt(document.getElementById('durationHr').value)||0;const m=parseInt(document.getElementById('durationMin').value)||0;const total=h*3600+m*60;if(total<=0){toast('Set a duration first!');return;}await fetch(FB+'/timer.json',{method:'PUT',body:JSON.stringify({state:'running',remaining:total,serverTime:Date.now(),total})});toast('▶ Timer started');}
+async function pauseTimer(){const t=await fetchTimer();let remaining=t.remaining||0;if(t.state==='running'&&t.serverTime)remaining=Math.max(0,remaining-Math.floor((Date.now()-t.serverTime)/1000));await fetch(FB+'/timer.json',{method:'PUT',body:JSON.stringify({state:'paused',remaining,serverTime:null,total:t.total})});toast('⏸ Timer paused');}
+async function resumeTimer(){const t=await fetchTimer();await fetch(FB+'/timer.json',{method:'PUT',body:JSON.stringify({state:'running',remaining:t.remaining||0,serverTime:Date.now(),total:t.total})});toast('▶ Timer resumed');}
+async function resetTimer(){const h=parseInt(document.getElementById('durationHr').value)||0;const m=parseInt(document.getElementById('durationMin').value)||0;const total=h*3600+m*60;await fetch(FB+'/timer.json',{method:'PUT',body:JSON.stringify({state:'stopped',remaining:total,serverTime:null,total})});toast('↺ Timer reset');}
 
-function renderScoreGrid() {
-  const grid = document.getElementById('scoreGrid');
-  grid.innerHTML = TEAMS.map(k => `
+/* ── SCORES ── */
+async function loadScores(){
+  const res=await fetch(FB+'/teams.json');const data=(await res.json())||{};
+  scores={};TEAMS.forEach(k=>{scores[k]=data[k]||0;});renderScoreGrid();
+}
+function getTeamLabel(k){const num=k.replace('team','');return teamNames[k]||`Team ${num}`;}
+function renderScoreGrid(){
+  const grid=document.getElementById('scoreGrid');
+  grid.innerHTML=TEAMS.map(k=>`
     <div class="team-score-row">
-      <span class="team-label">${EMOJIS[k]} T${k.replace('team','')}</span>
+      <span class="team-label">${EMOJIS[k]} ${getTeamLabel(k)}</span>
       <button class="sc-btn minus" onclick="adjustScore('${k}',-1)">−</button>
       <span class="score-val" id="sv_${k}">${scores[k]}</span>
       <button class="sc-btn plus"  onclick="adjustScore('${k}',1)">+</button>
-    </div>
-  `).join('');
+    </div>`).join('');
+}
+async function adjustScore(team,delta){
+  const cur=scores[team]||0;const newVal=Math.max(0,cur+delta);scores[team]=newVal;
+  document.getElementById('sv_'+team).textContent=newVal;
+  await fetch(FB+'/teams/'+team+'.json',{method:'PUT',body:JSON.stringify(newVal)});
+}
+async function resetAllScores(){
+  if(!confirm('Reset ALL team scores to 0?'))return;
+  const updates={};TEAMS.forEach(k=>{updates[k]=0;});
+  await fetch(FB+'/teams.json',{method:'PUT',body:JSON.stringify(updates)});
+  toast('All scores reset to 0');loadScores();
 }
 
-async function adjustScore(team, delta) {
-  const cur = scores[team] || 0;
-  const newVal = Math.max(0, cur + delta);
-  scores[team] = newVal;
-  document.getElementById('sv_' + team).textContent = newVal;
-  await fetch(FB + '/teams/' + team + '.json', {
-    method: 'PUT',
-    body: JSON.stringify(newVal)
+/* ── TEAM NAMES ── */
+async function loadTeamNames(){
+  const res=await fetch(FB+'/teamNames.json');const data=(await res.json())||{};
+  teamNames=data;renderNamesGrid();
+}
+function renderNamesGrid(){
+  const grid=document.getElementById('namesGrid');
+  grid.innerHTML=TEAMS.map(k=>{
+    const num=k.replace('team','');
+    const val=teamNames[k]||`Team ${num}`;
+    return`<div class="name-row">
+      <span class="name-emoji">${EMOJIS[k]}</span>
+      <input class="name-input" id="ni_${k}" type="text" value="${val}" placeholder="Team ${num}" maxlength="20">
+    </div>`;
+  }).join('');
+}
+async function saveTeamNames(){
+  const updates={};
+  TEAMS.forEach(k=>{
+    const val=document.getElementById('ni_'+k).value.trim();
+    updates[k]=val||`Team ${k.replace('team','')}`;
   });
+  await fetch(FB+'/teamNames.json',{method:'PUT',body:JSON.stringify(updates)});
+  teamNames=updates;
+  renderScoreGrid();
+  renderRosterTabs();
+  toast('✅ Team names saved!');
 }
 
-async function resetAllScores() {
-  if (!confirm('Reset ALL team scores to 0?')) return;
-  const updates = {};
-  TEAMS.forEach(k => { updates[k] = 0; });
-  await fetch(FB + '/teams.json', { method: 'PUT', body: JSON.stringify(updates) });
-  toast('All scores reset to 0');
-  loadScores();
+/* ── ROSTERS ── */
+async function loadRosters(){
+  const res=await fetch(FB+'/rosters.json');const data=(await res.json())||{};
+  rosters={};TEAMS.forEach(k=>{rosters[k]=data[k]||[];});
+  renderRosterTabs();
+  renderRosterPanel(activeRosterTab);
+}
+function renderRosterTabs(){
+  const tabsEl=document.getElementById('rosterTabs');
+  tabsEl.innerHTML=TEAMS.map(k=>{
+    const num=k.replace('team','');
+    const name=teamNames[k]||`T${num}`;
+    return`<button class="rtab${k===activeRosterTab?' active':''}" onclick="switchRosterTab('${k}')" style="border-color:${COLORS[k]}44">${EMOJIS[k]} ${name}</button>`;
+  }).join('');
+}
+function switchRosterTab(team){
+  activeRosterTab=team;
+  renderRosterTabs();
+  renderRosterPanel(team);
+}
+function renderRosterPanel(team){
+  const panelsEl=document.getElementById('rosterPanels');
+  const members=rosters[team]||[];
+  const num=team.replace('team','');
+  const name=teamNames[team]||`Team ${num}`;
+  panelsEl.innerHTML=`
+    <div class="roster-panel active">
+      <h3>${EMOJIS[team]} ${name}</h3>
+      <div class="member-list" id="memberList_${team}">
+        ${members.map((m,i)=>memberRowHTML(team,i,m)).join('')}
+      </div>
+      <button class="add-member-btn" onclick="addMember('${team}')">+ Add Member</button>
+      <br>
+      <button class="save-roster-btn" onclick="saveRoster('${team}')">💾 SAVE ROSTER</button>
+    </div>`;
+}
+function memberRowHTML(team,idx,value){
+  return`<div class="member-row" id="mr_${team}_${idx}">
+    <input class="member-input" id="mi_${team}_${idx}" type="text" value="${value}" placeholder="Member name" maxlength="30">
+    <button class="member-del" onclick="removeMember('${team}',${idx})">✕</button>
+  </div>`;
+}
+function addMember(team){
+  if(!rosters[team])rosters[team]=[];
+  rosters[team].push('');
+  renderRosterPanel(team);
+  // focus new input
+  const idx=rosters[team].length-1;
+  setTimeout(()=>{const el=document.getElementById(`mi_${team}_${idx}`);if(el)el.focus();},50);
+}
+function removeMember(team,idx){
+  rosters[team].splice(idx,1);
+  renderRosterPanel(team);
+}
+async function saveRoster(team){
+  // collect current inputs
+  const list=rosters[team]||[];
+  const saved=list.map((_,i)=>{
+    const el=document.getElementById(`mi_${team}_${i}`);
+    return el?el.value.trim():'';
+  }).filter(v=>v.length>0);
+  rosters[team]=saved;
+  await fetch(FB+'/rosters/'+team+'.json',{method:'PUT',body:JSON.stringify(saved)});
+  renderRosterPanel(team);
+  toast(`✅ ${teamNames[team]||'Team'} roster saved!`);
 }
 
-/* ─── TEAM SLOTS ─── */
-async function loadSlots() {
-  const res = await fetch(FB + '/selectedTeams.json');
-  const data = (await res.json()) || {};
-  const grid = document.getElementById('slotGrid');
-  grid.innerHTML = TEAMS.map(k => {
-    const taken = data[k] === true;
-    return `<button class="slot-btn ${taken?'taken':''}" 
-      style="border-color:${COLORS[k]};box-shadow:0 0 10px ${COLORS[k]}44"
-      onclick="toggleSlot('${k}',${taken})">
-      ${EMOJIS[k]} Team ${k.replace('team','')} ${taken?'🔒':'✅'}
+/* ── SLOTS ── */
+async function loadSlots(){
+  const res=await fetch(FB+'/selectedTeams.json');const data=(await res.json())||{};
+  const grid=document.getElementById('slotGrid');
+  grid.innerHTML=TEAMS.map(k=>{
+    const taken=data[k]===true;
+    const num=k.replace('team','');
+    const name=teamNames[k]||`Team ${num}`;
+    return`<button class="slot-btn${taken?' taken':''}" style="border-color:${COLORS[k]};box-shadow:0 0 10px ${COLORS[k]}44" onclick="toggleSlot('${k}',${taken})">
+      ${EMOJIS[k]} ${name} ${taken?'🔒':'✅'}
     </button>`;
   }).join('');
 }
-
-async function toggleSlot(team, isTaken) {
-  if (!isTaken) return;
-  if (!confirm(`Free up Team ${team.replace('team','')} slot?`)) return;
-  await fetch(FB + '/selectedTeams/' + team + '.json', { method: 'DELETE' });
-  toast(`Team ${team.replace('team','')} slot freed`);
-  loadSlots();
+async function toggleSlot(team,isTaken){
+  if(!isTaken)return;
+  const name=teamNames[team]||team;
+  if(!confirm(`Free up ${name} slot?`))return;
+  await fetch(FB+'/selectedTeams/'+team+'.json',{method:'DELETE'});
+  toast(`${name} slot freed`);loadSlots();
+}
+async function freeAllSlots(){
+  if(!confirm('Free ALL team slots? Everyone will need to re-join.'))return;
+  await fetch(FB+'/selectedTeams.json',{method:'DELETE'});
+  toast('All slots freed');loadSlots();
 }
 
-async function freeAllSlots() {
-  if (!confirm('Free ALL team slots? Everyone will need to re-join.')) return;
-  await fetch(FB + '/selectedTeams.json', { method: 'DELETE' });
-  toast('All slots freed');
-  loadSlots();
+/* ── INIT ── */
+async function init(){
+  await loadTeamNames();
+  loadScores();loadSlots();loadRosters();
+  setInterval(loadScores,3000);setInterval(loadSlots,3000);setInterval(syncTimerUI,1000);
+  syncTimerUI();
 }
-
-/* ─── INIT ─── */
-loadScores();
-loadSlots();
-setInterval(loadScores, 3000);
-setInterval(loadSlots, 3000);
-setInterval(syncTimerUI, 1000);
-syncTimerUI();
+init();
 </script>
 </body>
 </html>
