@@ -166,8 +166,9 @@ async function pollChallenge(){
   try{
     const res=await fetch(FB+'/activeEvent.json');const ev=(await res.json())||{};
     const banner=document.getElementById('challengeBanner');
-    if(ev&&ev.active&&ev.id){
-      // show banner only if not already completed this event this session
+    const now=Date.now();
+    const expired=ev.expiresAt&&now>ev.expiresAt;
+    if(ev&&ev.active&&ev.id&&!expired){
       const alreadyDone=completedEventIds.includes(ev.id+'_'+ev.firedAt);
       document.getElementById('challengeName').textContent=ev.name||'Challenge';
       document.getElementById('challengePts').textContent=`+${ev.points||1} point${(ev.points||1)!==1?'s':''} for completing!`;
@@ -175,6 +176,12 @@ async function pollChallenge(){
       document.getElementById('doneFlash').classList.toggle('show',alreadyDone);
       banner.classList.add('visible');
       lastEventId={id:ev.id,name:ev.name,points:ev.points||1,firedAt:ev.firedAt};
+      // show countdown if duration set
+      if(ev.expiresAt){
+        const secsLeft=Math.max(0,Math.round((ev.expiresAt-now)/1000));
+        const m=Math.floor(secsLeft/60);const s=secsLeft%60;
+        document.getElementById('challengePts').textContent=`+${ev.points||1} pt${(ev.points||1)!==1?'s':''} · ⏱ ${m}:${String(s).padStart(2,'0')} left`;
+      }
     } else {
       banner.classList.remove('visible');
       lastEventId=null;
