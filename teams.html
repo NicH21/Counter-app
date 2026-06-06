@@ -107,7 +107,7 @@
 <body>
 <div class="team-name" id="title">Loading...</div>
 <div class="score" id="score">0</div>
-<button class="point-btn" id="pointBtn" onclick="update()"><span>+1 POINT</span></button>
+<button class="point-btn" id="pointBtn" onclick="update()"><span>+2 LAPS</span></button>
 
 <!-- CHALLENGE BANNER -->
 <div class="challenge-banner" id="challengeBanner">
@@ -152,7 +152,7 @@ async function loadInfo(){
 
 async function update(){
   let res=await fetch(FB+"/teams/"+team+".json");let value=await res.json();
-  value=(value||0)+1;
+  value=(value||0)+2;
   await fetch(FB+"/teams/"+team+".json",{method:"PUT",body:JSON.stringify(value)});
   document.getElementById("score").innerText=value;
 }
