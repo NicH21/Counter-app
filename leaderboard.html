@@ -180,14 +180,18 @@ async function pollActiveEvent(){
   try{
     const res=await fetch(FB+'/activeEvent.json');const ev=(await res.json())||{};
     const strip=document.getElementById('eventStrip');
-    if(ev&&ev.active&&ev.name){
+    const now=Date.now();
+    const expired=ev.expiresAt&&now>ev.expiresAt;
+    if(ev&&ev.active&&ev.name&&!expired){
       document.getElementById('eventStripName').textContent=ev.name;
-      document.getElementById('eventStripPts').textContent=`+${ev.points||1} pt${(ev.points||1)!==1?'s':''} for completing!`;
+      let ptsText=`+${ev.points||1} pt${(ev.points||1)!==1?'s':''} for completing!`;
+      if(ev.expiresAt){const secsLeft=Math.max(0,Math.round((ev.expiresAt-now)/1000));const m=Math.floor(secsLeft/60);const s=secsLeft%60;ptsText+=` · ⏱ ${m}:${String(s).padStart(2,'0')} left`;}
+      document.getElementById('eventStripPts').textContent=ptsText;
       strip.classList.add('visible');
     }else{strip.classList.remove('visible');}
   }catch(e){}
 }
-setInterval(pollActiveEvent,2000);pollActiveEvent();
+setInterval(pollActiveEvent,1000);pollActiveEvent();
 
 </script>
 </body>
