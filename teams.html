@@ -6,18 +6,99 @@
   <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: linear-gradient(180deg, #020b18 0%, #053a5f 60%, #0a6fa8 100%); min-height: 100vh; color: white; font-family: 'Nunito', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; gap: 16px; }
+    body {
+      background: linear-gradient(180deg, #020b18 0%, #053a5f 60%, #0a6fa8 100%);
+      min-height: 100vh; color: white; font-family: 'Nunito', sans-serif;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; padding: 40px 20px; gap: 16px;
+    }
     .team-name { font-family: 'Bangers', cursive; font-size: clamp(40px,10vw,72px); letter-spacing: 4px; color: #a8e4ff; text-shadow: 0 0 30px rgba(0,229,255,0.5), 0 4px 0 rgba(0,0,0,0.4); text-align:center; }
     .score { font-family: 'Bangers', cursive; font-size: clamp(80px,22vw,140px); letter-spacing: 2px; color: #f0c040; text-shadow: 0 0 40px rgba(240,192,64,0.5), 0 4px 0 rgba(0,0,0,0.4); line-height: 1; }
     .point-btn { font-family: 'Bangers', cursive; font-size: 32px; letter-spacing: 3px; padding: 18px 60px; border-radius: 16px; border: 2px solid var(--tc, #00e5ff); background: rgba(5,20,40,0.8); color: white; cursor: pointer; box-shadow: 0 0 20px color-mix(in srgb, var(--tc, #00e5ff) 40%, transparent); transition: transform 0.1s, box-shadow 0.2s; position: relative; overflow: hidden; }
     .point-btn::before { content:""; position:absolute;top:0;left:-120%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent);transform:skewX(-20deg);animation:shine 2s linear infinite; }
     @keyframes shine{0%{left:-120%}100%{left:160%}}
     .point-btn:hover{transform:scale(1.05)}.point-btn:active{transform:scale(0.96)}
-    /* roster card */
+
+    /* ── CHALLENGE BANNER ── */
+    .challenge-banner {
+      display: none;
+      position: relative;
+      width: 100%; max-width: 420px;
+      background: linear-gradient(135deg, rgba(255,165,0,0.12), rgba(255,100,0,0.08));
+      border: 2px solid rgba(255,165,0,0.6);
+      border-radius: 20px;
+      padding: 20px 22px;
+      text-align: center;
+      box-shadow: 0 0 30px rgba(255,165,0,0.25), 0 0 60px rgba(255,100,0,0.1);
+      animation: bannerPulse 2s ease-in-out infinite;
+    }
+    .challenge-banner.visible { display: block; }
+    @keyframes bannerPulse {
+      0%,100%{box-shadow:0 0 30px rgba(255,165,0,0.25),0 0 60px rgba(255,100,0,0.1)}
+      50%{box-shadow:0 0 50px rgba(255,165,0,0.5),0 0 80px rgba(255,100,0,0.2)}
+    }
+    .challenge-badge {
+      font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+      color: rgba(255,169,77,0.7); margin-bottom: 8px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .badge-dot { width: 8px; height: 8px; border-radius: 50%; background: #ffa94d; animation: badgeBlink 0.8s infinite; }
+    @keyframes badgeBlink{0%,100%{opacity:1}50%{opacity:0.2}}
+    .challenge-name {
+      font-family: 'Bangers', cursive;
+      font-size: clamp(24px, 6vw, 36px);
+      letter-spacing: 2px;
+      color: #ffa94d;
+      text-shadow: 0 0 20px rgba(255,169,77,0.5);
+      margin-bottom: 6px;
+      line-height: 1.2;
+    }
+    .challenge-pts {
+      font-size: 14px; font-weight: 700;
+      color: rgba(240,192,64,0.8);
+      margin-bottom: 18px;
+      letter-spacing: 1px;
+    }
+    .complete-btn {
+      font-family: 'Bangers', cursive;
+      font-size: 26px;
+      letter-spacing: 3px;
+      padding: 16px 40px;
+      border-radius: 14px;
+      border: 2px solid #6bcb77;
+      background: rgba(5,20,40,0.85);
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(107,203,119,0.4);
+      transition: transform 0.12s, box-shadow 0.2s;
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+    }
+    .complete-btn::before{content:"";position:absolute;top:0;left:-120%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(107,203,119,0.6),transparent);transform:skewX(-20deg);animation:shine 1.8s linear infinite;}
+    .complete-btn span{position:relative;z-index:2}
+    .complete-btn:hover{transform:scale(1.03);box-shadow:0 0 36px rgba(107,203,119,0.7)}
+    .complete-btn:active{transform:scale(0.96)}
+    .complete-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+
+    /* completed flash */
+    .done-flash {
+      display: none;
+      font-family: 'Bangers', cursive;
+      font-size: 28px; letter-spacing: 3px;
+      color: #6bcb77;
+      text-shadow: 0 0 20px rgba(107,203,119,0.6);
+      text-align: center;
+      animation: flashIn 0.4s ease;
+    }
+    .done-flash.show{display:block}
+    @keyframes flashIn{0%{transform:scale(0.6);opacity:0}100%{transform:scale(1);opacity:1}}
+
+    /* roster */
     .roster-card { background: rgba(5,20,40,0.75); backdrop-filter: blur(8px); border-radius: 14px; border: 1px solid rgba(0,229,255,0.15); padding: 16px 22px; width: 100%; max-width: 340px; }
     .roster-title { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: rgba(168,228,255,0.5); margin-bottom: 10px; }
     .member-chip { font-size: 14px; font-weight: 700; color: #a8e4ff; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-    .member-chip:last-child { border-bottom: none; }
+    .member-chip:last-child{border-bottom:none}
     .no-members { font-size: 13px; color: rgba(168,228,255,0.3); }
     .back-btn { font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700; padding: 10px 24px; border-radius: 10px; border: 1px solid rgba(0,229,255,0.3); cursor: pointer; background: rgba(5,20,40,0.6); color: #a8e4ff; letter-spacing: 1px; transition: background 0.2s; }
     .back-btn:hover{background:rgba(0,229,255,0.1)}
@@ -26,14 +107,23 @@
 <body>
 <div class="team-name" id="title">Loading...</div>
 <div class="score" id="score">0</div>
-<button class="point-btn" id="pointBtn" onclick="update()"><span>+2 POINT</span></button>
+<button class="point-btn" id="pointBtn" onclick="update()"><span>+1 POINT</span></button>
+
+<!-- CHALLENGE BANNER -->
+<div class="challenge-banner" id="challengeBanner">
+  <div class="challenge-badge"><span class="badge-dot"></span> CHALLENGE ACTIVE <span class="badge-dot"></span></div>
+  <div class="challenge-name" id="challengeName">—</div>
+  <div class="challenge-pts" id="challengePts">+1 point for completing!</div>
+  <button class="complete-btn" id="completeBtn" onclick="completeChallenge()"><span>✅ WE COMPLETED IT!</span></button>
+  <div class="done-flash" id="doneFlash">🎉 DONE! POINTS EARNED!</div>
+</div>
 
 <div class="roster-card" id="rosterCard" style="display:none">
   <div class="roster-title">👥 Team Members</div>
   <div id="memberList"></div>
 </div>
 
-
+<button class="back-btn" onclick="window.location.href='./leaderboard.html'">📊 Leaderboard</button>
 
 <script>
 const COLORS={team1:'#ff6b6b',team2:'#ffd93d',team3:'#6bcb77',team4:'#4d96ff',team5:'#ff922b',team6:'#cc5de8',team7:'#20c997',team8:'#f06595',team9:'#74c0fc',team10:'#ff8787',team11:'#a9e34b',team12:'#ffa94d'};
@@ -44,23 +134,20 @@ if(!team){window.location.href="index.html";}
 const num=team.replace('team','');
 document.getElementById("pointBtn").style.setProperty('--tc',COLORS[team]||'#00e5ff');
 
+let lastEventId=null;
+let completedEventIds=JSON.parse(sessionStorage.getItem('completedEvents')||'[]');
+
 async function loadInfo(){
   try{
-    const [nameRes,rosterRes]=await Promise.all([
-      fetch(FB+'/teamNames/'+team+'.json'),
-      fetch(FB+'/rosters/'+team+'.json')
-    ]);
-    const name=await nameRes.json();
-    const roster=await rosterRes.json()||[];
+    const [nameRes,rosterRes]=await Promise.all([fetch(FB+'/teamNames/'+team+'.json'),fetch(FB+'/rosters/'+team+'.json')]);
+    const name=await nameRes.json();const roster=await rosterRes.json()||[];
     const displayName=(name&&name!=='null')?name:`Team ${num}`;
     document.getElementById("title").textContent=`${EMOJIS[team]||''} ${displayName}`;
     if(roster&&roster.length>0){
       document.getElementById('rosterCard').style.display='block';
       document.getElementById('memberList').innerHTML=roster.map(m=>`<div class="member-chip">👤 ${m}</div>`).join('');
     }
-  }catch(e){
-    document.getElementById("title").textContent=`${EMOJIS[team]||''} Team ${num}`;
-  }
+  }catch(e){document.getElementById("title").textContent=`${EMOJIS[team]||''} Team ${num}`;}
 }
 
 async function update(){
@@ -69,13 +156,60 @@ async function update(){
   await fetch(FB+"/teams/"+team+".json",{method:"PUT",body:JSON.stringify(value)});
   document.getElementById("score").innerText=value;
 }
-async function load(){
+async function loadScore(){
   let res=await fetch(FB+"/teams/"+team+".json");let value=await res.json();
   document.getElementById("score").innerText=value||0;
 }
+
+/* ── CHALLENGE POLLING ── */
+async function pollChallenge(){
+  try{
+    const res=await fetch(FB+'/activeEvent.json');const ev=(await res.json())||{};
+    const banner=document.getElementById('challengeBanner');
+    if(ev&&ev.active&&ev.id){
+      // show banner only if not already completed this event this session
+      const alreadyDone=completedEventIds.includes(ev.id+'_'+ev.firedAt);
+      document.getElementById('challengeName').textContent=ev.name||'Challenge';
+      document.getElementById('challengePts').textContent=`+${ev.points||1} point${(ev.points||1)!==1?'s':''} for completing!`;
+      document.getElementById('completeBtn').disabled=alreadyDone;
+      document.getElementById('doneFlash').classList.toggle('show',alreadyDone);
+      banner.classList.add('visible');
+      lastEventId={id:ev.id,name:ev.name,points:ev.points||1,firedAt:ev.firedAt};
+    } else {
+      banner.classList.remove('visible');
+      lastEventId=null;
+    }
+  }catch(e){}
+}
+
+async function completeChallenge(){
+  if(!lastEventId)return;
+  const key=lastEventId.id+'_'+lastEventId.firedAt;
+  if(completedEventIds.includes(key))return;
+
+  // disable button immediately
+  document.getElementById('completeBtn').disabled=true;
+  document.getElementById('doneFlash').classList.add('show');
+
+  // award points
+  const res=await fetch(FB+"/teams/"+team+".json");let current=await res.json();current=(current||0)+lastEventId.points;
+  await fetch(FB+"/teams/"+team+".json",{method:"PUT",body:JSON.stringify(current)});
+  document.getElementById("score").innerText=current;
+
+  // log completion
+  const logEntry={team,eventName:lastEventId.name,points:lastEventId.points,time:Date.now()};
+  await fetch(FB+'/completions/'+Date.now()+'_'+team+'.json',{method:'PUT',body:JSON.stringify(logEntry)});
+
+  // remember so refreshes don't double-count
+  completedEventIds.push(key);
+  sessionStorage.setItem('completedEvents',JSON.stringify(completedEventIds));
+}
+
 loadInfo();
-setInterval(load,1000);
-load();
+loadScore();
+setInterval(loadScore,1000);
+setInterval(pollChallenge,1500);
+pollChallenge();
 </script>
 </body>
 </html>
