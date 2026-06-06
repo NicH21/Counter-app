@@ -108,10 +108,15 @@
     .add-event-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
     .ev-name-inp{flex:2;min-width:140px;background:rgba(5,30,55,0.8);border:1px solid rgba(0,229,255,0.25);border-radius:9px;padding:9px 12px;color:#a8e4ff;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;outline:none;transition:border-color 0.2s}
     .ev-name-inp:focus{border-color:rgba(0,229,255,0.6)}
-    .ev-pts-inp{width:80px;background:rgba(5,30,55,0.8);border:1px solid rgba(240,192,64,0.25);border-radius:9px;padding:9px 10px;color:#f0c040;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;text-align:center;outline:none;transition:border-color 0.2s}
+    .ev-pts-inp{width:70px;background:rgba(5,30,55,0.8);border:1px solid rgba(240,192,64,0.25);border-radius:9px;padding:9px 10px;color:#f0c040;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;text-align:center;outline:none;transition:border-color 0.2s}
     .ev-pts-inp:focus{border-color:rgba(240,192,64,0.6)}
+    .ev-dur-inp{width:70px;background:rgba(5,30,55,0.8);border:1px solid rgba(107,203,119,0.25);border-radius:9px;padding:9px 10px;color:#6bcb77;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;text-align:center;outline:none;transition:border-color 0.2s}
+    .ev-dur-inp:focus{border-color:rgba(107,203,119,0.6)}
     .add-ev-btn{font-family:'Bangers',cursive;font-size:18px;letter-spacing:1px;padding:9px 20px;border-radius:10px;border:2px solid #4d96ff;box-shadow:0 0 10px rgba(77,150,255,0.3);cursor:pointer;background:rgba(2,11,24,0.85);color:white;transition:transform 0.1s,box-shadow 0.2s;white-space:nowrap}
     .add-ev-btn:hover{transform:translateY(-2px);box-shadow:0 0 20px rgba(77,150,255,0.6)}
+    .event-dur{font-size:12px;color:#6bcb77;font-weight:700;white-space:nowrap}
+    .active-event-timer{font-family:'Bangers',cursive;font-size:28px;letter-spacing:3px;color:#ffa94d;text-shadow:0 0 16px rgba(255,169,77,0.5);margin-top:4px}
+    .active-event-timer.expiring{color:#ff6b6b;text-shadow:0 0 16px rgba(255,107,107,0.6);animation:blink 0.6s infinite}
 
     /* completions log */
     .completions-log{max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:7px}
@@ -200,9 +205,10 @@
 
     <!-- Active event -->
     <div class="active-event-box" id="activeEventBox">
-      <div>
+      <div style="flex:1">
         <div class="active-event-label">Currently Active</div>
         <div class="active-event-name none" id="activeEventName">No active challenge</div>
+        <div class="active-event-timer" id="activeEventTimer" style="display:none"></div>
       </div>
       <button class="clear-event-btn" onclick="clearActiveEvent()">✕ Clear</button>
     </div>
@@ -213,9 +219,11 @@
     <!-- Add new event -->
     <div class="add-event-row">
       <input class="ev-name-inp" type="text" id="newEvName" placeholder="Challenge name…" maxlength="60">
-      <input class="ev-pts-inp" type="number" id="newEvPts" placeholder="Pts" value="1" min="1" max="999">
+      <input class="ev-pts-inp" type="number" id="newEvPts" placeholder="Pts" value="1" min="1" max="999" title="Points awarded">
+      <input class="ev-dur-inp" type="number" id="newEvDur" placeholder="Min" value="5" min="1" max="999" title="Duration in minutes">
       <button class="add-ev-btn" onclick="addEvent()">+ ADD</button>
     </div>
+    <div style="font-size:11px;color:rgba(168,228,255,0.3);margin-top:8px;letter-spacing:1px">Pts = points awarded &nbsp;·&nbsp; Min = how long the challenge stays active</div>
   </div>
 
   <!-- COMPLETIONS LOG -->
@@ -360,6 +368,7 @@ function renderEventList(){
     <div class="event-item${ev.enabled?' enabled':' disabled-ev'}" id="evitem_${ev.id}">
       <span class="event-name-disp">${ev.name}</span>
       <span class="event-pts">+${ev.points||1} pts</span>
+      <span class="event-dur">⏱${ev.durationMinutes||5}m</span>
       <button class="ev-fire-btn" onclick="fireEvent('${ev.id}')">🔥 Fire</button>
       <label class="toggle-switch" title="${ev.enabled?'Enabled':'Disabled'}">
         <input type="checkbox" ${ev.enabled?'checked':''} onchange="toggleEvent('${ev.id}',this.checked)">
@@ -370,14 +379,14 @@ function renderEventList(){
 }
 
 async function addEvent(){
-  const nameEl=document.getElementById('newEvName');const ptsEl=document.getElementById('newEvPts');
-  const name=nameEl.value.trim();const points=parseInt(ptsEl.value)||1;
+  const nameEl=document.getElementById('newEvName');const ptsEl=document.getElementById('newEvPts');const durEl=document.getElementById('newEvDur');
+  const name=nameEl.value.trim();const points=parseInt(ptsEl.value)||1;const durationMinutes=parseInt(durEl.value)||5;
   if(!name){nameEl.focus();return;}
   const id='ev_'+Date.now();
-  const ev={name,points,enabled:true};
+  const ev={name,points,durationMinutes,enabled:true};
   await fetch(FB+'/events/'+id+'.json',{method:'PUT',body:JSON.stringify(ev)});
   events.push({id,...ev});renderEventList();
-  nameEl.value='';ptsEl.value='1';nameEl.focus();
+  nameEl.value='';ptsEl.value='1';durEl.value='5';nameEl.focus();
   toast('✅ Challenge added!');
 }
 
@@ -414,27 +423,67 @@ async function fireEvent(id){
 }
 
 async function pushActiveEvent(ev){
-  const payload={id:ev.id,name:ev.name,points:ev.points||1,firedAt:Date.now(),active:true};
+  const durationMs=(ev.durationMinutes||5)*60*1000;
+  const firedAt=Date.now();
+  const expiresAt=firedAt+durationMs;
+  const payload={id:ev.id,name:ev.name,points:ev.points||1,firedAt,expiresAt,durationMinutes:ev.durationMinutes||5,active:true};
   await fetch(FB+'/activeEvent.json',{method:'PUT',body:JSON.stringify(payload)});
   updateActiveEventUI(payload);
-  toast(`⚡ "${ev.name}" fired!`);
+  scheduleEventExpiry(expiresAt);
+  toast(`⚡ "${ev.name}" fired! (${ev.durationMinutes||5} min)`);
+}
+
+let eventExpiryTimeout=null;
+function scheduleEventExpiry(expiresAt){
+  if(eventExpiryTimeout)clearTimeout(eventExpiryTimeout);
+  const ms=expiresAt-Date.now();
+  if(ms<=0){clearActiveEvent();return;}
+  eventExpiryTimeout=setTimeout(()=>{clearActiveEvent();toast('⏰ Challenge time is up!');},ms);
 }
 
 async function clearActiveEvent(){
-  await fetch(FB+'/activeEvent.json',{method:'PUT',body:JSON.stringify({active:false,name:'',id:'',points:0,firedAt:0})});
+  if(eventExpiryTimeout){clearTimeout(eventExpiryTimeout);eventExpiryTimeout=null;}
+  await fetch(FB+'/activeEvent.json',{method:'PUT',body:JSON.stringify({active:false,name:'',id:'',points:0,firedAt:0,expiresAt:0})});
   updateActiveEventUI(null);
   toast('✕ Challenge cleared');
 }
 
 function updateActiveEventUI(ev){
   const nameEl=document.getElementById('activeEventName');
-  if(ev&&ev.active&&ev.name){nameEl.textContent=`⚡ ${ev.name} (+${ev.points} pts)`;nameEl.className='active-event-name';}
-  else{nameEl.textContent='No active challenge';nameEl.className='active-event-name none';}
+  const timerEl=document.getElementById('activeEventTimer');
+  if(ev&&ev.active&&ev.name){
+    nameEl.textContent=`⚡ ${ev.name} (+${ev.points} pts)`;
+    nameEl.className='active-event-name';
+    timerEl.style.display='block';
+    updateActiveEventTimerDisplay(ev.expiresAt);
+  } else {
+    nameEl.textContent='No active challenge';
+    nameEl.className='active-event-name none';
+    timerEl.style.display='none';
+  }
+}
+
+let _activeExpiresAt=0;
+function updateActiveEventTimerDisplay(expiresAt){
+  _activeExpiresAt=expiresAt||0;
+}
+
+function tickActiveEventTimer(){
+  const timerEl=document.getElementById('activeEventTimer');
+  if(!timerEl||timerEl.style.display==='none')return;
+  const remaining=Math.max(0,Math.round((_activeExpiresAt-Date.now())/1000));
+  const m=Math.floor(remaining/60);const s=remaining%60;
+  timerEl.textContent=`⏱ ${m}:${String(s).padStart(2,'0')} left`;
+  timerEl.className='active-event-timer'+(remaining<=30?' expiring':'');
 }
 
 async function loadActiveEvent(){
   const res=await fetch(FB+'/activeEvent.json');const ev=(await res.json())||{};
   updateActiveEventUI(ev);
+  if(ev&&ev.active&&ev.expiresAt){
+    _activeExpiresAt=ev.expiresAt;
+    scheduleEventExpiry(ev.expiresAt);
+  }
 }
 
 /* ── EVENT SCHEDULER ── */
@@ -482,6 +531,7 @@ async function init(){
   loadScores();loadSlots();loadRosters();loadEvents();loadCompletionsLog();
   setInterval(loadScores,3000);setInterval(loadSlots,3000);setInterval(syncTimerUI,1000);
   setInterval(updateNextEventRow,1000);setInterval(loadCompletionsLog,3000);
+  setInterval(tickActiveEventTimer,1000);
   syncTimerUI();
 }
 init();
