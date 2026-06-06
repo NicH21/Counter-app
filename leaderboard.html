@@ -54,6 +54,14 @@
     .no-members{font-size:13px;color:rgba(168,228,255,0.35);text-align:center;padding:12px 0}
     .rmodal-close{display:block;width:100%;margin-top:14px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;padding:10px;border-radius:10px;border:1px solid rgba(168,228,255,0.2);background:transparent;color:rgba(168,228,255,0.6);cursor:pointer;letter-spacing:1px;transition:background 0.2s}
     .rmodal-close:hover{background:rgba(168,228,255,0.08)}
+
+    /* active event strip */
+    .event-strip { display:none; background:linear-gradient(135deg,rgba(255,165,0,0.12),rgba(255,100,0,0.08)); border:2px solid rgba(255,165,0,0.55); border-radius:14px; padding:14px 20px; margin-bottom:20px; text-align:center; animation:stripPulse 2s ease-in-out infinite; }
+    .event-strip.visible{display:block}
+    @keyframes stripPulse{0%,100%{box-shadow:0 0 20px rgba(255,165,0,0.2)}50%{box-shadow:0 0 40px rgba(255,165,0,0.45)}}
+    .event-strip-label{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,169,77,0.65);margin-bottom:5px}
+    .event-strip-name{font-family:'Bangers',cursive;font-size:clamp(20px,5vw,30px);letter-spacing:2px;color:#ffa94d;text-shadow:0 0 16px rgba(255,169,77,0.4)}
+    .event-strip-pts{font-size:13px;color:rgba(240,192,64,0.7);margin-top:3px}
     .back-btn{font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;padding:12px 30px;border-radius:10px;border:1px solid rgba(0,229,255,0.3);cursor:pointer;background:rgba(5,20,40,0.7);color:#a8e4ff;letter-spacing:1px;transition:background 0.2s,border-color 0.2s}
     .back-btn:hover{background:rgba(0,229,255,0.1);border-color:rgba(0,229,255,0.6)}
   </style>
@@ -67,6 +75,13 @@
     <div class="timer-clock" id="timerClock">--:--:--</div>
     <div class="timer-state" id="timerState"><span class="state-dot dot-stop"></span> Waiting for admin</div>
     <div class="progress-wrap"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  </div>
+
+  <!-- Active Event Strip -->
+  <div class="event-strip" id="eventStrip">
+    <div class="event-strip-label">⚡ Challenge Active</div>
+    <div class="event-strip-name" id="eventStripName">—</div>
+    <div class="event-strip-pts" id="eventStripPts"></div>
   </div>
   <div class="podium">
     <div class="place first" id="place1"><div class="place-left"><span class="medal">🥇</span><span class="place-name" id="name1">—</span></div><span class="place-score" id="score1">—</span></div>
@@ -161,6 +176,19 @@ function closeRosterModal(){document.getElementById('rosterModal').classList.rem
 document.getElementById('rosterModal').addEventListener('click',function(e){if(e.target===this)closeRosterModal();});
 
 load();refreshTimer();setInterval(load,500);setInterval(refreshTimer,1000);
+async function pollActiveEvent(){
+  try{
+    const res=await fetch(FB+'/activeEvent.json');const ev=(await res.json())||{};
+    const strip=document.getElementById('eventStrip');
+    if(ev&&ev.active&&ev.name){
+      document.getElementById('eventStripName').textContent=ev.name;
+      document.getElementById('eventStripPts').textContent=`+${ev.points||1} pt${(ev.points||1)!==1?'s':''} for completing!`;
+      strip.classList.add('visible');
+    }else{strip.classList.remove('visible');}
+  }catch(e){}
+}
+setInterval(pollActiveEvent,2000);pollActiveEvent();
+
 </script>
 </body>
 </html>
