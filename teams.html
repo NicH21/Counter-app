@@ -156,6 +156,9 @@ let wheelItems=[];
 let wheelSettings={enabled:false,cooldownMinutes:10};
 let lastSpinAt=0;
 
+/* ─────────────── TIMER LOCK ─────────────── */
+let timerEnded=false; // true when match time is up — gates all scoring
+
 /* Offscreen canvas — segments drawn ONCE, reused every RAF frame */
 let offscreen=null;
 
@@ -194,6 +197,7 @@ async function loadInfo(){
 }
 
 async function update(){
+  if(timerEnded)return;
   let res=await fetch(FB+"/teams/"+team+".json");let value=await res.json();
   value=(value||0)+2;
   await fetch(FB+"/teams/"+team+".json",{method:"PUT",body:JSON.stringify(value)});
@@ -381,7 +385,7 @@ function segmentAngle(idx){
 
 /* ─────────────── SPIN ─────────────── */
 async function startSpin(){
-  if(isSpinning||wheelItems.length===0)return;
+  if(isSpinning||wheelItems.length===0||timerEnded)return;
   if(!checkCooldown())return;
 
   isSpinning=true;
@@ -569,13 +573,61 @@ function resizeWheel(){
 }
 window.addEventListener('resize',resizeWheel,{passive:true});
 
+/* ─────────────── TIMER POLL & LOCK ─────────────── */
+async function pollTimer(){
+  try{
+    const res=await fetch(FB+'/timer.json');
+    const t=(await res.json())||{};
+    let remaining=t.remaining||0;
+    if(t.state==='running'&&t.serverTime) remaining=Math.max(0,remaining-(Date.now()-t.serverTime)/1000);
+    const ended=(t.state==='running'&&remaining<=0)||(t.state==='ended');
+    const wasEnded=timerEnded;
+    timerEnded=ended;
+    if(ended!==wasEnded) applyTimerLock(ended);
+  }catch(e){}
+}
+
+function applyTimerLock(ended){
+  /* ── Lap button ── */
+  const lapBtn=document.getElementById('pointBtn');
+  lapBtn.disabled=ended;
+  lapBtn.style.opacity=ended?'0.4':'';
+  lapBtn.style.cursor=ended?'not-allowed':'';
+  lapBtn.title=ended?'Timer has ended — laps are locked':'';
+
+  /* ── Spin button ── */
+  const spinBtn=document.getElementById('spinBtn');
+  if(ended){
+    spinBtn.disabled=true;
+    spinBtn.classList.remove('ready');
+    document.getElementById('wheelCooldownMsg').textContent='⏰ Match over — wheel locked';
+  } else {
+    // Let updateSpinBtn() decide whether cooldown applies
+    updateSpinBtn();
+  }
+
+  /* ── Challenge complete button ── */
+  // Only lock if not already marked done
+  const completeBtn=document.getElementById('completeBtn');
+  if(ended) completeBtn.disabled=true;
+
+  /* ── Visual "ended" banner on lap button ── */
+  if(ended){
+    lapBtn.querySelector('span').textContent='⏰ TIME\'S UP';
+  } else {
+    lapBtn.querySelector('span').textContent='+2 LAPS';
+  }
+}
+
 /* ─────────────── INIT ─────────────── */
 loadInfo();
 loadScore();
 loadWheel();
 resizeWheel();
+pollTimer();
 setInterval(loadScore,1500);
 setInterval(pollChallenge,1500);
+setInterval(pollTimer,2000);
 setInterval(async()=>{
   // Re-poll wheel settings so admin changes propagate live
   try{
