@@ -19,92 +19,83 @@
     @keyframes shine{0%{left:-120%}100%{left:160%}}
     .point-btn:hover{transform:scale(1.05)}.point-btn:active{transform:scale(0.96)}
 
-    /* ── CHALLENGE BANNER ── */
-    .challenge-banner {
-      display: none;
-      position: relative;
-      width: 100%; max-width: 420px;
-      background: linear-gradient(135deg, rgba(255,165,0,0.12), rgba(255,100,0,0.08));
-      border: 2px solid rgba(255,165,0,0.6);
-      border-radius: 20px;
-      padding: 20px 22px;
-      text-align: center;
-      box-shadow: 0 0 30px rgba(255,165,0,0.25), 0 0 60px rgba(255,100,0,0.1);
-      animation: bannerPulse 2s ease-in-out infinite;
-    }
-    .challenge-banner.visible { display: block; }
-    @keyframes bannerPulse {
-      0%,100%{box-shadow:0 0 30px rgba(255,165,0,0.25),0 0 60px rgba(255,100,0,0.1)}
-      50%{box-shadow:0 0 50px rgba(255,165,0,0.5),0 0 80px rgba(255,100,0,0.2)}
-    }
-    .challenge-badge {
-      font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
-      color: rgba(255,169,77,0.7); margin-bottom: 8px;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-    }
-    .badge-dot { width: 8px; height: 8px; border-radius: 50%; background: #ffa94d; animation: badgeBlink 0.8s infinite; }
+    /* CHALLENGE BANNER */
+    .challenge-banner { display:none; position:relative; width:100%; max-width:420px; background:linear-gradient(135deg,rgba(255,165,0,0.12),rgba(255,100,0,0.08)); border:2px solid rgba(255,165,0,0.6); border-radius:20px; padding:20px 22px; text-align:center; box-shadow:0 0 30px rgba(255,165,0,0.25); animation:bannerPulse 2s ease-in-out infinite; }
+    .challenge-banner.visible{display:block}
+    @keyframes bannerPulse{0%,100%{box-shadow:0 0 30px rgba(255,165,0,0.25)}50%{box-shadow:0 0 50px rgba(255,165,0,0.5)}}
+    .challenge-badge{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,169,77,0.7);margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:8px}
+    .badge-dot{width:8px;height:8px;border-radius:50%;background:#ffa94d;animation:badgeBlink 0.8s infinite}
     @keyframes badgeBlink{0%,100%{opacity:1}50%{opacity:0.2}}
-    .challenge-name {
-      font-family: 'Bangers', cursive;
-      font-size: clamp(24px, 6vw, 36px);
-      letter-spacing: 2px;
-      color: #ffa94d;
-      text-shadow: 0 0 20px rgba(255,169,77,0.5);
-      margin-bottom: 6px;
-      line-height: 1.2;
-    }
-    .challenge-pts {
-      font-size: 14px; font-weight: 700;
-      color: rgba(240,192,64,0.8);
-      margin-bottom: 18px;
-      letter-spacing: 1px;
-    }
-    .complete-btn {
-      font-family: 'Bangers', cursive;
-      font-size: 26px;
-      letter-spacing: 3px;
-      padding: 16px 40px;
-      border-radius: 14px;
-      border: 2px solid #6bcb77;
-      background: rgba(5,20,40,0.85);
-      color: white;
-      cursor: pointer;
-      box-shadow: 0 0 20px rgba(107,203,119,0.4);
-      transition: transform 0.12s, box-shadow 0.2s;
-      position: relative;
-      overflow: hidden;
-      width: 100%;
-    }
-    .complete-btn::before{content:"";position:absolute;top:0;left:-120%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(107,203,119,0.6),transparent);transform:skewX(-20deg);animation:shine 1.8s linear infinite;}
+    .challenge-name{font-family:'Bangers',cursive;font-size:clamp(24px,6vw,36px);letter-spacing:2px;color:#ffa94d;text-shadow:0 0 20px rgba(255,169,77,0.5);margin-bottom:6px;line-height:1.2}
+    .challenge-pts{font-size:14px;font-weight:700;color:rgba(240,192,64,0.8);margin-bottom:18px;letter-spacing:1px}
+    .complete-btn{font-family:'Bangers',cursive;font-size:26px;letter-spacing:3px;padding:16px 40px;border-radius:14px;border:2px solid #6bcb77;background:rgba(5,20,40,0.85);color:white;cursor:pointer;box-shadow:0 0 20px rgba(107,203,119,0.4);transition:transform 0.12s,box-shadow 0.2s;position:relative;overflow:hidden;width:100%}
+    .complete-btn::before{content:"";position:absolute;top:0;left:-120%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(107,203,119,0.6),transparent);transform:skewX(-20deg);animation:shine 1.8s linear infinite}
     .complete-btn span{position:relative;z-index:2}
-    .complete-btn:hover{transform:scale(1.03);box-shadow:0 0 36px rgba(107,203,119,0.7)}
-    .complete-btn:active{transform:scale(0.96)}
-    .complete-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
-
-    /* completed flash */
-    .done-flash {
-      display: none;
-      font-family: 'Bangers', cursive;
-      font-size: 28px; letter-spacing: 3px;
-      color: #6bcb77;
-      text-shadow: 0 0 20px rgba(107,203,119,0.6);
-      text-align: center;
-      animation: flashIn 0.4s ease;
-    }
+    .complete-btn:hover{transform:scale(1.03);box-shadow:0 0 36px rgba(107,203,119,0.7)}.complete-btn:active{transform:scale(0.96)}.complete-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+    .done-flash{display:none;font-family:'Bangers',cursive;font-size:28px;letter-spacing:3px;color:#6bcb77;text-shadow:0 0 20px rgba(107,203,119,0.6);text-align:center;animation:flashIn 0.4s ease}
     .done-flash.show{display:block}
     @keyframes flashIn{0%{transform:scale(0.6);opacity:0}100%{transform:scale(1);opacity:1}}
 
-    /* roster */
-    .roster-card { background: rgba(5,20,40,0.75); backdrop-filter: blur(8px); border-radius: 14px; border: 1px solid rgba(0,229,255,0.15); padding: 16px 22px; width: 100%; max-width: 340px; }
-    .roster-title { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: rgba(168,228,255,0.5); margin-bottom: 10px; }
-    .member-chip { font-size: 14px; font-weight: 700; color: #a8e4ff; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    /* ROSTER */
+    .roster-card{background:rgba(5,20,40,0.75);backdrop-filter:blur(8px);border-radius:14px;border:1px solid rgba(0,229,255,0.15);padding:16px 22px;width:100%;max-width:340px}
+    .roster-title{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(168,228,255,0.5);margin-bottom:10px}
+    .member-chip{font-size:14px;font-weight:700;color:#a8e4ff;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;gap:8px}
     .member-chip:last-child{border-bottom:none}
-    .no-members { font-size: 13px; color: rgba(168,228,255,0.3); }
-    .back-btn { font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700; padding: 10px 24px; border-radius: 10px; border: 1px solid rgba(0,229,255,0.3); cursor: pointer; background: rgba(5,20,40,0.6); color: #a8e4ff; letter-spacing: 1px; transition: background 0.2s; }
+    .captain-badge{font-size:11px;font-weight:700;letter-spacing:1px;color:#f0c040;background:rgba(240,192,64,0.15);border:1px solid rgba(240,192,64,0.4);border-radius:5px;padding:2px 7px;white-space:nowrap}
+    .member-chip.captain-chip{color:#f0c040}
+    .no-members{font-size:13px;color:rgba(168,228,255,0.3)}
+    .back-btn{font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;padding:10px 24px;border-radius:10px;border:1px solid rgba(0,229,255,0.3);cursor:pointer;background:rgba(5,20,40,0.6);color:#a8e4ff;letter-spacing:1px;transition:background 0.2s}
     .back-btn:hover{background:rgba(0,229,255,0.1)}
+
+    /* ══ WHEEL SECTION ══ */
+    .wheel-section{width:100%;max-width:400px;display:none;flex-direction:column;align-items:center;gap:0}
+    .wheel-section.visible{display:flex}
+
+    .wheel-section-title{font-family:'Bangers',cursive;font-size:22px;letter-spacing:3px;color:#cc5de8;text-shadow:0 0 16px rgba(204,93,232,0.5);margin-bottom:12px;text-align:center}
+
+    /* Wheel container — fixed size, no layout shifts */
+    .wheel-wrap{position:relative;width:280px;height:280px;flex-shrink:0}
+    @media(max-width:360px){.wheel-wrap{width:240px;height:240px}}
+    .wheel-canvas{display:block;border-radius:50%;will-change:transform}
+    /* Pointer arrow — pure CSS, zero JS */
+    .wheel-pointer{position:absolute;top:50%;right:-18px;transform:translateY(-50%);width:0;height:0;border-top:14px solid transparent;border-bottom:14px solid transparent;border-right:26px solid #fff;filter:drop-shadow(0 0 6px rgba(255,255,255,0.7));z-index:10}
+
+    /* Spin button */
+    .spin-btn{font-family:'Bangers',cursive;font-size:28px;letter-spacing:3px;padding:16px 44px;border-radius:16px;border:2px solid #cc5de8;background:rgba(5,20,40,0.85);color:white;cursor:pointer;box-shadow:0 0 22px rgba(204,93,232,0.4);transition:transform 0.12s,box-shadow 0.2s;position:relative;overflow:hidden;margin-top:16px;width:100%}
+    .spin-btn::before{content:"";position:absolute;top:0;left:-120%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(204,93,232,0.7),transparent);transform:skewX(-20deg);animation:shine 2.2s linear infinite}
+    .spin-btn span{position:relative;z-index:2}
+    .spin-btn:hover:not(:disabled){transform:scale(1.04);box-shadow:0 0 38px rgba(204,93,232,0.7)}
+    .spin-btn:active:not(:disabled){transform:scale(0.96)}
+    .spin-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+    .spin-btn.ready{animation:spinBtnPulse 2s ease-in-out infinite}
+    @keyframes spinBtnPulse{0%,100%{box-shadow:0 0 22px rgba(204,93,232,0.4)}50%{box-shadow:0 0 44px rgba(204,93,232,0.8)}}
+
+    .wheel-cooldown-msg{font-size:13px;color:rgba(168,228,255,0.5);letter-spacing:1px;margin-top:8px;text-align:center;height:18px}
+
+    /* Result overlay — opacity transition only (compositor) */
+    .wheel-result-overlay{
+      position:fixed;inset:0;
+      background:rgba(2,11,24,0.92);
+      backdrop-filter:blur(4px);
+      z-index:200;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+      opacity:0;pointer-events:none;
+      transition:opacity 0.35s ease;
+    }
+    .wheel-result-overlay.show{opacity:1;pointer-events:all}
+    .result-badge{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:rgba(204,93,232,0.7);animation:badgeBlink 1s infinite}
+    .result-name{font-family:'Bangers',cursive;font-size:clamp(36px,10vw,64px);letter-spacing:4px;text-align:center;line-height:1.1;padding:0 20px}
+    .result-pts{font-family:'Bangers',cursive;font-size:clamp(28px,8vw,48px);color:#f0c040;text-shadow:0 0 24px rgba(240,192,64,0.6);letter-spacing:2px}
+    .result-dismiss{font-family:'Bangers',cursive;font-size:22px;letter-spacing:2px;padding:14px 40px;border-radius:14px;border:2px solid #cc5de8;background:rgba(5,20,40,0.9);color:white;cursor:pointer;margin-top:8px;transition:transform 0.12s,box-shadow 0.2s;box-shadow:0 0 16px rgba(204,93,232,0.4)}
+    .result-dismiss:hover{transform:scale(1.05);box-shadow:0 0 30px rgba(204,93,232,0.7)}
+
+    /* Confetti canvas — overlaid, pointer-events none */
+    #confettiCanvas{position:fixed;inset:0;pointer-events:none;z-index:201}
   </style>
 </head>
 <body>
+<canvas id="confettiCanvas"></canvas>
+
 <div class="team-name" id="title">Loading...</div>
 <div class="score" id="score">0</div>
 <button class="point-btn" id="pointBtn" onclick="update()"><span>+2 LAPS</span></button>
@@ -118,6 +109,18 @@
   <div class="done-flash" id="doneFlash">🎉 DONE! POINTS EARNED!</div>
 </div>
 
+<!-- SPIN THE WHEEL -->
+<div class="wheel-section" id="wheelSection">
+  <div class="wheel-section-title">🎡 SPIN THE WHEEL</div>
+  <div class="wheel-wrap" id="wheelWrap">
+    <canvas class="wheel-canvas" id="wheelCanvas" width="280" height="280"></canvas>
+    <div class="wheel-pointer"></div>
+  </div>
+  <button class="spin-btn ready" id="spinBtn" onclick="startSpin()"><span>🎰 SPIN!</span></button>
+  <div class="wheel-cooldown-msg" id="wheelCooldownMsg"></div>
+</div>
+
+<!-- ROSTER -->
 <div class="roster-card" id="rosterCard" style="display:none">
   <div class="roster-title">👥 Team Members</div>
   <div id="memberList"></div>
@@ -125,29 +128,69 @@
 
 <button class="back-btn" onclick="window.location.href='./leaderboard.html'">📊 Leaderboard</button>
 
+<!-- RESULT OVERLAY -->
+<div class="wheel-result-overlay" id="resultOverlay">
+  <div class="result-badge">🎡 You landed on…</div>
+  <div class="result-name" id="resultName">—</div>
+  <div class="result-pts" id="resultPts"></div>
+  <button class="result-dismiss" onclick="dismissResult()">NICE! ✓</button>
+</div>
+
 <script>
-const COLORS={team1:'#ff6b6b',team2:'#ffd93d',team3:'#6bcb77',team4:'#4d96ff',team5:'#ff922b',team6:'#cc5de8',team7:'#20c997',team8:'#f06595',team9:'#74c0fc',team10:'#ff8787',team11:'#a9e34b',team12:'#ffa94d'};
-const EMOJIS={team1:'🔴',team2:'⚡',team3:'🌿',team4:'💧',team5:'🔥',team6:'💜',team7:'🌊',team8:'🌸',team9:'🩵',team10:'🎯',team11:'🍏',team12:'🧡'};
+/* ─────────────── CONFIG ─────────────── */
+const COLORS_TEAM={team1:'#ff6b6b',team2:'#ffd93d',team3:'#6bcb77',team4:'#4d96ff',team5:'#ff922b',team6:'#cc5de8',team7:'#20c997',team8:'#f06595',team9:'#74c0fc',team10:'#ff8787',team11:'#a9e34b',team12:'#ffa94d'};
+const WHEEL_SEG_COLORS=['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#ff922b','#cc5de8','#20c997','#f06595','#74c0fc','#a9e34b','#ffa94d','#e64980','#339af0','#51cf66'];
 const FB="https://counterapp-5297b-default-rtdb.firebaseio.com";
 let team=localStorage.getItem("myTeam");
 if(!team){window.location.href="index.html";}
 const num=team.replace('team','');
-document.getElementById("pointBtn").style.setProperty('--tc',COLORS[team]||'#00e5ff');
+document.getElementById("pointBtn").style.setProperty('--tc',COLORS_TEAM[team]||'#00e5ff');
 
+/* ─────────────── PERF DETECTION ─────────────── */
+const LOW_END = (navigator.hardwareConcurrency||4) <= 2;
+
+/* ─────────────── STATE ─────────────── */
 let lastEventId=null;
 let completedEventIds=JSON.parse(sessionStorage.getItem('completedEvents')||'[]');
+let wheelItems=[];
+let wheelSettings={enabled:false,cooldownMinutes:10};
+let lastSpinAt=0;
 
+/* Offscreen canvas — segments drawn ONCE, reused every RAF frame */
+let offscreen=null;
+
+/* Animation state */
+let spinRAF=null;
+let spinStartTime=0;
+let spinDuration=4200;   // ms — feels satisfying but not tedious
+let spinStartAngle=0;
+let spinTotalRotation=0;
+let spinTargetIdx=0;
+let isSpinning=false;
+let currentAngle=0;      // tracks current visual angle (persists between spins for nice feel)
+
+/* ─────────────── HELPERS ─────────────── */
+function parseRoster(raw){
+  if(!raw||!Array.isArray(raw))return[];
+  return raw.map(m=>typeof m==='string'?{name:m,captain:false}:{name:m.name||'',captain:!!m.captain});
+}
+
+/* ─────────────── GAME ─────────────── */
 async function loadInfo(){
   try{
     const [nameRes,rosterRes]=await Promise.all([fetch(FB+'/teamNames/'+team+'.json'),fetch(FB+'/rosters/'+team+'.json')]);
-    const name=await nameRes.json();const roster=await rosterRes.json()||[];
+    const name=await nameRes.json();const rawRoster=await rosterRes.json();
+    const roster=parseRoster(rawRoster);
     const displayName=(name&&name!=='null')?name:`Team ${num}`;
-    document.getElementById("title").textContent=`${EMOJIS[team]||''} ${displayName}`;
+    document.getElementById("title").textContent=displayName;
     if(roster&&roster.length>0){
       document.getElementById('rosterCard').style.display='block';
-      document.getElementById('memberList').innerHTML=roster.map(m=>`<div class="member-chip">👤 ${m}</div>`).join('');
+      document.getElementById('memberList').innerHTML=roster.map(m=>{
+        const isCap=m.captain;
+        return`<div class="member-chip${isCap?' captain-chip':''}"><span>👤 ${m.name}</span>${isCap?'<span class="captain-badge">★ Captain</span>':''}</div>`;
+      }).join('');
     }
-  }catch(e){document.getElementById("title").textContent=`${EMOJIS[team]||''} Team ${num}`;}
+  }catch(e){document.getElementById("title").textContent=`Team ${num}`;}
 }
 
 async function update(){
@@ -157,34 +200,31 @@ async function update(){
   document.getElementById("score").innerText=value;
 }
 async function loadScore(){
-  let res=await fetch(FB+"/teams/"+team+".json");let value=await res.json();
+  const res=await fetch(FB+"/teams/"+team+".json");const value=await res.json();
   document.getElementById("score").innerText=value||0;
 }
 
-/* ── CHALLENGE POLLING ── */
 async function pollChallenge(){
   try{
     const res=await fetch(FB+'/activeEvent.json');const ev=(await res.json())||{};
     const banner=document.getElementById('challengeBanner');
-    const now=Date.now();
-    const expired=ev.expiresAt&&now>ev.expiresAt;
+    const now=Date.now();const expired=ev.expiresAt&&now>ev.expiresAt;
     if(ev&&ev.active&&ev.id&&!expired){
       const alreadyDone=completedEventIds.includes(ev.id+'_'+ev.firedAt);
       document.getElementById('challengeName').textContent=ev.name||'Challenge';
-      document.getElementById('challengePts').textContent=`+${ev.points||1} point${(ev.points||1)!==1?'s':''} for completing!`;
       document.getElementById('completeBtn').disabled=alreadyDone;
       document.getElementById('doneFlash').classList.toggle('show',alreadyDone);
       banner.classList.add('visible');
       lastEventId={id:ev.id,name:ev.name,points:ev.points||1,firedAt:ev.firedAt};
-      // show countdown if duration set
       if(ev.expiresAt){
         const secsLeft=Math.max(0,Math.round((ev.expiresAt-now)/1000));
         const m=Math.floor(secsLeft/60);const s=secsLeft%60;
         document.getElementById('challengePts').textContent=`+${ev.points||1} pt${(ev.points||1)!==1?'s':''} · ⏱ ${m}:${String(s).padStart(2,'0')} left`;
+      } else {
+        document.getElementById('challengePts').textContent=`+${ev.points||1} point${(ev.points||1)!==1?'s':''} for completing!`;
       }
     } else {
-      banner.classList.remove('visible');
-      lastEventId=null;
+      banner.classList.remove('visible');lastEventId=null;
     }
   }catch(e){}
 }
@@ -193,29 +233,363 @@ async function completeChallenge(){
   if(!lastEventId)return;
   const key=lastEventId.id+'_'+lastEventId.firedAt;
   if(completedEventIds.includes(key))return;
-
-  // disable button immediately
   document.getElementById('completeBtn').disabled=true;
   document.getElementById('doneFlash').classList.add('show');
-
-  // award points
   const res=await fetch(FB+"/teams/"+team+".json");let current=await res.json();current=(current||0)+lastEventId.points;
   await fetch(FB+"/teams/"+team+".json",{method:"PUT",body:JSON.stringify(current)});
   document.getElementById("score").innerText=current;
-
-  // log completion
   const logEntry={team,eventName:lastEventId.name,points:lastEventId.points,time:Date.now()};
   await fetch(FB+'/completions/'+Date.now()+'_'+team+'.json',{method:'PUT',body:JSON.stringify(logEntry)});
-
-  // remember so refreshes don't double-count
   completedEventIds.push(key);
   sessionStorage.setItem('completedEvents',JSON.stringify(completedEventIds));
 }
 
+/* ─────────────── WHEEL DATA ─────────────── */
+async function loadWheel(){
+  try{
+    const [iRes,sRes,spinRes]=await Promise.all([
+      fetch(FB+'/wheelItems.json'),
+      fetch(FB+'/wheelSettings.json'),
+      fetch(FB+'/wheelSpins/'+team+'.json')
+    ]);
+    const iData=(await iRes.json())||{};
+    const sData=(await sRes.json())||{};
+    const spinData=(await spinRes.json())||{};
+    wheelSettings={enabled:!!sData.enabled,cooldownMinutes:sData.cooldownMinutes||10};
+    wheelItems=Object.entries(iData).map(([id,v])=>({id,...v}));
+    lastSpinAt=spinData.lastSpinAt||0;
+    updateWheelVisibility();
+    if(wheelItems.length>0){buildOffscreen();drawWheel(currentAngle);}
+    updateSpinBtn();
+  }catch(e){}
+}
+
+function updateWheelVisibility(){
+  const sec=document.getElementById('wheelSection');
+  if(wheelSettings.enabled&&wheelItems.length>0){
+    sec.classList.add('visible');
+  } else {
+    sec.classList.remove('visible');
+  }
+}
+
+/* ─────────────── OFFSCREEN CANVAS ─────────────── */
+/*
+  Key perf trick: draw all segments ONCE onto an offscreen canvas.
+  Each animation frame just draws that image rotated — no path math per frame.
+*/
+function buildOffscreen(){
+  const canvas=document.getElementById('wheelCanvas');
+  const SIZE=canvas.width;
+  offscreen=document.createElement('canvas');
+  offscreen.width=SIZE;offscreen.height=SIZE;
+  const ctx=offscreen.getContext('2d');
+  const cx=SIZE/2,cy=SIZE/2,R=SIZE/2-3;
+  const total=wheelItems.reduce((s,i)=>s+(i.weight||1),0);
+  let angle=-Math.PI/2;
+
+  wheelItems.forEach((item,idx)=>{
+    const slice=(item.weight||1)/total*Math.PI*2;
+    const col=WHEEL_SEG_COLORS[idx%WHEEL_SEG_COLORS.length];
+
+    // Segment fill
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,R,angle,angle+slice);ctx.closePath();
+    ctx.fillStyle=col;ctx.fill();
+
+    // Subtle inner highlight
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,R,angle,angle+slice);ctx.closePath();
+    const grad=ctx.createRadialGradient(cx,cy,0,cx,cy,R);
+    grad.addColorStop(0,'rgba(255,255,255,0.18)');grad.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=grad;ctx.fill();
+
+    // Divider line
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(angle)*R,cy+Math.sin(angle)*R);
+    ctx.strokeStyle='rgba(2,11,24,0.5)';ctx.lineWidth=2;ctx.stroke();
+
+    // Label — only draw if segment is wide enough to be readable
+    if(slice>0.22){
+      ctx.save();
+      ctx.translate(cx,cy);ctx.rotate(angle+slice/2);
+      ctx.textAlign='right';
+      ctx.fillStyle='rgba(255,255,255,0.97)';
+      ctx.shadowColor='rgba(0,0,0,0.6)';ctx.shadowBlur=3;
+      const fontSize=Math.min(14,Math.max(9,R*0.16));
+      ctx.font=`900 ${fontSize}px Nunito,sans-serif`;
+      const maxLen=Math.floor(R*0.28);
+      let txt=item.label;
+      if(ctx.measureText(txt).width>maxLen) txt=txt.slice(0,Math.max(3,Math.floor(maxLen/fontSize*1.5)))+'…';
+      ctx.fillText(txt,R-8,fontSize*0.38);
+      ctx.restore();
+    }
+    angle+=slice;
+  });
+
+  // Rim
+  ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);
+  ctx.strokeStyle='rgba(168,228,255,0.2)';ctx.lineWidth=3;ctx.stroke();
+
+  // Center hub
+  ctx.beginPath();ctx.arc(cx,cy,18,0,Math.PI*2);
+  ctx.fillStyle='rgba(2,11,24,0.95)';ctx.fill();
+  ctx.strokeStyle='rgba(204,93,232,0.7)';ctx.lineWidth=3;ctx.stroke();
+  ctx.beginPath();ctx.arc(cx,cy,7,0,Math.PI*2);
+  ctx.fillStyle='rgba(204,93,232,0.9)';ctx.fill();
+}
+
+/* ─────────────── DRAW LOOP ─────────────── */
+/*
+  Only operation per frame: clear, rotate context, draw offscreen image.
+  All GPU-composited — no layout touches.
+*/
+function drawWheel(angle){
+  const canvas=document.getElementById('wheelCanvas');
+  if(!canvas||!offscreen)return;
+  const ctx=canvas.getContext('2d');
+  const cx=canvas.width/2,cy=canvas.height/2;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.save();
+  ctx.translate(cx,cy);
+  ctx.rotate(angle);
+  ctx.translate(-cx,-cy);
+  ctx.drawImage(offscreen,0,0);
+  ctx.restore();
+}
+
+/* ─────────────── EASING ─────────────── */
+/* Quintic ease-out: blazing fast start, long smooth deceleration */
+function easeOut5(t){ return 1-Math.pow(1-t,5); }
+
+/* ─────────────── WEIGHTED RANDOM ─────────────── */
+function pickWinner(){
+  const total=wheelItems.reduce((s,i)=>s+(i.weight||1),0);
+  let r=Math.random()*total;
+  for(let i=0;i<wheelItems.length;i++){
+    r-=(wheelItems[i].weight||1);
+    if(r<=0)return i;
+  }
+  return wheelItems.length-1;
+}
+
+/* Compute the angle at center of segment idx */
+function segmentAngle(idx){
+  const total=wheelItems.reduce((s,i)=>s+(i.weight||1),0);
+  let a=-Math.PI/2;
+  for(let i=0;i<idx;i++) a+=(wheelItems[i].weight||1)/total*Math.PI*2;
+  a+=(wheelItems[idx].weight||1)/total*Math.PI*2/2;
+  return a;
+}
+
+/* ─────────────── SPIN ─────────────── */
+async function startSpin(){
+  if(isSpinning||wheelItems.length===0)return;
+  if(!checkCooldown())return;
+
+  isSpinning=true;
+  document.getElementById('spinBtn').disabled=true;
+  document.getElementById('spinBtn').classList.remove('ready');
+
+  // 1. Determine winner BEFORE animation
+  spinTargetIdx=pickWinner();
+  const winner=wheelItems[spinTargetIdx];
+
+  // 2. Compute how far to spin
+  // We want the wheel to land with the pointer (right side, 0°) pointing at the winner segment
+  // The pointer is at angle=0 relative to canvas, segments start at -PI/2
+  // targetAngle is the center of the winning segment in the wheel's local frame
+  const segCenter=segmentAngle(spinTargetIdx); // angle from wheel center to segment center
+  // We need: currentAngle + spinTotal ≡ -segCenter (mod 2π)
+  // Add 5 full rotations for drama
+  const fullRotations=5+Math.floor(Math.random()*3);
+  const targetOffset=( -segCenter - currentAngle % (Math.PI*2) + Math.PI*2*10 ) % (Math.PI*2);
+  spinTotalRotation=Math.PI*2*fullRotations + targetOffset;
+  spinStartAngle=currentAngle;
+  spinStartTime=performance.now();
+
+  // 3. Save spin to Firebase (non-blocking)
+  fetch(FB+'/wheelSpins/'+team+'.json',{method:'PUT',body:JSON.stringify({lastSpinAt:Date.now(),result:winner.label,points:winner.points||0})});
+  lastSpinAt=Date.now();
+
+  // 4. Run RAF loop
+  if(spinRAF)cancelAnimationFrame(spinRAF);
+  spinRAF=requestAnimationFrame(rafSpin);
+}
+
+function rafSpin(now){
+  const elapsed=now-spinStartTime;
+  const t=Math.min(1,elapsed/spinDuration);
+  const eased=easeOut5(t);
+  currentAngle=spinStartAngle+spinTotalRotation*eased;
+  drawWheel(currentAngle);
+
+  if(t<1){
+    spinRAF=requestAnimationFrame(rafSpin);
+  } else {
+    spinRAF=null;
+    isSpinning=false;
+    currentAngle=spinStartAngle+spinTotalRotation; // snap to exact
+    drawWheel(currentAngle);
+    onSpinComplete();
+  }
+}
+
+async function onSpinComplete(){
+  const winner=wheelItems[spinTargetIdx];
+
+  // Award points
+  if((winner.points||0)>0){
+    const res=await fetch(FB+"/teams/"+team+".json");let current=await res.json();
+    current=(current||0)+(winner.points||0);
+    await fetch(FB+"/teams/"+team+".json",{method:"PUT",body:JSON.stringify(current)});
+    document.getElementById("score").innerText=current;
+    const logEntry={team,eventName:'🎡 '+winner.label,points:winner.points,time:Date.now()};
+    await fetch(FB+'/completions/'+Date.now()+'_'+team+'.json',{method:'PUT',body:JSON.stringify(logEntry)});
+  }
+
+  // Show result overlay
+  const col=WHEEL_SEG_COLORS[spinTargetIdx%WHEEL_SEG_COLORS.length];
+  const nameEl=document.getElementById('resultName');
+  const ptsEl=document.getElementById('resultPts');
+  nameEl.textContent=winner.label;
+  nameEl.style.color=col;
+  nameEl.style.textShadow=`0 0 30px ${col}`;
+  ptsEl.textContent=(winner.points||0)>0?`+${winner.points} POINTS!`:'Better luck next time!';
+  ptsEl.style.color=(winner.points||0)>0?'#f0c040':'rgba(168,228,255,0.5)';
+  document.getElementById('resultOverlay').classList.add('show');
+
+  // Confetti — only on capable devices
+  if(!LOW_END&&(winner.points||0)>0) spawnConfetti(col);
+
+  updateSpinBtn();
+}
+
+function dismissResult(){
+  document.getElementById('resultOverlay').classList.remove('show');
+  stopConfetti();
+}
+
+/* ─────────────── COOLDOWN ─────────────── */
+function checkCooldown(){
+  const coolMs=wheelSettings.cooldownMinutes*60*1000;
+  const elapsed=Date.now()-lastSpinAt;
+  return elapsed>=coolMs||lastSpinAt===0;
+}
+
+function updateSpinBtn(){
+  const btn=document.getElementById('spinBtn');
+  const msg=document.getElementById('wheelCooldownMsg');
+  if(wheelItems.length===0){btn.disabled=true;msg.textContent='No wheel items set up yet';return;}
+  const coolMs=wheelSettings.cooldownMinutes*60*1000;
+  const remaining=coolMs-(Date.now()-lastSpinAt);
+  if(lastSpinAt>0&&remaining>0){
+    btn.disabled=true;btn.classList.remove('ready');
+    const m=Math.floor(remaining/60000);const s=Math.floor((remaining%60000)/1000);
+    msg.textContent=`⏳ Next spin in ${m}:${String(s).padStart(2,'0')}`;
+  } else {
+    btn.disabled=false;btn.classList.add('ready');
+    msg.textContent=lastSpinAt>0?'Ready to spin again!':'';
+  }
+}
+
+/* Tick cooldown display */
+setInterval(updateSpinBtn,1000);
+
+/* ─────────────── CONFETTI ─────────────── */
+/*
+  Lightweight — flat colored rectangles only, no shadows, no blur.
+  Auto-cancels after 3s. Skipped entirely on LOW_END devices.
+*/
+let confettiParticles=[];
+let confettiRAF=null;
+let confettiActive=false;
+
+const confettiCanvas=document.getElementById('confettiCanvas');
+const confettiCtx=confettiCanvas.getContext('2d');
+function resizeConfetti(){confettiCanvas.width=window.innerWidth;confettiCanvas.height=window.innerHeight;}
+resizeConfetti();window.addEventListener('resize',resizeConfetti,{passive:true});
+
+function spawnConfetti(accentColor){
+  if(LOW_END)return;
+  confettiParticles=[];
+  const W=confettiCanvas.width,H=confettiCanvas.height;
+  const colors=['#cc5de8','#f0c040','#6bcb77','#4d96ff','#ff6b6b','#ffd93d',accentColor];
+  for(let i=0;i<60;i++){
+    confettiParticles.push({
+      x:W*0.5+(Math.random()-0.5)*W*0.4,
+      y:H*0.35+(Math.random()-0.5)*H*0.2,
+      vx:(Math.random()-0.5)*7,
+      vy:-4-Math.random()*6,
+      rot:Math.random()*Math.PI*2,
+      rotV:(Math.random()-0.5)*0.18,
+      w:7+Math.random()*7,
+      h:4+Math.random()*4,
+      color:colors[Math.floor(Math.random()*colors.length)],
+      alpha:1,
+      gravity:0.22
+    });
+  }
+  confettiActive=true;
+  if(confettiRAF)cancelAnimationFrame(confettiRAF);
+  confettiRAF=requestAnimationFrame(tickConfetti);
+  setTimeout(stopConfetti,3000);
+}
+
+function tickConfetti(){
+  confettiCtx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
+  let alive=false;
+  for(const p of confettiParticles){
+    if(p.alpha<=0.02)continue;
+    alive=true;
+    confettiCtx.save();
+    confettiCtx.globalAlpha=p.alpha;
+    confettiCtx.translate(p.x,p.y);
+    confettiCtx.rotate(p.rot);
+    confettiCtx.fillStyle=p.color;
+    confettiCtx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+    confettiCtx.restore();
+    p.x+=p.vx;p.y+=p.vy;p.vy+=p.gravity;p.vx*=0.99;
+    p.rot+=p.rotV;p.alpha-=0.013;
+  }
+  if(alive&&confettiActive) confettiRAF=requestAnimationFrame(tickConfetti);
+  else { confettiCtx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height); confettiRAF=null; }
+}
+
+function stopConfetti(){
+  confettiActive=false;
+}
+
+/* ─────────────── WHEEL CANVAS RESPONSIVE ─────────────── */
+function resizeWheel(){
+  const wrap=document.getElementById('wheelWrap');
+  if(!wrap)return;
+  const size=Math.min(280,window.innerWidth-80);
+  wrap.style.width=size+'px';wrap.style.height=size+'px';
+  const canvas=document.getElementById('wheelCanvas');
+  canvas.width=size;canvas.height=size;
+  if(wheelItems.length>0){buildOffscreen();drawWheel(currentAngle);}
+}
+window.addEventListener('resize',resizeWheel,{passive:true});
+
+/* ─────────────── INIT ─────────────── */
 loadInfo();
 loadScore();
-setInterval(loadScore,1000);
+loadWheel();
+resizeWheel();
+setInterval(loadScore,1500);
 setInterval(pollChallenge,1500);
+setInterval(async()=>{
+  // Re-poll wheel settings so admin changes propagate live
+  try{
+    const [sRes,iRes]=await Promise.all([fetch(FB+'/wheelSettings.json'),fetch(FB+'/wheelItems.json')]);
+    const sData=(await sRes.json())||{};const iData=(await iRes.json())||{};
+    const prevEnabled=wheelSettings.enabled;
+    wheelSettings={enabled:!!sData.enabled,cooldownMinutes:sData.cooldownMinutes||10};
+    const newItems=Object.entries(iData).map(([id,v])=>({id,...v}));
+    const changed=JSON.stringify(newItems)!==JSON.stringify(wheelItems);
+    wheelItems=newItems;
+    if(changed&&wheelItems.length>0){buildOffscreen();drawWheel(currentAngle);}
+    updateWheelVisibility();
+  }catch(e){}
+},5000);
 pollChallenge();
 </script>
 </body>
