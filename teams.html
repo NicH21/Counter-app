@@ -216,7 +216,7 @@ async function pollChallenge(){
     if(ev&&ev.active&&ev.id&&!expired){
       const alreadyDone=completedEventIds.includes(ev.id+'_'+ev.firedAt);
       document.getElementById('challengeName').textContent=ev.name||'Challenge';
-      document.getElementById('completeBtn').disabled=alreadyDone;
+      document.getElementById('completeBtn').disabled=alreadyDone||timerEnded;
       document.getElementById('doneFlash').classList.toggle('show',alreadyDone);
       banner.classList.add('visible');
       lastEventId={id:ev.id,name:ev.name,points:ev.points||1,firedAt:ev.firedAt};
@@ -234,7 +234,7 @@ async function pollChallenge(){
 }
 
 async function completeChallenge(){
-  if(!lastEventId)return;
+  if(!lastEventId||timerEnded)return;
   const key=lastEventId.id+'_'+lastEventId.firedAt;
   if(completedEventIds.includes(key))return;
   document.getElementById('completeBtn').disabled=true;
@@ -481,6 +481,11 @@ function checkCooldown(){
 function updateSpinBtn(){
   const btn=document.getElementById('spinBtn');
   const msg=document.getElementById('wheelCooldownMsg');
+  if(timerEnded){
+    btn.disabled=true;btn.classList.remove('ready');
+    msg.textContent='⏰ Match over — wheel locked';
+    return;
+  }
   if(wheelItems.length===0){btn.disabled=true;msg.textContent='No wheel items set up yet';return;}
   const coolMs=wheelSettings.cooldownMinutes*60*1000;
   const remaining=coolMs-(Date.now()-lastSpinAt);
