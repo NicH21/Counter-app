@@ -324,6 +324,7 @@ const COLORS = {team1:'#ff6b6b',team2:'#ffd93d',team3:'#6bcb77',team4:'#4d96ff',
 let scores={}, teamNames={}, rosters={}, activeRosterTab='team1';
 let events=[], eventFreqMinutes=15;
 let timerState={}, nextEventAt=null, eventScheduleInterval=null;
+let adminTimerEnded=false; // gates Fire buttons and auto-scheduler
 
 /* TOAST */
 function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2400);}
@@ -352,10 +353,25 @@ function updateTimerUI(state,remaining){
 async function fetchTimer(){const res=await fetch(FB+'/timer.json');return(await res.json())||{};}
 async function syncTimerUI(){
   const t=await fetchTimer();timerState=t;
-  if(!t.state||t.state==='stopped'){updateTimerUI('stopped',t.remaining||0);return;}
+  if(!t.state||t.state==='stopped'){updateTimerUI('stopped',t.remaining||0);applyAdminTimerLock(false);return;}
   let remaining=t.remaining||0;
   if(t.state==='running'&&t.serverTime){remaining=Math.max(0,remaining-Math.floor((Date.now()-t.serverTime)/1000));}
-  updateTimerUI(t.state==='running'&&remaining<=0?'ended':t.state,remaining);
+  const ended=t.state==='running'&&remaining<=0;
+  updateTimerUI(ended?'ended':t.state,remaining);
+  applyAdminTimerLock(ended);
+}
+
+function applyAdminTimerLock(ended){
+  if(adminTimerEnded===ended)return; // no change, skip re-render
+  adminTimerEnded=ended;
+  // Re-render event list so Fire buttons pick up disabled state
+  renderEventList();
+  // Stop auto-scheduler if timer ended
+  if(ended){
+    if(eventScheduleInterval){clearTimeout(eventScheduleInterval);eventScheduleInterval=null;}
+    nextEventAt=null;updateNextEventRow();
+    toast('⏰ Timer ended — events & wheel locked');
+  }
 }
 async function startTimer(){
   const h=parseInt(document.getElementById('durationHr').value)||0;const m=parseInt(document.getElementById('durationMin').value)||0;const total=h*3600+m*60;
@@ -522,7 +538,7 @@ function renderEventList(){
       <span class="event-name-disp">${ev.name}</span>
       <span class="event-pts">+${ev.points||1} pts</span>
       <span class="event-dur">⏱${ev.durationMinutes||5}m</span>
-      <button class="ev-fire-btn" onclick="fireEvent('${ev.id}')">🔥 Fire</button>
+      <button class="ev-fire-btn" onclick="fireEvent('${ev.id}')" ${adminTimerEnded?'disabled title="Timer ended"':''} style="${adminTimerEnded?'opacity:0.35;cursor:not-allowed':''}">🔥 Fire</button>
       <label class="toggle-switch" title="${ev.enabled?'Enabled':'Disabled'}">
         <input type="checkbox" ${ev.enabled?'checked':''} onchange="toggleEvent('${ev.id}',this.checked)">
         <span class="toggle-slider"></span>
@@ -546,7 +562,10 @@ async function toggleEvent(id,enabled){const ev=events.find(e=>e.id===id);if(!ev
 async function saveFrequency(){const val=parseInt(document.getElementById('freqMinutes').value)||15;eventFreqMinutes=val;await fetch(FB+'/eventSettings/freqMinutes.json',{method:'PUT',body:JSON.stringify(val)});toast('✅ Frequency saved!');}
 function getEnabledEvents(){return events.filter(e=>e.enabled);}
 function pickRandomEvent(){const pool=getEnabledEvents();if(!pool.length)return null;return pool[Math.floor(Math.random()*pool.length)];}
-async function fireEvent(id){const ev=events.find(e=>e.id===id)||{id,name:'Challenge',points:1};await pushActiveEvent(ev);}
+async function fireEvent(id){
+  if(adminTimerEnded){toast('⏰ Timer ended — cannot fire events');return;}
+  const ev=events.find(e=>e.id===id)||{id,name:'Challenge',points:1};await pushActiveEvent(ev);
+}
 async function pushActiveEvent(ev){
   const durationMs=(ev.durationMinutes||5)*60*1000;const firedAt=Date.now();const expiresAt=firedAt+durationMs;
   const payload={id:ev.id,name:ev.name,points:ev.points||1,firedAt,expiresAt,durationMinutes:ev.durationMinutes||5,active:true};
