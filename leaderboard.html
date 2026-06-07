@@ -50,7 +50,9 @@
     .rmodal{background:linear-gradient(145deg,rgba(5,20,40,0.98),rgba(2,11,24,0.98));border:2px solid rgba(0,229,255,0.25);border-radius:20px;padding:28px 28px 22px;width:90%;max-width:360px;text-align:left;box-shadow:0 0 40px rgba(0,229,255,0.1),0 20px 60px rgba(0,0,0,0.5);max-height:80vh;overflow-y:auto}
     .rmodal h3{font-family:'Bangers',cursive;font-size:28px;letter-spacing:3px;margin-bottom:6px;text-align:center}
     .rmodal-sub{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(168,228,255,0.4);text-align:center;margin-bottom:18px}
-    .member-chip{background:rgba(5,30,55,0.8);border:1px solid rgba(0,229,255,0.2);border-radius:8px;padding:9px 14px;font-size:14px;font-weight:700;color:#a8e4ff;margin-bottom:8px}
+    .member-chip{background:rgba(5,30,55,0.8);border:1px solid rgba(0,229,255,0.2);border-radius:8px;padding:9px 14px;font-size:14px;font-weight:700;color:#a8e4ff;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+    .member-chip.captain-chip{border-color:rgba(240,192,64,0.5);background:rgba(40,30,5,0.5)}
+    .captain-badge{font-size:11px;font-weight:700;letter-spacing:1px;color:#f0c040;background:rgba(240,192,64,0.15);border:1px solid rgba(240,192,64,0.4);border-radius:5px;padding:2px 7px;white-space:nowrap;font-family:'Nunito',sans-serif}
     .no-members{font-size:13px;color:rgba(168,228,255,0.35);text-align:center;padding:12px 0}
     .rmodal-close{display:block;width:100%;margin-top:14px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;padding:10px;border-radius:10px;border:1px solid rgba(168,228,255,0.2);background:transparent;color:rgba(168,228,255,0.6);cursor:pointer;letter-spacing:1px;transition:background 0.2s}
     .rmodal-close:hover{background:rgba(168,228,255,0.08)}
@@ -83,6 +85,7 @@
     <div class="event-strip-name" id="eventStripName">—</div>
     <div class="event-strip-pts" id="eventStripPts"></div>
   </div>
+
   <div class="podium">
     <div class="place first" id="place1"><div class="place-left"><span class="medal">🥇</span><span class="place-name" id="name1">—</span></div><span class="place-score" id="score1">—</span></div>
     <div class="place second" id="place2"><div class="place-left"><span class="medal">🥈</span><span class="place-name" id="name2">—</span></div><span class="place-score" id="score2">—</span></div>
@@ -108,7 +111,6 @@
 <script>
 const TEAMS=['team1','team2','team3','team4','team5','team6','team7','team8','team9','team10','team11','team12'];
 const COLORS={team1:'#ff6b6b',team2:'#ffd93d',team3:'#6bcb77',team4:'#4d96ff',team5:'#ff922b',team6:'#cc5de8',team7:'#20c997',team8:'#f06595',team9:'#74c0fc',team10:'#ff8787',team11:'#a9e34b',team12:'#ffa94d'};
-const EMOJIS={team1:'🔴',team2:'⚡',team3:'🌿',team4:'💧',team5:'🔥',team6:'💜',team7:'🌊',team8:'🌸',team9:'🩵',team10:'🎯',team11:'🍏',team12:'🧡'};
 const FB="https://counterapp-5297b-default-rtdb.firebaseio.com";
 let prevTop=['','',''];
 let cachedRosters={};
@@ -133,6 +135,11 @@ async function refreshTimer(){
   }catch(e){}
 }
 
+function parseRoster(raw){
+  if(!raw||!Array.isArray(raw))return[];
+  return raw.map(m=>typeof m==='string'?{name:m,captain:false}:{name:m.name||'',captain:!!m.captain});
+}
+
 async function load(){
   try{
     const [scoreRes,namesRes,rosterRes]=await Promise.all([
@@ -140,14 +147,15 @@ async function load(){
     ]);
     const data=await scoreRes.json()||{};
     cachedNames=await namesRes.json()||{};
-    cachedRosters=await rosterRes.json()||{};
+    const rawRosters=await rosterRes.json()||{};
+    TEAMS.forEach(k=>{cachedRosters[k]=parseRoster(rawRosters[k]);});
     const sorted=TEAMS.map(k=>({key:k,name:cachedNames[k]||'Team '+k.replace('team',''),score:data[k]||0})).sort((a,b)=>b.score-a.score);
     const maxScore=sorted[0]?.score||1;
     [0,1,2].forEach(i=>{
       const entry=sorted[i];
       const nameEl=document.getElementById('name'+(i+1));const scoreEl=document.getElementById('score'+(i+1));const placeEl=document.getElementById('place'+(i+1));
       if(prevTop[i]&&prevTop[i]!==entry.key){placeEl.classList.add('pop');setTimeout(()=>placeEl.classList.remove('pop'),600);}
-      nameEl.innerHTML=`${EMOJIS[entry.key]} ${entry.name}`;scoreEl.innerText=entry.score;prevTop[i]=entry.key;
+      nameEl.textContent=entry.name;scoreEl.innerText=entry.score;prevTop[i]=entry.key;
     });
     const container=document.getElementById('allTeamsRows');
     container.innerHTML=sorted.map((entry,i)=>`
@@ -155,7 +163,7 @@ async function load(){
         <div class="row-left">
           <span class="row-rank">${i+1}</span>
           <span class="dot" style="background:${COLORS[entry.key]}"></span>
-          <span class="row-name">${EMOJIS[entry.key]} ${entry.name}</span>
+          <span class="row-name">${entry.name}</span>
         </div>
         <div class="row-bar-wrap"><div class="row-bar" style="width:${maxScore>0?(entry.score/maxScore*100):0}%;background:linear-gradient(90deg,${COLORS[entry.key]},${COLORS[entry.key]}aa)"></div></div>
         <span class="row-score">${entry.score}</span>
@@ -166,16 +174,26 @@ async function load(){
 function showRoster(team){
   const name=cachedNames[team]||'Team '+team.replace('team','');
   const members=cachedRosters[team]||[];
-  document.getElementById('rmodalTitle').textContent=`${EMOJIS[team]} ${name}`;
+  document.getElementById('rmodalTitle').textContent=name;
   const membersEl=document.getElementById('rmodalMembers');
-  if(members.length===0){membersEl.innerHTML='<div class="no-members">No members listed yet</div>';}
-  else{membersEl.innerHTML=members.map(m=>`<div class="member-chip">👤 ${m}</div>`).join('');}
+  if(members.length===0){
+    membersEl.innerHTML='<div class="no-members">No members listed yet</div>';
+  } else {
+    membersEl.innerHTML=members.map(m=>{
+      const isCap=m.captain;
+      return`<div class="member-chip${isCap?' captain-chip':''}">
+        <span style="flex:1">👤 ${m.name}</span>
+        ${isCap?'<span class="captain-badge">★ Captain</span>':''}
+      </div>`;
+    }).join('');
+  }
   document.getElementById('rosterModal').classList.add('open');
 }
 function closeRosterModal(){document.getElementById('rosterModal').classList.remove('open');}
 document.getElementById('rosterModal').addEventListener('click',function(e){if(e.target===this)closeRosterModal();});
 
 load();refreshTimer();setInterval(load,500);setInterval(refreshTimer,1000);
+
 async function pollActiveEvent(){
   try{
     const res=await fetch(FB+'/activeEvent.json');const ev=(await res.json())||{};
@@ -192,7 +210,6 @@ async function pollActiveEvent(){
   }catch(e){}
 }
 setInterval(pollActiveEvent,1000);pollActiveEvent();
-
 </script>
 </body>
 </html>
