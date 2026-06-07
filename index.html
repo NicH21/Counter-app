@@ -56,7 +56,6 @@
     .t1{--tc:#ff6b6b}.t2{--tc:#ffd93d}.t3{--tc:#6bcb77}.t4{--tc:#4d96ff}.t5{--tc:#ff922b}.t6{--tc:#cc5de8}.t7{--tc:#20c997}.t8{--tc:#f06595}.t9{--tc:#74c0fc}.t10{--tc:#ff8787}.t11{--tc:#a9e34b}.t12{--tc:#ffa94d}
     .team-btn.t1,.team-btn.t2,.team-btn.t3,.team-btn.t4,.team-btn.t5,.team-btn.t6,.team-btn.t7,.team-btn.t8,.team-btn.t9,.team-btn.t10,.team-btn.t11,.team-btn.t12 { border-color:var(--tc); box-shadow:0 0 14px color-mix(in srgb,var(--tc) 40%,transparent),inset 0 1px 0 rgba(255,255,255,0.08); }
     .team-btn.t1:hover:not(:disabled),.team-btn.t2:hover:not(:disabled),.team-btn.t3:hover:not(:disabled),.team-btn.t4:hover:not(:disabled),.team-btn.t5:hover:not(:disabled),.team-btn.t6:hover:not(:disabled),.team-btn.t7:hover:not(:disabled),.team-btn.t8:hover:not(:disabled),.team-btn.t9:hover:not(:disabled),.team-btn.t10:hover:not(:disabled),.team-btn.t11:hover:not(:disabled),.team-btn.t12:hover:not(:disabled) { box-shadow:0 0 36px color-mix(in srgb,var(--tc) 70%,transparent),inset 0 1px 0 rgba(255,255,255,0.12); }
-    .team-emoji { display: block; font-size: 24px; margin-bottom: 3px; }
     .team-btn-name { display: block; font-size: 17px; line-height: 1.2; }
     .bottom-btns { display: flex; gap: 14px; margin-top: 8px; width: 100%; justify-content: center; flex-wrap: wrap; }
     .lb-btn { position: relative; font-family: 'Bangers', cursive; font-size: 26px; letter-spacing: 3px; padding: 15px 40px; border-radius: 16px; background: #080f1a; color: white; cursor: pointer; overflow: hidden; border: 2px solid #00aaff; box-shadow: 0 0 18px rgba(0,170,255,0.6), 0 0 40px rgba(0,170,255,0.2); transition: transform 0.15s, box-shadow 0.2s; flex: 1; min-width: 180px; }
@@ -173,7 +172,6 @@
 <script>
 const TEAMS = ['team1','team2','team3','team4','team5','team6','team7','team8','team9','team10','team11','team12'];
 const COLORS = {team1:'#ff6b6b',team2:'#ffd93d',team3:'#6bcb77',team4:'#4d96ff',team5:'#ff922b',team6:'#cc5de8',team7:'#20c997',team8:'#f06595',team9:'#74c0fc',team10:'#ff8787',team11:'#a9e34b',team12:'#ffa94d'};
-const EMOJIS = {team1:'🔴',team2:'⚡',team3:'🌿',team4:'💧',team5:'🔥',team6:'💜',team7:'🌊',team8:'🌸',team9:'🩵',team10:'🎯',team11:'🍏',team12:'🧡'};
 const FB = "https://counterapp-5297b-default-rtdb.firebaseio.com";
 const ADMIN_PIN = '1234';
 
@@ -200,7 +198,7 @@ function buildGrid(selectedData) {
     const taken = selectedData && selectedData[k] === true;
     const name = teamNames[k] || `Team ${num}`;
     return `<button id="${k}" class="team-btn ${cls}${taken?' disabled-btn':''}" onclick="choose('${k}')" ${taken?'disabled':''}>
-      <span><span class="team-emoji">${EMOJIS[k]}</span><span class="team-btn-name">${name}</span></span>
+      <span><span class="team-btn-name">${name}</span></span>
     </button>`;
   }).join('');
 }
@@ -221,13 +219,7 @@ async function loadTeams() {
       const name = namesData[k] || `Team ${num}`;
       const taken = selData && selData[k] === true;
       btn.disabled = taken;
-      btn.querySelector('.team-btn-name').textContent = name;
-      if (taken) {
-        btn.querySelector('.team-emoji').textContent = '🚫';
-        btn.querySelector('.team-btn-name').innerHTML = name + '<br><small style="font-size:12px;opacity:0.7">Taken</small>';
-      } else {
-        btn.querySelector('.team-emoji').textContent = EMOJIS[k];
-      }
+      btn.querySelector('.team-btn-name').textContent = taken ? name + ' — Taken' : name;
     });
   } catch(e) {}
 }
