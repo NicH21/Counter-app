@@ -19,6 +19,30 @@
     @keyframes shine{0%{left:-120%}100%{left:160%}}
     .point-btn:hover{transform:scale(1.05)}.point-btn:active{transform:scale(0.96)}
 
+    /* CURRENCY HUD */
+    .currency-hud{
+      position:fixed;top:14px;right:14px;z-index:50;
+      display:flex;flex-direction:column;gap:6px;align-items:flex-end;
+    }
+    .coin-badge{
+      display:flex;align-items:center;gap:6px;
+      background:rgba(2,11,24,0.82);
+      backdrop-filter:blur(6px);
+      border-radius:20px;
+      padding:6px 12px 6px 8px;
+      border:1.5px solid;
+      font-family:'Bangers',cursive;
+      font-size:18px;
+      letter-spacing:1px;
+      transition:transform 0.15s;
+      box-shadow:0 2px 12px rgba(0,0,0,0.3);
+    }
+    .coin-badge.gold{border-color:rgba(240,192,64,0.5);color:#f0c040;text-shadow:0 0 10px rgba(240,192,64,0.4)}
+    .coin-badge.mako{border-color:rgba(77,150,255,0.5);color:#4d96ff;text-shadow:0 0 10px rgba(77,150,255,0.4)}
+    .coin-badge.bump{animation:coinBump 0.35s ease}
+    @keyframes coinBump{0%{transform:scale(1)}50%{transform:scale(1.25)}100%{transform:scale(1)}}
+    .coin-icon{font-size:16px;line-height:1}
+
     /* CHALLENGE BANNER */
     .challenge-banner { display:none; position:relative; width:100%; max-width:420px; background:linear-gradient(135deg,rgba(255,165,0,0.12),rgba(255,100,0,0.08)); border:2px solid rgba(255,165,0,0.6); border-radius:20px; padding:20px 22px; text-align:center; box-shadow:0 0 30px rgba(255,165,0,0.25); animation:bannerPulse 2s ease-in-out infinite; }
     .challenge-banner.visible{display:block}
@@ -95,6 +119,18 @@
 </head>
 <body>
 <canvas id="confettiCanvas"></canvas>
+
+<!-- CURRENCY HUD -->
+<div class="currency-hud">
+  <div class="coin-badge gold" id="goldBadge">
+    <span class="coin-icon">🥇</span>
+    <span id="goldCount">0</span>
+  </div>
+  <div class="coin-badge mako" id="makoBadge">
+    <span class="coin-icon">🔵</span>
+    <span id="makoCount">0</span>
+  </div>
+</div>
 
 <div class="team-name" id="title">Loading...</div>
 <div class="score" id="score">0</div>
@@ -624,15 +660,47 @@ function applyTimerLock(ended){
   }
 }
 
+/* ─────────────── CURRENCY ─────────────── */
+let _lastGold=-1,_lastMako=-1;
+
+async function pollCurrency(){
+  try{
+    const res=await fetch(FB+'/currency/'+team+'.json');
+    const data=(await res.json())||{};
+    const gold=data.gold||0;
+    const mako=data.mako||0;
+    if(gold!==_lastGold){
+      document.getElementById('goldCount').textContent=gold;
+      if(_lastGold>=0&&gold>_lastGold) bump('goldBadge');
+      _lastGold=gold;
+    }
+    if(mako!==_lastMako){
+      document.getElementById('makoCount').textContent=mako;
+      if(_lastMako>=0&&mako>_lastMako) bump('makoBadge');
+      _lastMako=mako;
+    }
+  }catch(e){}
+}
+
+function bump(id){
+  const el=document.getElementById(id);
+  el.classList.remove('bump');
+  void el.offsetWidth; // force reflow to restart animation
+  el.classList.add('bump');
+  setTimeout(()=>el.classList.remove('bump'),400);
+}
+
 /* ─────────────── INIT ─────────────── */
 loadInfo();
 loadScore();
 loadWheel();
 resizeWheel();
 pollTimer();
+pollCurrency();
 setInterval(loadScore,1500);
 setInterval(pollChallenge,1500);
 setInterval(pollTimer,2000);
+setInterval(pollCurrency,3000);
 setInterval(async()=>{
   // Re-poll wheel settings so admin changes propagate live
   try{
