@@ -64,13 +64,10 @@
     .member-row.is-captain{border-color:rgba(240,192,64,0.5);background:rgba(40,30,5,0.4)}
     .member-input{flex:1;background:rgba(5,30,55,0.8);border:1px solid rgba(0,229,255,0.2);border-radius:8px;padding:8px 12px;color:#a8e4ff;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;outline:none;transition:border-color 0.2s}
     .member-input:focus{border-color:rgba(0,229,255,0.6)}
-
-    /* Captain toggle */
     .captain-btn{flex-shrink:0;font-size:11px;font-weight:700;letter-spacing:1px;padding:5px 9px;border-radius:7px;border:1.5px solid rgba(240,192,64,0.3);background:transparent;color:rgba(240,192,64,0.45);cursor:pointer;transition:all 0.18s;white-space:nowrap;font-family:'Nunito',sans-serif}
     .captain-btn:hover{border-color:rgba(240,192,64,0.7);color:#f0c040;background:rgba(240,192,64,0.1)}
     .captain-btn.active{border-color:#f0c040;color:#020b18;background:#f0c040;box-shadow:0 0 10px rgba(240,192,64,0.5)}
     .captain-label{font-size:11px;font-weight:700;letter-spacing:1px;color:#f0c040;padding:3px 7px;border-radius:5px;background:rgba(240,192,64,0.15);border:1px solid rgba(240,192,64,0.4);white-space:nowrap;font-family:'Nunito',sans-serif}
-
     .member-del{width:30px;height:30px;border-radius:8px;border:1px solid rgba(255,107,107,0.4);background:rgba(2,11,24,0.8);color:#ff6b6b;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:transform 0.1s,background 0.15s;flex-shrink:0}
     .member-del:hover{background:rgba(255,64,64,0.15);transform:scale(1.1)}
     .add-member-btn{font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;padding:8px 16px;border-radius:9px;border:1px solid rgba(107,203,119,0.4);background:transparent;color:#6bcb77;cursor:pointer;transition:background 0.2s}
@@ -79,7 +76,7 @@
     .save-roster-btn:hover{transform:translateY(-2px);box-shadow:0 0 24px rgba(107,203,119,0.6)}
     .captain-hint{font-size:11px;color:rgba(240,192,64,0.45);letter-spacing:1px;margin-bottom:10px}
 
-    /* EVENTS SECTION */
+    /* EVENTS */
     .events-settings-row{display:flex;align-items:center;gap:14px;margin-bottom:20px;flex-wrap:wrap}
     .events-settings-row label{font-size:14px;color:rgba(168,228,255,0.7);white-space:nowrap}
     .freq-input{width:70px;padding:8px 10px;border-radius:10px;border:1px solid rgba(255,165,0,0.4);background:rgba(2,11,24,0.7);color:#ffa94d;font-family:'Nunito',sans-serif;font-size:16px;font-weight:700;text-align:center;outline:none}
@@ -181,6 +178,72 @@
     .wheel-hint{font-size:11px;color:rgba(168,228,255,0.3);margin-top:8px;letter-spacing:1px}
     .wheel-preview-wrap{display:flex;justify-content:center;margin:16px 0 4px}
 
+    /* ══ SHOP ADMIN ══ */
+    .shop-card { border-color: rgba(77,150,255,0.25); }
+    .shop-toggle-row { display:flex; align-items:center; gap:14px; margin-bottom:20px; flex-wrap:wrap; }
+    .shop-enabled-label { font-size:14px; font-weight:700; color:rgba(168,228,255,0.7); }
+    .shop-item-list { display:flex; flex-direction:column; gap:8px; margin-bottom:14px; }
+    .shop-item-row {
+      background: rgba(2,11,24,0.6);
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.07);
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      transition: border-color 0.2s;
+    }
+    .shop-item-row.enabled { border-color: rgba(77,150,255,0.3); }
+    .shop-item-row.type-powerup { border-color: rgba(107,203,119,0.3); }
+    .shop-item-row.type-sabotage { border-color: rgba(255,107,107,0.3); }
+    .si-emoji { font-size: 24px; flex-shrink: 0; }
+    .si-info { flex: 1; min-width: 80px; }
+    .si-name { font-size: 14px; font-weight: 900; color: #a8e4ff; }
+    .si-desc { font-size: 11px; color: rgba(168,228,255,0.4); margin-top: 2px; letter-spacing: 0.5px; }
+    .si-type-badge {
+      font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+      padding: 2px 7px; border-radius: 5px; white-space: nowrap;
+    }
+    .type-powerup .si-type-badge { background: rgba(107,203,119,0.15); color: #6bcb77; border: 1px solid rgba(107,203,119,0.35); }
+    .type-sabotage .si-type-badge { background: rgba(255,107,107,0.15); color: #ff6b6b; border: 1px solid rgba(255,107,107,0.35); }
+    .type-item .si-type-badge { background: rgba(77,150,255,0.15); color: #74c0fc; border: 1px solid rgba(77,150,255,0.35); }
+    .si-price {
+      display: flex; align-items: center; gap: 5px;
+      font-family: 'Bangers', cursive; font-size: 20px; color: #74c0fc;
+      white-space: nowrap;
+    }
+    .si-price-img { width: 20px; height: 20px; border-radius: 50%; object-fit: contain; }
+    .si-del { width:28px;height:28px;border-radius:7px;border:1px solid rgba(255,107,107,0.3);background:rgba(2,11,24,0.8);color:#ff6b6b;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:transform 0.1s,background 0.15s;flex-shrink:0 }
+    .si-del:hover { background:rgba(255,64,64,0.15);transform:scale(1.1) }
+
+    /* Add item form */
+    .add-shop-row { display:flex; gap:8px; flex-wrap:wrap; margin-top:4px; align-items: flex-start; }
+    .si-emoji-inp { width:52px; background:rgba(5,30,55,0.8); border:1px solid rgba(255,255,255,0.15); border-radius:9px; padding:9px 6px; color:#a8e4ff; font-size:20px; text-align:center; outline:none; font-family:'Nunito',sans-serif; }
+    .si-name-inp { flex:2; min-width:110px; background:rgba(5,30,55,0.8); border:1px solid rgba(0,229,255,0.25); border-radius:9px; padding:9px 12px; color:#a8e4ff; font-family:'Nunito',sans-serif; font-size:14px; font-weight:700; outline:none; transition:border-color 0.2s; }
+    .si-name-inp:focus { border-color:rgba(0,229,255,0.6); }
+    .si-desc-inp { flex:3; min-width:140px; background:rgba(5,30,55,0.8); border:1px solid rgba(0,229,255,0.15); border-radius:9px; padding:9px 12px; color:rgba(168,228,255,0.7); font-family:'Nunito',sans-serif; font-size:13px; font-weight:700; outline:none; transition:border-color 0.2s; }
+    .si-desc-inp:focus { border-color:rgba(0,229,255,0.5); }
+    .si-price-inp { width:68px; background:rgba(5,30,55,0.8); border:1px solid rgba(77,150,255,0.3); border-radius:9px; padding:9px 10px; color:#74c0fc; font-family:'Nunito',sans-serif; font-size:14px; font-weight:700; text-align:center; outline:none; transition:border-color 0.2s; }
+    .si-price-inp:focus { border-color:rgba(77,150,255,0.7); }
+    .si-type-select { background:rgba(5,30,55,0.8); border:1px solid rgba(255,255,255,0.15); border-radius:9px; padding:9px 10px; color:#a8e4ff; font-family:'Nunito',sans-serif; font-size:13px; font-weight:700; outline:none; cursor:pointer; }
+    .add-si-btn { font-family:'Bangers',cursive; font-size:17px; letter-spacing:1px; padding:9px 20px; border-radius:10px; border:2px solid #4d96ff; box-shadow:0 0 10px rgba(77,150,255,0.3); cursor:pointer; background:rgba(2,11,24,0.85); color:white; transition:transform 0.1s,box-shadow 0.2s; white-space:nowrap; }
+    .add-si-btn:hover { transform:translateY(-2px); box-shadow:0 0 20px rgba(77,150,255,0.6); }
+    .shop-hint { font-size:11px; color:rgba(168,228,255,0.3); margin-top:8px; letter-spacing:1px; }
+
+    /* Shop purchase log */
+    .shop-log { max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 7px; }
+    .shop-log-row { background:rgba(2,11,24,0.5); border-radius:9px; border:1px solid rgba(77,150,255,0.2); padding:9px 14px; display:flex; align-items:center; gap:10px; font-size:13px; flex-wrap:wrap; }
+    .shop-log-team { font-weight:900; color:#74c0fc; white-space:nowrap; }
+    .shop-log-item { flex:1; color:#a8e4ff; }
+    .shop-log-cost { color:#4d96ff; font-weight:700; white-space:nowrap; font-family:'Bangers',cursive; font-size:16px; }
+    .shop-log-type { font-size:10px; font-weight:700; letter-spacing:1px; padding:2px 6px; border-radius:5px; white-space:nowrap; text-transform:uppercase; }
+    .shop-log-type.powerup { background:rgba(107,203,119,0.15); color:#6bcb77; }
+    .shop-log-type.sabotage { background:rgba(255,107,107,0.15); color:#ff6b6b; }
+    .shop-log-type.item { background:rgba(77,150,255,0.15); color:#74c0fc; }
+    .shop-log-time { color:rgba(168,228,255,0.35); font-size:11px; white-space:nowrap; }
+    .shop-log-empty { font-size:13px; color:rgba(168,228,255,0.3); text-align:center; padding:14px 0; }
+
     /* SLOTS */
     .slot-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
     @media(max-width:480px){.slot-grid{grid-template-columns:repeat(2,1fr)}}
@@ -242,9 +305,7 @@
 
   <!-- RANDOM EVENTS -->
   <div class="card">
-    <div class="card-title">
-      <span>⚡ Random Events</span>
-    </div>
+    <div class="card-title"><span>⚡ Random Events</span></div>
     <div class="events-settings-row">
       <label>Fire every</label>
       <input class="freq-input" type="number" id="freqMinutes" value="15" min="1" max="120">
@@ -290,17 +351,59 @@
   <div class="card">
     <div class="card-title">💰 Team Currency</div>
     <div class="currency-legend">
-      <div class="legend-item"><img class="legend-coin" id="legendGold" src="" alt="Gold"><span><b style="color:#f0c040">Gold Mako</b> — purchased with real money, used for anything</span></div>
-      <div class="legend-item"><img class="legend-coin" id="legendMako" src="" alt="Mako"><span><b style="color:#4d96ff">Mako Coins</b> — earned in-game, used for powerups &amp; sabotages</span></div>
+      <div class="legend-item"><img class="legend-coin" id="legendGold" src="./assets/gold-mako.png" alt="Gold"><span><b style="color:#f0c040">Gold Mako</b> — purchased with real money, used for anything</span></div>
+      <div class="legend-item"><img class="legend-coin" id="legendMako" src="./assets/mako-coin.png" alt="Mako"><span><b style="color:#4d96ff">Mako Coins</b> — earned in-game, spent in the shop</span></div>
     </div>
     <div class="currency-grid" id="currencyGrid">Loading...</div>
+  </div>
+
+  <!-- ══ MAKO SHOP ══ -->
+  <div class="card shop-card">
+    <div class="card-title">🛒 Mako Shop</div>
+
+    <!-- Enable toggle -->
+    <div class="shop-toggle-row">
+      <span class="shop-enabled-label">Shop enabled:</span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="shopEnabledToggle" onchange="saveShopSettings()" checked>
+        <span class="toggle-slider"></span>
+      </label>
+      <span style="font-size:12px;color:rgba(168,228,255,0.4);letter-spacing:1px">Teams spend Mako Coins on power-ups &amp; sabotages</span>
+    </div>
+
+    <!-- Items list -->
+    <div class="shop-item-list" id="shopItemList">
+      <div style="font-size:13px;color:rgba(168,228,255,0.3);text-align:center;padding:10px 0">No shop items yet — add some below</div>
+    </div>
+
+    <!-- Add item row -->
+    <div class="add-shop-row">
+      <input class="si-emoji-inp" type="text" id="newSiEmoji" value="⚡" maxlength="4" title="Emoji icon">
+      <input class="si-name-inp" type="text" id="newSiName" placeholder="Item name…" maxlength="40">
+      <input class="si-desc-inp" type="text" id="newSiDesc" placeholder="Short description (optional)…" maxlength="80">
+      <input class="si-price-inp" type="number" id="newSiPrice" value="5" min="1" max="9999" title="Mako Coin cost">
+      <select class="si-type-select" id="newSiType">
+        <option value="powerup">⚡ Power-up</option>
+        <option value="sabotage">💀 Sabotage</option>
+        <option value="item">🛒 Item</option>
+      </select>
+      <button class="add-si-btn" onclick="addShopItem()">+ ADD</button>
+    </div>
+    <div class="shop-hint">Emoji · Name · Description · Price (Mako Coins) · Type</div>
+  </div>
+
+  <!-- SHOP PURCHASE LOG -->
+  <div class="card">
+    <div class="card-title">
+      <span>🛒 Shop Purchase Log</span>
+      <button class="clear-log-btn" onclick="clearShopLog()">Clear</button>
+    </div>
+    <div class="shop-log" id="shopLog"><div class="shop-log-empty">No purchases yet</div></div>
   </div>
 
   <!-- SPIN THE WHEEL -->
   <div class="card">
     <div class="card-title"><span>🎡 Spin the Wheel</span></div>
-
-    <!-- Enable toggle + cooldown -->
     <div class="wheel-toggle-row">
       <span class="wheel-enabled-label">Wheel enabled:</span>
       <label class="toggle-switch">
@@ -312,16 +415,10 @@
       <span style="font-size:14px;color:rgba(168,228,255,0.5)">min</span>
       <button class="wheel-save-btn" onclick="saveWheelSettings()">💾 Save</button>
     </div>
-
-    <!-- Live mini-preview canvas -->
     <div class="wheel-preview-wrap">
       <canvas id="wheelPreviewCanvas" width="180" height="180" style="border-radius:50%;box-shadow:0 0 20px rgba(204,93,232,0.3)"></canvas>
     </div>
-
-    <!-- Items list -->
     <div class="wheel-item-list" id="wheelItemList"></div>
-
-    <!-- Add item row -->
     <div class="add-wheel-row">
       <input class="wi-name-inp" type="text" id="newWiName" placeholder="Label…" maxlength="30">
       <input class="wi-pts-inp" type="number" id="newWiPts" value="1" min="0" max="999" title="Points awarded (0 = no points)">
@@ -349,25 +446,23 @@
 
 <script>
 const FB = "https://counterapp-5297b-default-rtdb.firebaseio.com";
-const GOLD_IMG='./assets/gold-mako.png';
-const MAKO_IMG='./assets/mako-coin.png';const TEAMS = ['team1','team2','team3','team4','team5','team6','team7','team8','team9','team10','team11','team12'];
+const GOLD_IMG = './assets/gold-mako.png';
+const MAKO_IMG = './assets/mako-coin.png';
+const TEAMS = ['team1','team2','team3','team4','team5','team6','team7','team8','team9','team10','team11','team12'];
 const COLORS = {team1:'#ff6b6b',team2:'#ffd93d',team3:'#6bcb77',team4:'#4d96ff',team5:'#ff922b',team6:'#cc5de8',team7:'#20c997',team8:'#f06595',team9:'#74c0fc',team10:'#ff8787',team11:'#a9e34b',team12:'#ffa94d'};
 
 let scores={}, teamNames={}, rosters={}, activeRosterTab='team1';
 let events=[], eventFreqMinutes=15;
 let timerState={}, nextEventAt=null, eventScheduleInterval=null;
-let adminTimerEnded=false; // gates Fire buttons and auto-scheduler
+let adminTimerEnded=false;
 
 /* TOAST */
 function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2400);}
 
-/* Roster helpers — store as array of {name, captain} objects */
-function parseRoster(raw) {
-  if (!raw || !Array.isArray(raw)) return [];
-  return raw.map(m => {
-    if (typeof m === 'string') return {name: m, captain: false};
-    return {name: m.name||'', captain: !!m.captain};
-  });
+/* Roster helpers */
+function parseRoster(raw){
+  if(!raw||!Array.isArray(raw))return[];
+  return raw.map(m=>{if(typeof m==='string')return{name:m,captain:false};return{name:m.name||'',captain:!!m.captain};});
 }
 
 /* ── TIMER ── */
@@ -392,18 +487,11 @@ async function syncTimerUI(){
   updateTimerUI(ended?'ended':t.state,remaining);
   applyAdminTimerLock(ended);
 }
-
 function applyAdminTimerLock(ended){
-  if(adminTimerEnded===ended)return; // no change, skip re-render
+  if(adminTimerEnded===ended)return;
   adminTimerEnded=ended;
-  // Re-render event list so Fire buttons pick up disabled state
   renderEventList();
-  // Stop auto-scheduler if timer ended
-  if(ended){
-    if(eventScheduleInterval){clearTimeout(eventScheduleInterval);eventScheduleInterval=null;}
-    nextEventAt=null;updateNextEventRow();
-    toast('⏰ Timer ended — events & wheel locked');
-  }
+  if(ended){if(eventScheduleInterval){clearTimeout(eventScheduleInterval);eventScheduleInterval=null;}nextEventAt=null;updateNextEventRow();toast('⏰ Timer ended — events & wheel locked');}
 }
 async function startTimer(){
   const h=parseInt(document.getElementById('durationHr').value)||0;const m=parseInt(document.getElementById('durationMin').value)||0;const total=h*3600+m*60;
@@ -415,8 +503,7 @@ async function pauseTimer(){
   const t=await fetchTimer();let remaining=t.remaining||0;
   if(t.state==='running'&&t.serverTime)remaining=Math.max(0,remaining-Math.floor((Date.now()-t.serverTime)/1000));
   await fetch(FB+'/timer.json',{method:'PUT',body:JSON.stringify({state:'paused',remaining,serverTime:null,total:t.total})});
-  if(eventScheduleInterval)clearTimeout(eventScheduleInterval);
-  toast('⏸ Timer paused');
+  if(eventScheduleInterval)clearTimeout(eventScheduleInterval);toast('⏸ Timer paused');
 }
 async function resumeTimer(){
   const t=await fetchTimer();
@@ -426,8 +513,7 @@ async function resumeTimer(){
 async function resetTimer(){
   const h=parseInt(document.getElementById('durationHr').value)||0;const m=parseInt(document.getElementById('durationMin').value)||0;const total=h*3600+m*60;
   await fetch(FB+'/timer.json',{method:'PUT',body:JSON.stringify({state:'stopped',remaining:total,serverTime:null,total})});
-  if(eventScheduleInterval)clearTimeout(eventScheduleInterval);
-  nextEventAt=null;updateNextEventRow();toast('↺ Timer reset');
+  if(eventScheduleInterval)clearTimeout(eventScheduleInterval);nextEventAt=null;updateNextEventRow();toast('↺ Timer reset');
 }
 
 /* ── SCORES ── */
@@ -444,150 +530,69 @@ async function resetAllScores(){if(!confirm('Reset ALL team scores to 0?'))retur
 async function loadTeamNames(){const res=await fetch(FB+'/teamNames.json');const data=(await res.json())||{};teamNames=data;renderNamesGrid();}
 function renderNamesGrid(){
   const grid=document.getElementById('namesGrid');
-  grid.innerHTML=TEAMS.map(k=>{
-    const num=k.replace('team','');const val=teamNames[k]||`Team ${num}`;
-    return`<div class="name-row"><input class="name-input" id="ni_${k}" type="text" value="${val}" placeholder="Team ${num}" maxlength="20"></div>`;
-  }).join('');
+  grid.innerHTML=TEAMS.map(k=>{const num=k.replace('team','');const val=teamNames[k]||`Team ${num}`;return`<div class="name-row"><input class="name-input" id="ni_${k}" type="text" value="${val}" placeholder="Team ${num}" maxlength="20"></div>`;}).join('');
 }
 async function saveTeamNames(){const u={};TEAMS.forEach(k=>{const v=document.getElementById('ni_'+k).value.trim();u[k]=v||`Team ${k.replace('team','')}`;});await fetch(FB+'/teamNames.json',{method:'PUT',body:JSON.stringify(u)});teamNames=u;renderScoreGrid();renderRosterTabs();toast('✅ Names saved!');}
 
 /* ── ROSTERS ── */
 async function loadRosters(){
-  const res=await fetch(FB+'/rosters.json');
-  const data=(await res.json())||{};
-  rosters={};
-  TEAMS.forEach(k=>{rosters[k]=parseRoster(data[k]);});
+  const res=await fetch(FB+'/rosters.json');const data=(await res.json())||{};
+  rosters={};TEAMS.forEach(k=>{rosters[k]=parseRoster(data[k]);});
   renderRosterTabs();renderRosterPanel(activeRosterTab);
 }
-
 function renderRosterTabs(){
   const el=document.getElementById('rosterTabs');
-  el.innerHTML=TEAMS.map(k=>{
-    const num=k.replace('team','');const name=teamNames[k]||`T${num}`;
-    return`<button class="rtab${k===activeRosterTab?' active':''}" onclick="switchRosterTab('${k}')" style="border-color:${COLORS[k]}44">${name}</button>`;
-  }).join('');
+  el.innerHTML=TEAMS.map(k=>{const num=k.replace('team','');const name=teamNames[k]||`T${num}`;return`<button class="rtab${k===activeRosterTab?' active':''}" onclick="switchRosterTab('${k}')" style="border-color:${COLORS[k]}44">${name}</button>`;}).join('');
 }
-
 function switchRosterTab(team){activeRosterTab=team;renderRosterTabs();renderRosterPanel(team);}
-
 function renderRosterPanel(team){
   const panelsEl=document.getElementById('rosterPanels');
-  const members=rosters[team]||[];
-  const num=team.replace('team','');
-  const name=teamNames[team]||`Team ${num}`;
-  const hasCaptain=members.some(m=>m.captain);
-
-  panelsEl.innerHTML=`
-    <div class="roster-panel active">
-      <h3>${name}</h3>
-      <p class="captain-hint">★ Click "Set Captain" to mark the team captain — only one captain per team</p>
-      <div class="member-list" id="memberList_${team}">
-        ${members.map((m,i)=>memberRowHTML(team,i,m,hasCaptain)).join('')}
-      </div>
-      <button class="add-member-btn" onclick="addMember('${team}')">+ Add Member</button><br>
-      <button class="save-roster-btn" onclick="saveRoster('${team}')">💾 SAVE ROSTER</button>
-    </div>`;
+  const members=rosters[team]||[];const num=team.replace('team','');const name=teamNames[team]||`Team ${num}`;
+  panelsEl.innerHTML=`<div class="roster-panel active"><h3>${name}</h3><p class="captain-hint">★ Click "Set Captain" to mark the team captain — only one captain per team</p><div class="member-list" id="memberList_${team}">${members.map((m,i)=>memberRowHTML(team,i,m)).join('')}</div><button class="add-member-btn" onclick="addMember('${team}')">+ Add Member</button><br><button class="save-roster-btn" onclick="saveRoster('${team}')">💾 SAVE ROSTER</button></div>`;
 }
-
-function memberRowHTML(team, idx, member, hasCaptain){
-  const isCap = member.captain;
-  const capBtn = isCap
-    ? `<span class="captain-label">★ Captain</span>`
-    : `<button class="captain-btn" onclick="setCaptain('${team}',${idx})">Set Captain</button>`;
-  return `<div class="member-row${isCap?' is-captain':''}" id="mr_${team}_${idx}">
-    <input class="member-input" id="mi_${team}_${idx}" type="text" value="${member.name}" placeholder="Member name" maxlength="30">
-    ${capBtn}
-    <button class="member-del" onclick="removeMember('${team}',${idx})">✕</button>
-  </div>`;
+function memberRowHTML(team,idx,member){
+  const isCap=member.captain;
+  const capBtn=isCap?`<span class="captain-label">★ Captain</span>`:`<button class="captain-btn" onclick="setCaptain('${team}',${idx})">Set Captain</button>`;
+  return`<div class="member-row${isCap?' is-captain':''}" id="mr_${team}_${idx}"><input class="member-input" id="mi_${team}_${idx}" type="text" value="${member.name}" placeholder="Member name" maxlength="30">${capBtn}<button class="member-del" onclick="removeMember('${team}',${idx})">✕</button></div>`;
 }
-
-function setCaptain(team, idx){
-  // Read current input values first so we don't lose edits
-  syncMemberInputs(team);
-  rosters[team].forEach((m,i)=>m.captain=(i===idx));
-  renderRosterPanel(team);
-}
-
-function syncMemberInputs(team){
-  (rosters[team]||[]).forEach((m,i)=>{
-    const el=document.getElementById(`mi_${team}_${i}`);
-    if(el) m.name=el.value;
-  });
-}
-
-function addMember(team){
-  syncMemberInputs(team);
-  if(!rosters[team])rosters[team]=[];
-  rosters[team].push({name:'',captain:false});
-  renderRosterPanel(team);
-  const idx=rosters[team].length-1;
-  setTimeout(()=>{const el=document.getElementById(`mi_${team}_${idx}`);if(el)el.focus();},50);
-}
-
-function removeMember(team,idx){
-  syncMemberInputs(team);
-  rosters[team].splice(idx,1);
-  renderRosterPanel(team);
-}
-
+function setCaptain(team,idx){syncMemberInputs(team);rosters[team].forEach((m,i)=>m.captain=(i===idx));renderRosterPanel(team);}
+function syncMemberInputs(team){(rosters[team]||[]).forEach((m,i)=>{const el=document.getElementById(`mi_${team}_${i}`);if(el)m.name=el.value;});}
+function addMember(team){syncMemberInputs(team);if(!rosters[team])rosters[team]=[];rosters[team].push({name:'',captain:false});renderRosterPanel(team);const idx=rosters[team].length-1;setTimeout(()=>{const el=document.getElementById(`mi_${team}_${idx}`);if(el)el.focus();},50);}
+function removeMember(team,idx){syncMemberInputs(team);rosters[team].splice(idx,1);renderRosterPanel(team);}
 async function saveRoster(team){
   syncMemberInputs(team);
-  const saved=(rosters[team]||[])
-    .filter(m=>m.name.trim().length>0)
-    .map(m=>({name:m.name.trim(),captain:!!m.captain}));
-  rosters[team]=saved;
-  await fetch(FB+'/rosters/'+team+'.json',{method:'PUT',body:JSON.stringify(saved)});
-  renderRosterPanel(team);
-  toast(`✅ ${teamNames[team]||'Team'} roster saved!`);
+  const saved=(rosters[team]||[]).filter(m=>m.name.trim().length>0).map(m=>({name:m.name.trim(),captain:!!m.captain}));
+  rosters[team]=saved;await fetch(FB+'/rosters/'+team+'.json',{method:'PUT',body:JSON.stringify(saved)});renderRosterPanel(team);toast(`✅ ${teamNames[team]||'Team'} roster saved!`);
 }
 
 /* ── SLOTS ── */
 async function loadSlots(){
   const res=await fetch(FB+'/selectedTeams.json');const data=(await res.json())||{};
   const grid=document.getElementById('slotGrid');
-  grid.innerHTML=TEAMS.map(k=>{
-    const taken=data[k]===true;const num=k.replace('team','');const name=teamNames[k]||`Team ${num}`;
-    return`<button class="slot-btn${taken?' taken':''}" style="border-color:${COLORS[k]};box-shadow:0 0 10px ${COLORS[k]}44" onclick="toggleSlot('${k}',${taken})">${name} ${taken?'🔒':'✅'}</button>`;
-  }).join('');
+  grid.innerHTML=TEAMS.map(k=>{const taken=data[k]===true;const num=k.replace('team','');const name=teamNames[k]||`Team ${num}`;return`<button class="slot-btn${taken?' taken':''}" style="border-color:${COLORS[k]};box-shadow:0 0 10px ${COLORS[k]}44" onclick="toggleSlot('${k}',${taken})">${name} ${taken?'🔒':'✅'}</button>`;}).join('');
 }
 async function toggleSlot(team,isTaken){if(!isTaken)return;const name=teamNames[team]||team;if(!confirm(`Free up ${name} slot?`))return;await fetch(FB+'/selectedTeams/'+team+'.json',{method:'DELETE'});toast(`${name} slot freed`);loadSlots();}
 async function freeAllSlots(){if(!confirm('Free ALL slots?'))return;await fetch(FB+'/selectedTeams.json',{method:'DELETE'});toast('All slots freed');loadSlots();}
 
-/* ── EVENTS ENGINE ── */
+/* ── EVENTS ── */
 async function loadEvents(){
   const [evRes,setRes]=await Promise.all([fetch(FB+'/events.json'),fetch(FB+'/eventSettings.json')]);
   const evData=(await evRes.json())||{};const setData=(await setRes.json())||{};
-  eventFreqMinutes=setData.freqMinutes||15;
-  document.getElementById('freqMinutes').value=eventFreqMinutes;
-  events=Object.entries(evData).map(([id,ev])=>({id,...ev}));
-  renderEventList();loadActiveEvent();
+  eventFreqMinutes=setData.freqMinutes||15;document.getElementById('freqMinutes').value=eventFreqMinutes;
+  events=Object.entries(evData).map(([id,ev])=>({id,...ev}));renderEventList();loadActiveEvent();
 }
 function renderEventList(){
   const el=document.getElementById('eventList');
   if(events.length===0){el.innerHTML='<div style="font-size:13px;color:rgba(168,228,255,0.3);text-align:center;padding:12px 0">No challenges added yet</div>';return;}
-  el.innerHTML=events.map(ev=>`
-    <div class="event-item${ev.enabled?' enabled':' disabled-ev'}" id="evitem_${ev.id}">
-      <span class="event-name-disp">${ev.name}</span>
-      <span class="event-pts">+${ev.points||1} pts</span>
-      <span class="event-dur">⏱${ev.durationMinutes||5}m</span>
-      <button class="ev-fire-btn" onclick="fireEvent('${ev.id}')" ${adminTimerEnded?'disabled title="Timer ended"':''} style="${adminTimerEnded?'opacity:0.35;cursor:not-allowed':''}">🔥 Fire</button>
-      <label class="toggle-switch" title="${ev.enabled?'Enabled':'Disabled'}">
-        <input type="checkbox" ${ev.enabled?'checked':''} onchange="toggleEvent('${ev.id}',this.checked)">
-        <span class="toggle-slider"></span>
-      </label>
-      <button class="ev-del-btn" onclick="deleteEvent('${ev.id}')">✕</button>
-    </div>`).join('');
+  el.innerHTML=events.map(ev=>`<div class="event-item${ev.enabled?' enabled':' disabled-ev'}" id="evitem_${ev.id}"><span class="event-name-disp">${ev.name}</span><span class="event-pts">+${ev.points||1} pts</span><span class="event-dur">⏱${ev.durationMinutes||5}m</span><button class="ev-fire-btn" onclick="fireEvent('${ev.id}')" ${adminTimerEnded?'disabled title="Timer ended"':''} style="${adminTimerEnded?'opacity:0.35;cursor:not-allowed':''}">🔥 Fire</button><label class="toggle-switch" title="${ev.enabled?'Enabled':'Disabled'}"><input type="checkbox" ${ev.enabled?'checked':''} onchange="toggleEvent('${ev.id}',this.checked)"><span class="toggle-slider"></span></label><button class="ev-del-btn" onclick="deleteEvent('${ev.id}')">✕</button></div>`).join('');
 }
 async function addEvent(){
   const nameEl=document.getElementById('newEvName');const ptsEl=document.getElementById('newEvPts');const durEl=document.getElementById('newEvDur');
   const name=nameEl.value.trim();const points=parseInt(ptsEl.value)||1;const durationMinutes=parseInt(durEl.value)||5;
   if(!name){nameEl.focus();return;}
-  const id='ev_'+Date.now();
-  const ev={name,points,durationMinutes,enabled:true};
+  const id='ev_'+Date.now();const ev={name,points,durationMinutes,enabled:true};
   await fetch(FB+'/events/'+id+'.json',{method:'PUT',body:JSON.stringify(ev)});
-  events.push({id,...ev});renderEventList();
-  nameEl.value='';ptsEl.value='1';durEl.value='5';nameEl.focus();
-  toast('✅ Challenge added!');
+  events.push({id,...ev});renderEventList();nameEl.value='';ptsEl.value='1';durEl.value='5';nameEl.focus();toast('✅ Challenge added!');
 }
 async function deleteEvent(id){if(!confirm('Delete this challenge?'))return;await fetch(FB+'/events/'+id+'.json',{method:'DELETE'});events=events.filter(e=>e.id!==id);renderEventList();}
 async function toggleEvent(id,enabled){const ev=events.find(e=>e.id===id);if(!ev)return;ev.enabled=enabled;await fetch(FB+'/events/'+id+'/enabled.json',{method:'PUT',body:JSON.stringify(enabled)});renderEventList();}
@@ -596,20 +601,15 @@ function getEnabledEvents(){return events.filter(e=>e.enabled);}
 function pickRandomEvent(){const pool=getEnabledEvents();if(!pool.length)return null;return pool[Math.floor(Math.random()*pool.length)];}
 async function fireEvent(id){
   if(adminTimerEnded){toast('⏰ Timer ended — cannot fire events');return;}
-  const activeRes=await fetch(FB+'/activeEvent.json');
-  const activeEv=(await activeRes.json())||{};
-  const now=Date.now();
-  if(activeEv&&activeEv.active&&activeEv.expiresAt&&now<activeEv.expiresAt){
-    if(!confirm(`"${activeEv.name}" is still active. Replace it with this one?`))return;
-  }
+  const activeRes=await fetch(FB+'/activeEvent.json');const activeEv=(await activeRes.json())||{};const now=Date.now();
+  if(activeEv&&activeEv.active&&activeEv.expiresAt&&now<activeEv.expiresAt){if(!confirm(`"${activeEv.name}" is still active. Replace it?`))return;}
   const ev=events.find(e=>e.id===id)||{id,name:'Challenge',points:1};await pushActiveEvent(ev);
 }
 async function pushActiveEvent(ev){
   const durationMs=(ev.durationMinutes||5)*60*1000;const firedAt=Date.now();const expiresAt=firedAt+durationMs;
   const payload={id:ev.id,name:ev.name,points:ev.points||1,firedAt,expiresAt,durationMinutes:ev.durationMinutes||5,active:true};
   await fetch(FB+'/activeEvent.json',{method:'PUT',body:JSON.stringify(payload)});
-  updateActiveEventUI(payload);scheduleEventExpiry(expiresAt);
-  toast(`⚡ "${ev.name}" fired! (${ev.durationMinutes||5} min)`);
+  updateActiveEventUI(payload);scheduleEventExpiry(expiresAt);toast(`⚡ "${ev.name}" fired! (${ev.durationMinutes||5} min)`);
 }
 let eventExpiryTimeout=null;
 function scheduleEventExpiry(expiresAt){if(eventExpiryTimeout)clearTimeout(eventExpiryTimeout);const ms=expiresAt-Date.now();if(ms<=0){clearActiveEvent();return;}eventExpiryTimeout=setTimeout(()=>{clearActiveEvent();toast('⏰ Challenge time is up!');},ms);}
@@ -632,10 +632,7 @@ function tickActiveEventTimer(){
   timerEl.textContent=`⏱ ${m}:${String(s).padStart(2,'0')} left`;
   timerEl.className='active-event-timer'+(remaining<=30?' expiring':'');
 }
-async function loadActiveEvent(){
-  const res=await fetch(FB+'/activeEvent.json');const ev=(await res.json())||{};
-  updateActiveEventUI(ev);if(ev&&ev.active&&ev.expiresAt){_activeExpiresAt=ev.expiresAt;scheduleEventExpiry(ev.expiresAt);}
-}
+async function loadActiveEvent(){const res=await fetch(FB+'/activeEvent.json');const ev=(await res.json())||{};updateActiveEventUI(ev);if(ev&&ev.active&&ev.expiresAt){_activeExpiresAt=ev.expiresAt;scheduleEventExpiry(ev.expiresAt);}}
 function scheduleNextEvent(){
   if(eventScheduleInterval)clearTimeout(eventScheduleInterval);
   const ms=eventFreqMinutes*60*1000;nextEventAt=Date.now()+ms;updateNextEventRow();
@@ -643,10 +640,7 @@ function scheduleNextEvent(){
     const t=await fetchTimer();let remaining=t.remaining||0;
     if(t.state==='running'&&t.serverTime)remaining=Math.max(0,remaining-Math.floor((Date.now()-t.serverTime)/1000));
     if(t.state==='running'&&remaining>0){
-      // Only fire if no event is currently active
-      const activeRes=await fetch(FB+'/activeEvent.json');
-      const activeEv=(await activeRes.json())||{};
-      const now=Date.now();
+      const activeRes=await fetch(FB+'/activeEvent.json');const activeEv=(await activeRes.json())||{};const now=Date.now();
       const currentlyActive=activeEv&&activeEv.active&&activeEv.expiresAt&&now<activeEv.expiresAt;
       if(!currentlyActive){const ev=pickRandomEvent();if(ev){await pushActiveEvent(ev);}}
       else{toast('⏳ Event still active — next fire skipped');}
@@ -657,8 +651,7 @@ function scheduleNextEvent(){
 function updateNextEventRow(){
   const el=document.getElementById('nextEventRow');
   if(!nextEventAt){el.textContent='⏳ Next event in: — (timer not running)';return;}
-  const diff=Math.max(0,Math.round((nextEventAt-Date.now())/1000));
-  el.textContent=`⏳ Next random event in: ${fmtTime(diff)}`;
+  el.textContent=`⏳ Next random event in: ${fmtTime(Math.max(0,Math.round((nextEventAt-Date.now())/1000)))}`;
 }
 
 /* ── COMPLETIONS LOG ── */
@@ -667,41 +660,31 @@ async function loadCompletionsLog(){
   const entries=Object.values(data).sort((a,b)=>b.time-a.time);
   const el=document.getElementById('completionsLog');
   if(entries.length===0){el.innerHTML='<div class="comp-empty">No completions yet</div>';return;}
-  el.innerHTML=entries.map(c=>{
-    const teamName=teamNames[c.team]||c.team;
-    const d=new Date(c.time);const timeStr=d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-    return`<div class="comp-row"><span class="comp-team">${teamName}</span><span class="comp-event">${c.eventName}</span><span class="comp-pts">+${c.points}pts</span><span class="comp-time">${timeStr}</span></div>`;
-  }).join('');
+  el.innerHTML=entries.map(c=>{const teamName=teamNames[c.team]||c.team;const d=new Date(c.time);const timeStr=d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});return`<div class="comp-row"><span class="comp-team">${teamName}</span><span class="comp-event">${c.eventName}</span><span class="comp-pts">+${c.points}pts</span><span class="comp-time">${timeStr}</span></div>`;}).join('');
 }
 async function clearLog(){if(!confirm('Clear completion log?'))return;await fetch(FB+'/completions.json',{method:'DELETE'});toast('Log cleared');loadCompletionsLog();}
 
 /* ══════════════════════════════
-   CURRENCY ENGINE (ADMIN)
+   CURRENCY ENGINE
 ══════════════════════════════ */
-let currency={}; // {team1:{gold:0,mako:0}, ...}
+let currency={};
 
 async function loadCurrency(){
-  const res=await fetch(FB+'/currency.json');
-  const data=(await res.json())||{};
-  currency={};
-  TEAMS.forEach(k=>{currency[k]={gold:data[k]?.gold||0,mako:data[k]?.mako||0};});
+  const res=await fetch(FB+'/currency.json');const data=(await res.json())||{};
+  currency={};TEAMS.forEach(k=>{currency[k]={gold:data[k]?.gold||0,mako:data[k]?.mako||0};});
   renderCurrencyGrid();
-  // Set legend coin images (safe to call each time)
-  const lg=document.getElementById('legendGold');const lm=document.getElementById('legendMako');
-  if(lg)lg.src=GOLD_COIN_IMG;if(lm)lm.src=MAKO_COIN_IMG;
 }
 
 function renderCurrencyGrid(){
   const grid=document.getElementById('currencyGrid');
   grid.innerHTML=TEAMS.map(k=>{
     const name=teamNames[k]||'Team '+k.replace('team','');
-    const g=currency[k]?.gold||0;
-    const m=currency[k]?.mako||0;
+    const g=currency[k]?.gold||0;const m=currency[k]?.mako||0;
     return`<div class="currency-team-row">
       <div class="currency-team-name" style="color:${COLORS[k]}">${name}</div>
       <div class="currency-inputs">
         <div class="currency-row">
-          <img class="coin-img" src="${GOLD_COIN_IMG}" alt="Gold Mako">
+          <img class="coin-img" src="${GOLD_IMG}" alt="Gold Mako">
           <span class="currency-label">GOLD</span>
           <button class="cur-btn minus gold" onclick="adjCurrency('${k}','gold',-1)">−</button>
           <span class="currency-val gold" id="cg_${k}">${g}</span>
@@ -710,7 +693,7 @@ function renderCurrencyGrid(){
           <button class="cur-btn plus gold" style="width:auto;padding:0 8px;font-size:12px" onclick="adjCurrencyByInput('${k}','gold')">ADD</button>
         </div>
         <div class="currency-row">
-          <img class="coin-img" src="${MAKO_COIN_IMG}" alt="Mako Coin">
+          <img class="coin-img" src="${MAKO_IMG}" alt="Mako Coin">
           <span class="currency-label">MAKO</span>
           <button class="cur-btn minus mako" onclick="adjCurrency('${k}','mako',-1)">−</button>
           <span class="currency-val mako" id="cm_${k}">${m}</span>
@@ -729,20 +712,156 @@ async function adjCurrency(team,type,delta){
   document.getElementById(type==='gold'?`cg_${team}`:`cm_${team}`).textContent=currency[team][type];
   await fetch(FB+'/currency/'+team+'/'+type+'.json',{method:'PUT',body:JSON.stringify(currency[team][type])});
 }
-
 async function adjCurrencyByInput(team,type){
   const inp=document.getElementById(type==='gold'?`cgi_${team}`:`cmi_${team}`);
-  const amount=parseInt(inp.value)||1;
-  await adjCurrency(team,type,amount);
+  const amount=parseInt(inp.value)||1;await adjCurrency(team,type,amount);
   toast(`+${amount} ${type==='gold'?'Gold Mako':'Mako Coins'} → ${teamNames[team]||team}`);
+}
+
+/* ══════════════════════════════
+   MAKO SHOP ENGINE (ADMIN)
+══════════════════════════════ */
+let shopItems = [];
+
+async function loadShopData(){
+  const [itemsRes, settingsRes] = await Promise.all([
+    fetch(FB+'/shopItems.json'),
+    fetch(FB+'/shopSettings.json')
+  ]);
+  const itemsData = (await itemsRes.json()) || {};
+  const settingsData = (await settingsRes.json()) || {};
+
+  document.getElementById('shopEnabledToggle').checked = settingsData.enabled !== false;
+
+  shopItems = Object.entries(itemsData)
+    .map(([id,v]) => ({id,...v}))
+    .sort((a,b) => (a.sortOrder||99)-(b.sortOrder||99) || (a.name||'').localeCompare(b.name||''));
+
+  renderShopItemList();
+}
+
+function getShopTypeClass(type){
+  if(type==='powerup') return 'type-powerup';
+  if(type==='sabotage') return 'type-sabotage';
+  return 'type-item';
+}
+function getShopTypeBadge(type){
+  if(type==='powerup') return '⚡ POWER-UP';
+  if(type==='sabotage') return '💀 SABOTAGE';
+  return '🛒 ITEM';
+}
+
+function renderShopItemList(){
+  const el = document.getElementById('shopItemList');
+  if(shopItems.length === 0){
+    el.innerHTML = '<div style="font-size:13px;color:rgba(168,228,255,0.3);text-align:center;padding:10px 0">No shop items yet — add some below</div>';
+    return;
+  }
+  el.innerHTML = shopItems.map(item => {
+    const typeClass = getShopTypeClass(item.type);
+    return `<div class="shop-item-row ${item.enabled!==false?'enabled':''} ${typeClass}" id="shoprow_${item.id}">
+      <div class="si-emoji">${item.emoji||'🛒'}</div>
+      <div class="si-info">
+        <div class="si-name">${item.name}</div>
+        ${item.description?`<div class="si-desc">${item.description}</div>`:''}
+      </div>
+      <div class="si-type-badge">${getShopTypeBadge(item.type)}</div>
+      <div class="si-price">
+        <img class="si-price-img" src="${MAKO_IMG}" alt="Mako">
+        ${item.price||0}
+      </div>
+      <label class="toggle-switch" title="${item.enabled!==false?'Visible':'Hidden'}">
+        <input type="checkbox" ${item.enabled!==false?'checked':''} onchange="toggleShopItem('${item.id}',this.checked)">
+        <span class="toggle-slider"></span>
+      </label>
+      <button class="si-del" onclick="deleteShopItem('${item.id}')">✕</button>
+    </div>`;
+  }).join('');
+}
+
+async function addShopItem(){
+  const emojiEl = document.getElementById('newSiEmoji');
+  const nameEl  = document.getElementById('newSiName');
+  const descEl  = document.getElementById('newSiDesc');
+  const priceEl = document.getElementById('newSiPrice');
+  const typeEl  = document.getElementById('newSiType');
+
+  const name = nameEl.value.trim();
+  if(!name){ nameEl.focus(); return; }
+  const emoji = emojiEl.value.trim() || '🛒';
+  const description = descEl.value.trim();
+  const price = Math.max(1, parseInt(priceEl.value)||5);
+  const type = typeEl.value || 'item';
+  const id = 'si_' + Date.now();
+  const item = { emoji, name, description, price, type, enabled: true, sortOrder: shopItems.length };
+
+  await fetch(FB+'/shopItems/'+id+'.json', {method:'PUT', body:JSON.stringify(item)});
+  shopItems.push({id,...item});
+  renderShopItemList();
+  nameEl.value=''; descEl.value=''; emojiEl.value='⚡'; priceEl.value='5';
+  nameEl.focus();
+  toast('✅ Shop item added!');
+}
+
+async function deleteShopItem(id){
+  if(!confirm('Remove this shop item?')) return;
+  await fetch(FB+'/shopItems/'+id+'.json', {method:'DELETE'});
+  shopItems = shopItems.filter(i => i.id !== id);
+  renderShopItemList();
+  toast('🗑 Item removed');
+}
+
+async function toggleShopItem(id, enabled){
+  const item = shopItems.find(i => i.id === id);
+  if(!item) return;
+  item.enabled = enabled;
+  await fetch(FB+'/shopItems/'+id+'/enabled.json', {method:'PUT', body:JSON.stringify(enabled)});
+  renderShopItemList();
+}
+
+async function saveShopSettings(){
+  const enabled = document.getElementById('shopEnabledToggle').checked;
+  await fetch(FB+'/shopSettings.json', {method:'PUT', body:JSON.stringify({enabled})});
+  toast(enabled ? '🛒 Shop enabled!' : '🛒 Shop disabled');
+}
+
+/* ── SHOP PURCHASE LOG ── */
+async function loadShopLog(){
+  const res = await fetch(FB+'/shopPurchases.json');
+  const data = (await res.json()) || {};
+  const entries = Object.values(data).sort((a,b) => b.time - a.time);
+  const el = document.getElementById('shopLog');
+  if(entries.length === 0){
+    el.innerHTML = '<div class="shop-log-empty">No purchases yet</div>';
+    return;
+  }
+  el.innerHTML = entries.map(p => {
+    const teamName = teamNames[p.team] || p.team;
+    const d = new Date(p.time);
+    const timeStr = d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    const typeClass = p.itemType || 'item';
+    return `<div class="shop-log-row">
+      <span class="shop-log-team">${p.itemEmoji||'🛒'} ${teamName}</span>
+      <span class="shop-log-item">${p.itemName}</span>
+      <span class="shop-log-type ${typeClass}">${getShopTypeBadge(p.itemType||'item')}</span>
+      <span class="shop-log-cost">-${p.cost} 🪙</span>
+      <span class="shop-log-time">${timeStr}</span>
+    </div>`;
+  }).join('');
+}
+
+async function clearShopLog(){
+  if(!confirm('Clear the shop purchase log?')) return;
+  await fetch(FB+'/shopPurchases.json', {method:'DELETE'});
+  toast('Shop log cleared');
+  loadShopLog();
 }
 
 /* ══════════════════════════════
    WHEEL ENGINE (ADMIN)
 ══════════════════════════════ */
 const WHEEL_COLORS=['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#ff922b','#cc5de8','#20c997','#f06595','#74c0fc','#a9e34b','#ffa94d','#e64980','#339af0','#51cf66','#ff6b6b'];
-let wheelItems=[];
-let wheelSettings={enabled:false,cooldownMinutes:10};
+let wheelItems=[];let wheelSettings={enabled:false,cooldownMinutes:10};
 
 async function loadWheelData(){
   const [iRes,sRes]=await Promise.all([fetch(FB+'/wheelItems.json'),fetch(FB+'/wheelSettings.json')]);
@@ -753,101 +872,54 @@ async function loadWheelData(){
   wheelItems=Object.entries(iData).map(([id,v])=>({id,...v}));
   renderWheelItems();drawWheelPreview();
 }
-
 function renderWheelItems(){
   const el=document.getElementById('wheelItemList');
   if(wheelItems.length===0){el.innerHTML='<div style="font-size:13px;color:rgba(168,228,255,0.3);text-align:center;padding:10px 0">No items yet — add some below</div>';return;}
   const totalW=wheelItems.reduce((s,i)=>s+(i.weight||1),0);
-  el.innerHTML=wheelItems.map((item,idx)=>{
-    const pct=Math.round((item.weight||1)/totalW*100);
-    const col=WHEEL_COLORS[idx%WHEEL_COLORS.length];
-    return`<div class="wheel-item-row">
-      <div class="wi-color" style="background:${col}"></div>
-      <span class="wi-name">${item.label}</span>
-      <span class="wi-pts">${item.points>0?'+'+item.points+' pts':'No pts'}</span>
-      <span class="wi-weight">~${pct}%</span>
-      <button class="wi-del" onclick="deleteWheelItem('${item.id}')">✕</button>
-    </div>`;
-  }).join('');
+  el.innerHTML=wheelItems.map((item,idx)=>{const pct=Math.round((item.weight||1)/totalW*100);const col=WHEEL_COLORS[idx%WHEEL_COLORS.length];return`<div class="wheel-item-row"><div class="wi-color" style="background:${col}"></div><span class="wi-name">${item.label}</span><span class="wi-pts">${item.points>0?'+'+item.points+' pts':'No pts'}</span><span class="wi-weight">~${pct}%</span><button class="wi-del" onclick="deleteWheelItem('${item.id}')">✕</button></div>`;}).join('');
 }
-
 async function addWheelItem(){
-  const labelEl=document.getElementById('newWiName');
-  const ptsEl=document.getElementById('newWiPts');
-  const wEl=document.getElementById('newWiWeight');
-  const label=labelEl.value.trim();
-  if(!label){labelEl.focus();return;}
-  const points=parseInt(ptsEl.value)||0;
-  const weight=Math.max(1,parseInt(wEl.value)||1);
-  const id='wi_'+Date.now();
-  const item={label,points,weight};
+  const labelEl=document.getElementById('newWiName');const ptsEl=document.getElementById('newWiPts');const wEl=document.getElementById('newWiWeight');
+  const label=labelEl.value.trim();if(!label){labelEl.focus();return;}
+  const points=parseInt(ptsEl.value)||0;const weight=Math.max(1,parseInt(wEl.value)||1);
+  const id='wi_'+Date.now();const item={label,points,weight};
   await fetch(FB+'/wheelItems/'+id+'.json',{method:'PUT',body:JSON.stringify(item)});
-  wheelItems.push({id,...item});
-  renderWheelItems();drawWheelPreview();
-  labelEl.value='';ptsEl.value='1';wEl.value='1';labelEl.focus();
-  toast('✅ Wheel item added!');
+  wheelItems.push({id,...item});renderWheelItems();drawWheelPreview();
+  labelEl.value='';ptsEl.value='1';wEl.value='1';labelEl.focus();toast('✅ Wheel item added!');
 }
-
-async function deleteWheelItem(id){
-  await fetch(FB+'/wheelItems/'+id+'.json',{method:'DELETE'});
-  wheelItems=wheelItems.filter(i=>i.id!==id);
-  renderWheelItems();drawWheelPreview();
-}
-
+async function deleteWheelItem(id){await fetch(FB+'/wheelItems/'+id+'.json',{method:'DELETE'});wheelItems=wheelItems.filter(i=>i.id!==id);renderWheelItems();drawWheelPreview();}
 async function saveWheelSettings(){
-  const enabled=document.getElementById('wheelEnabledToggle').checked;
-  const cooldownMinutes=parseInt(document.getElementById('wheelCooldown').value)||10;
+  const enabled=document.getElementById('wheelEnabledToggle').checked;const cooldownMinutes=parseInt(document.getElementById('wheelCooldown').value)||10;
   wheelSettings={enabled,cooldownMinutes};
   await fetch(FB+'/wheelSettings.json',{method:'PUT',body:JSON.stringify(wheelSettings)});
   toast(enabled?'🎡 Wheel enabled!':'🎡 Wheel disabled');
 }
-
-/* Mini preview canvas — drawn once on change, not animated */
 function drawWheelPreview(){
-  const canvas=document.getElementById('wheelPreviewCanvas');
-  if(!canvas)return;
-  const ctx=canvas.getContext('2d');
-  const W=canvas.width,H=canvas.height,cx=W/2,cy=H/2,R=W/2-4;
+  const canvas=document.getElementById('wheelPreviewCanvas');if(!canvas)return;
+  const ctx=canvas.getContext('2d');const W=canvas.width,H=canvas.height,cx=W/2,cy=H/2,R=W/2-4;
   ctx.clearRect(0,0,W,H);
-  if(wheelItems.length===0){
-    ctx.fillStyle='rgba(5,20,40,0.8)';ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='rgba(168,228,255,0.3)';ctx.font='13px Nunito,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText('No items',cx,cy);return;
-  }
-  const total=wheelItems.reduce((s,i)=>s+(i.weight||1),0);
-  let angle=-Math.PI/2;
+  if(wheelItems.length===0){ctx.fillStyle='rgba(5,20,40,0.8)';ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);ctx.fill();ctx.fillStyle='rgba(168,228,255,0.3)';ctx.font='13px Nunito,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('No items',cx,cy);return;}
+  const total=wheelItems.reduce((s,i)=>s+(i.weight||1),0);let angle=-Math.PI/2;
   wheelItems.forEach((item,idx)=>{
-    const slice=(item.weight||1)/total*Math.PI*2;
-    const col=WHEEL_COLORS[idx%WHEEL_COLORS.length];
-    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,R,angle,angle+slice);ctx.closePath();
-    ctx.fillStyle=col;ctx.fill();
+    const slice=(item.weight||1)/total*Math.PI*2;const col=WHEEL_COLORS[idx%WHEEL_COLORS.length];
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,R,angle,angle+slice);ctx.closePath();ctx.fillStyle=col;ctx.fill();
     ctx.strokeStyle='rgba(2,11,24,0.6)';ctx.lineWidth=1.5;ctx.stroke();
-    // label
-    if(slice>0.25){
-      ctx.save();ctx.translate(cx,cy);ctx.rotate(angle+slice/2);
-      ctx.textAlign='right';ctx.fillStyle='rgba(255,255,255,0.95)';
-      ctx.font=`bold ${Math.min(11,Math.max(8,R*0.18))}px Nunito,sans-serif`;
-      const txt=item.label.length>10?item.label.slice(0,9)+'…':item.label;
-      ctx.fillText(txt,R-6,4);ctx.restore();
-    }
+    if(slice>0.25){ctx.save();ctx.translate(cx,cy);ctx.rotate(angle+slice/2);ctx.textAlign='right';ctx.fillStyle='rgba(255,255,255,0.95)';ctx.font=`bold ${Math.min(11,Math.max(8,R*0.18))}px Nunito,sans-serif`;const txt=item.label.length>10?item.label.slice(0,9)+'…':item.label;ctx.fillText(txt,R-6,4);ctx.restore();}
     angle+=slice;
   });
-  // Center circle
-  ctx.beginPath();ctx.arc(cx,cy,14,0,Math.PI*2);
-  ctx.fillStyle='rgba(2,11,24,0.9)';ctx.fill();
-  ctx.strokeStyle='rgba(168,228,255,0.4)';ctx.lineWidth=2;ctx.stroke();
-  // Pointer
-  ctx.beginPath();ctx.moveTo(cx+R-2,cy-7);ctx.lineTo(cx+R+8,cy);ctx.lineTo(cx+R-2,cy+7);ctx.closePath();
-  ctx.fillStyle='#fff';ctx.fill();
+  ctx.beginPath();ctx.arc(cx,cy,14,0,Math.PI*2);ctx.fillStyle='rgba(2,11,24,0.9)';ctx.fill();ctx.strokeStyle='rgba(168,228,255,0.4)';ctx.lineWidth=2;ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx+R-2,cy-7);ctx.lineTo(cx+R+8,cy);ctx.lineTo(cx+R-2,cy+7);ctx.closePath();ctx.fillStyle='#fff';ctx.fill();
 }
 
 /* ── INIT ── */
 async function init(){
   await loadTeamNames();
   loadScores();loadSlots();loadRosters();loadEvents();loadCompletionsLog();loadWheelData();loadCurrency();
+  loadShopData();loadShopLog();
   setInterval(loadScores,3000);setInterval(loadSlots,3000);setInterval(syncTimerUI,1000);
   setInterval(updateNextEventRow,1000);setInterval(loadCompletionsLog,3000);
   setInterval(tickActiveEventTimer,1000);setInterval(loadCurrency,5000);
+  setInterval(loadShopLog, 5000);
   syncTimerUI();
 }
 init();
