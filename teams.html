@@ -76,17 +76,11 @@
     /* ══ WHEEL SECTION ══ */
     .wheel-section{width:100%;max-width:400px;display:none;flex-direction:column;align-items:center;gap:0}
     .wheel-section.visible{display:flex}
-
     .wheel-section-title{font-family:'Bangers',cursive;font-size:22px;letter-spacing:3px;color:#cc5de8;text-shadow:0 0 16px rgba(204,93,232,0.5);margin-bottom:12px;text-align:center}
-
-    /* Wheel container — fixed size, no layout shifts */
     .wheel-wrap{position:relative;width:280px;height:280px;flex-shrink:0}
     @media(max-width:360px){.wheel-wrap{width:240px;height:240px}}
     .wheel-canvas{display:block;border-radius:50%;will-change:transform}
-    /* Pointer arrow — pure CSS, zero JS */
     .wheel-pointer{position:absolute;top:50%;right:-18px;transform:translateY(-50%);width:0;height:0;border-top:14px solid transparent;border-bottom:14px solid transparent;border-right:26px solid #fff;filter:drop-shadow(0 0 6px rgba(255,255,255,0.7));z-index:10}
-
-    /* Spin button */
     .spin-btn{font-family:'Bangers',cursive;font-size:28px;letter-spacing:3px;padding:16px 44px;border-radius:16px;border:2px solid #cc5de8;background:rgba(5,20,40,0.85);color:white;cursor:pointer;box-shadow:0 0 22px rgba(204,93,232,0.4);transition:transform 0.12s,box-shadow 0.2s;position:relative;overflow:hidden;margin-top:16px;width:100%}
     .spin-btn::before{content:"";position:absolute;top:0;left:-120%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(204,93,232,0.7),transparent);transform:skewX(-20deg);animation:shine 2.2s linear infinite}
     .spin-btn span{position:relative;z-index:2}
@@ -95,10 +89,7 @@
     .spin-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
     .spin-btn.ready{animation:spinBtnPulse 2s ease-in-out infinite}
     @keyframes spinBtnPulse{0%,100%{box-shadow:0 0 22px rgba(204,93,232,0.4)}50%{box-shadow:0 0 44px rgba(204,93,232,0.8)}}
-
     .wheel-cooldown-msg{font-size:13px;color:rgba(168,228,255,0.5);letter-spacing:1px;margin-top:8px;text-align:center;height:18px}
-
-    /* Result overlay — opacity transition only (compositor) */
     .wheel-result-overlay{
       position:fixed;inset:0;
       background:rgba(2,11,24,0.92);
@@ -114,9 +105,287 @@
     .result-pts{font-family:'Bangers',cursive;font-size:clamp(28px,8vw,48px);color:#f0c040;text-shadow:0 0 24px rgba(240,192,64,0.6);letter-spacing:2px}
     .result-dismiss{font-family:'Bangers',cursive;font-size:22px;letter-spacing:2px;padding:14px 40px;border-radius:14px;border:2px solid #cc5de8;background:rgba(5,20,40,0.9);color:white;cursor:pointer;margin-top:8px;transition:transform 0.12s,box-shadow 0.2s;box-shadow:0 0 16px rgba(204,93,232,0.4)}
     .result-dismiss:hover{transform:scale(1.05);box-shadow:0 0 30px rgba(204,93,232,0.7)}
-
-    /* Confetti canvas — overlaid, pointer-events none */
     #confettiCanvas{position:fixed;inset:0;pointer-events:none;z-index:201}
+
+    /* ══ SHOP SECTION ══ */
+    .shop-section {
+      width: 100%;
+      max-width: 480px;
+      display: none;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+    }
+    .shop-section.visible { display: flex; }
+
+    .shop-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .shop-title {
+      font-family: 'Bangers', cursive;
+      font-size: 26px;
+      letter-spacing: 3px;
+      color: #4d96ff;
+      text-shadow: 0 0 16px rgba(77,150,255,0.55);
+    }
+    .shop-balance {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(2,11,24,0.8);
+      border: 1.5px solid rgba(77,150,255,0.3);
+      border-radius: 20px;
+      padding: 4px 14px 4px 6px;
+      font-family: 'Bangers', cursive;
+      font-size: 20px;
+      color: #74c0fc;
+    }
+    .shop-balance-img {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      object-fit: contain;
+    }
+
+    .shop-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    @media(max-width: 380px) { .shop-grid { grid-template-columns: 1fr; } }
+
+    .shop-item {
+      background: rgba(5,20,40,0.8);
+      border: 1.5px solid rgba(77,150,255,0.2);
+      border-radius: 16px;
+      padding: 16px 14px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      text-align: center;
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .shop-item::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(77,150,255,0.06), transparent);
+      pointer-events: none;
+    }
+    .shop-item.powerup { border-color: rgba(107,203,119,0.3); }
+    .shop-item.powerup::before { background: linear-gradient(135deg, rgba(107,203,119,0.08), transparent); }
+    .shop-item.sabotage { border-color: rgba(255,107,107,0.3); }
+    .shop-item.sabotage::before { background: linear-gradient(135deg, rgba(255,107,107,0.08), transparent); }
+
+    .shop-item:hover:not(.cant-afford):not(:disabled) {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 0 24px rgba(77,150,255,0.35);
+    }
+    .shop-item.powerup:hover:not(.cant-afford) { box-shadow: 0 0 24px rgba(107,203,119,0.4); border-color: rgba(107,203,119,0.7); }
+    .shop-item.sabotage:hover:not(.cant-afford) { box-shadow: 0 0 24px rgba(255,107,107,0.4); border-color: rgba(255,107,107,0.7); }
+    .shop-item.cant-afford { opacity: 0.45; cursor: not-allowed; transform: none !important; }
+
+    .shop-item-emoji { font-size: 32px; line-height: 1; }
+    .shop-item-name {
+      font-family: 'Bangers', cursive;
+      font-size: 17px;
+      letter-spacing: 1.5px;
+      color: #a8e4ff;
+      line-height: 1.2;
+    }
+    .shop-item-desc {
+      font-size: 11px;
+      color: rgba(168,228,255,0.5);
+      line-height: 1.4;
+      letter-spacing: 0.5px;
+    }
+    .shop-item-type-badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+    .shop-item.powerup .shop-item-type-badge { background: rgba(107,203,119,0.15); color: #6bcb77; border: 1px solid rgba(107,203,119,0.35); }
+    .shop-item.sabotage .shop-item-type-badge { background: rgba(255,107,107,0.15); color: #ff6b6b; border: 1px solid rgba(255,107,107,0.35); }
+    .shop-item-default .shop-item-type-badge { background: rgba(77,150,255,0.15); color: #74c0fc; border: 1px solid rgba(77,150,255,0.35); }
+
+    .shop-item-price {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-family: 'Bangers', cursive;
+      font-size: 22px;
+      color: #74c0fc;
+      margin-top: 2px;
+    }
+    .shop-price-img { width: 22px; height: 22px; border-radius: 50%; object-fit: contain; }
+    .shop-buy-btn {
+      font-family: 'Bangers', cursive;
+      font-size: 16px;
+      letter-spacing: 2px;
+      padding: 8px 0;
+      width: 100%;
+      border-radius: 10px;
+      border: 1.5px solid rgba(77,150,255,0.5);
+      background: rgba(2,11,24,0.8);
+      color: white;
+      cursor: pointer;
+      transition: background 0.15s, box-shadow 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+    .shop-item.powerup .shop-buy-btn { border-color: rgba(107,203,119,0.5); }
+    .shop-item.powerup .shop-buy-btn:hover { background: rgba(107,203,119,0.15); box-shadow: 0 0 12px rgba(107,203,119,0.4); }
+    .shop-item.sabotage .shop-buy-btn { border-color: rgba(255,107,107,0.5); }
+    .shop-item.sabotage .shop-buy-btn:hover { background: rgba(255,107,107,0.15); box-shadow: 0 0 12px rgba(255,107,107,0.4); }
+    .shop-buy-btn:hover { background: rgba(77,150,255,0.15); box-shadow: 0 0 12px rgba(77,150,255,0.3); }
+    .shop-buy-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .shop-buy-btn span { position: relative; z-index: 2; }
+
+    .shop-empty {
+      font-size: 13px;
+      color: rgba(168,228,255,0.3);
+      text-align: center;
+      padding: 20px 0;
+      letter-spacing: 1px;
+    }
+
+    /* Purchase confirm modal */
+    .shop-modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(2,11,24,0.88);
+      backdrop-filter: blur(6px);
+      z-index: 150;
+      align-items: center;
+      justify-content: center;
+    }
+    .shop-modal-overlay.open { display: flex; }
+    .shop-modal {
+      background: linear-gradient(145deg, rgba(5,20,40,0.98), rgba(2,11,24,0.98));
+      border: 2px solid rgba(77,150,255,0.35);
+      border-radius: 22px;
+      padding: 32px 28px 24px;
+      width: 90%;
+      max-width: 360px;
+      text-align: center;
+      box-shadow: 0 0 40px rgba(77,150,255,0.2), 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .shop-modal.powerup { border-color: rgba(107,203,119,0.45); box-shadow: 0 0 40px rgba(107,203,119,0.2), 0 20px 60px rgba(0,0,0,0.5); }
+    .shop-modal.sabotage { border-color: rgba(255,107,107,0.45); box-shadow: 0 0 40px rgba(255,107,107,0.2), 0 20px 60px rgba(0,0,0,0.5); }
+    .shop-modal-emoji { font-size: 52px; line-height: 1; margin-bottom: 10px; }
+    .shop-modal-name {
+      font-family: 'Bangers', cursive;
+      font-size: 32px;
+      letter-spacing: 3px;
+      color: #a8e4ff;
+      margin-bottom: 6px;
+    }
+    .shop-modal-desc {
+      font-size: 13px;
+      color: rgba(168,228,255,0.55);
+      margin-bottom: 18px;
+      line-height: 1.5;
+      letter-spacing: 0.5px;
+    }
+    .shop-modal-cost {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-family: 'Bangers', cursive;
+      font-size: 28px;
+      color: #74c0fc;
+      background: rgba(2,11,24,0.7);
+      border: 1.5px solid rgba(77,150,255,0.25);
+      border-radius: 14px;
+      padding: 6px 20px;
+      margin-bottom: 22px;
+    }
+    .shop-modal-cost-img { width: 28px; height: 28px; border-radius: 50%; object-fit: contain; }
+    .shop-modal-btns { display: flex; gap: 10px; }
+    .shop-modal-confirm {
+      flex: 1;
+      font-family: 'Bangers', cursive;
+      font-size: 22px;
+      letter-spacing: 2px;
+      padding: 13px;
+      border-radius: 12px;
+      border: 2px solid #74c0fc;
+      background: rgba(2,11,24,0.85);
+      color: white;
+      cursor: pointer;
+      transition: transform 0.12s, box-shadow 0.2s;
+      box-shadow: 0 0 14px rgba(77,150,255,0.3);
+    }
+    .shop-modal.powerup .shop-modal-confirm { border-color: #6bcb77; box-shadow: 0 0 14px rgba(107,203,119,0.3); }
+    .shop-modal.sabotage .shop-modal-confirm { border-color: #ff6b6b; box-shadow: 0 0 14px rgba(255,107,107,0.3); }
+    .shop-modal-confirm:hover { transform: scale(1.04); box-shadow: 0 0 28px rgba(77,150,255,0.6); }
+    .shop-modal-cancel {
+      font-family: 'Nunito', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 13px 20px;
+      border-radius: 12px;
+      border: 1px solid rgba(168,228,255,0.2);
+      background: transparent;
+      color: rgba(168,228,255,0.5);
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .shop-modal-cancel:hover { background: rgba(168,228,255,0.08); color: #a8e4ff; }
+
+    /* Purchase success overlay */
+    .purchase-success {
+      position: fixed;
+      inset: 0;
+      background: rgba(2,11,24,0.9);
+      backdrop-filter: blur(4px);
+      z-index: 160;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .purchase-success.show { opacity: 1; pointer-events: all; }
+    .purchase-success-emoji { font-size: 72px; animation: popIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275); }
+    @keyframes popIn { 0%{transform:scale(0.3);opacity:0} 100%{transform:scale(1);opacity:1} }
+    .purchase-success-title {
+      font-family: 'Bangers', cursive;
+      font-size: clamp(32px, 8vw, 52px);
+      letter-spacing: 3px;
+      color: #6bcb77;
+      text-shadow: 0 0 30px rgba(107,203,119,0.6);
+    }
+    .purchase-success-name {
+      font-family: 'Bangers', cursive;
+      font-size: clamp(20px, 5vw, 30px);
+      letter-spacing: 2px;
+      color: #a8e4ff;
+    }
+    .purchase-success-cost {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-family: 'Bangers', cursive;
+      font-size: 22px;
+      color: #74c0fc;
+      opacity: 0.8;
+    }
+    .purchase-success-cost-img { width: 24px; height: 24px; border-radius: 50%; object-fit: contain; }
   </style>
 </head>
 <body>
@@ -125,11 +394,11 @@
 <!-- CURRENCY HUD -->
 <div class="currency-hud">
   <div class="coin-badge gold" id="goldBadge">
-    <img class="coin-icon-img" src="" id="goldCoinImg" alt="Gold Mako">
+    <img class="coin-icon-img" src="./assets/gold-mako.png" id="goldCoinImg" alt="Gold Mako">
     <span id="goldCount">0</span>
   </div>
   <div class="coin-badge mako" id="makoBadge">
-    <img class="coin-icon-img" src="" id="makoCoinImg" alt="Mako Coin">
+    <img class="coin-icon-img" src="./assets/mako-coin.png" id="makoCoinImg" alt="Mako Coin">
     <span id="makoCount">0</span>
   </div>
 </div>
@@ -158,6 +427,20 @@
   <div class="wheel-cooldown-msg" id="wheelCooldownMsg"></div>
 </div>
 
+<!-- ══ MAKO SHOP ══ -->
+<div class="shop-section" id="shopSection">
+  <div class="shop-header">
+    <div class="shop-title">🛒 MAKO SHOP</div>
+    <div class="shop-balance">
+      <img class="shop-balance-img" src="./assets/mako-coin.png" id="shopBalanceImg" alt="Mako">
+      <span id="shopBalanceCount">0</span>
+    </div>
+  </div>
+  <div class="shop-grid" id="shopGrid">
+    <div class="shop-empty" style="grid-column:1/-1">Loading shop…</div>
+  </div>
+</div>
+
 <!-- ROSTER -->
 <div class="roster-card" id="rosterCard" style="display:none">
   <div class="roster-title">👥 Team Members</div>
@@ -166,7 +449,7 @@
 
 <button class="back-btn" onclick="window.location.href='./leaderboard.html'">📊 Leaderboard</button>
 
-<!-- RESULT OVERLAY -->
+<!-- RESULT OVERLAY (wheel) -->
 <div class="wheel-result-overlay" id="resultOverlay">
   <div class="result-badge">🎡 You landed on…</div>
   <div class="result-name" id="resultName">—</div>
@@ -174,10 +457,39 @@
   <button class="result-dismiss" onclick="dismissResult()">NICE! ✓</button>
 </div>
 
+<!-- SHOP CONFIRM MODAL -->
+<div class="shop-modal-overlay" id="shopModal">
+  <div class="shop-modal" id="shopModalInner">
+    <div class="shop-modal-emoji" id="shopModalEmoji">🛒</div>
+    <div class="shop-modal-name" id="shopModalName">Item Name</div>
+    <div class="shop-modal-desc" id="shopModalDesc">Description here</div>
+    <div class="shop-modal-cost">
+      <img class="shop-modal-cost-img" src="./assets/mako-coin.png" id="shopModalCostImg" alt="Mako">
+      <span id="shopModalCost">0</span> MAKO
+    </div>
+    <div class="shop-modal-btns">
+      <button class="shop-modal-confirm" id="shopModalConfirm" onclick="confirmPurchase()">BUY IT!</button>
+      <button class="shop-modal-cancel" onclick="closeShopModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- PURCHASE SUCCESS -->
+<div class="purchase-success" id="purchaseSuccess">
+  <div class="purchase-success-emoji" id="purchaseSuccessEmoji">🎉</div>
+  <div class="purchase-success-title">PURCHASED!</div>
+  <div class="purchase-success-name" id="purchaseSuccessName"></div>
+  <div class="purchase-success-cost">
+    <img class="purchase-success-cost-img" src="./assets/mako-coin.png" id="purchaseSuccessCostImg" alt="Mako">
+    <span id="purchaseSuccessCost"></span>
+  </div>
+</div>
+
 <script>
 /* ─────────────── CONFIG ─────────────── */
 const GOLD_IMG='./assets/gold-mako.png';
-const MAKO_IMG='./assets/mako-coin.png';const COLORS_TEAM={team1:'#ff6b6b',team2:'#ffd93d',team3:'#6bcb77',team4:'#4d96ff',team5:'#ff922b',team6:'#cc5de8',team7:'#20c997',team8:'#f06595',team9:'#74c0fc',team10:'#ff8787',team11:'#a9e34b',team12:'#ffa94d'};
+const MAKO_IMG='./assets/mako-coin.png';
+const COLORS_TEAM={team1:'#ff6b6b',team2:'#ffd93d',team3:'#6bcb77',team4:'#4d96ff',team5:'#ff922b',team6:'#cc5de8',team7:'#20c997',team8:'#f06595',team9:'#74c0fc',team10:'#ff8787',team11:'#a9e34b',team12:'#ffa94d'};
 const WHEEL_SEG_COLORS=['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#ff922b','#cc5de8','#20c997','#f06595','#74c0fc','#a9e34b','#ffa94d','#e64980','#339af0','#51cf66'];
 const FB="https://counterapp-5297b-default-rtdb.firebaseio.com";
 let team=localStorage.getItem("myTeam");
@@ -185,7 +497,6 @@ if(!team){window.location.href="index.html";}
 const num=team.replace('team','');
 document.getElementById("pointBtn").style.setProperty('--tc',COLORS_TEAM[team]||'#00e5ff');
 
-/* ─────────────── PERF DETECTION ─────────────── */
 const LOW_END = (navigator.hardwareConcurrency||4) <= 2;
 
 /* ─────────────── STATE ─────────────── */
@@ -194,22 +505,21 @@ let completedEventIds=JSON.parse(sessionStorage.getItem('completedEvents')||'[]'
 let wheelItems=[];
 let wheelSettings={enabled:false,cooldownMinutes:10};
 let lastSpinAt=0;
-
-/* ─────────────── TIMER LOCK ─────────────── */
-let timerEnded=false; // true when match time is up — gates all scoring
-
-/* Offscreen canvas — segments drawn ONCE, reused every RAF frame */
+let timerEnded=false;
 let offscreen=null;
-
-/* Animation state */
 let spinRAF=null;
 let spinStartTime=0;
-let spinDuration=4200;   // ms — feels satisfying but not tedious
+let spinDuration=4200;
 let spinStartAngle=0;
 let spinTotalRotation=0;
 let spinTargetIdx=0;
 let isSpinning=false;
-let currentAngle=0;      // tracks current visual angle (persists between spins for nice feel)
+let currentAngle=0;
+
+/* ─────────────── SHOP STATE ─────────────── */
+let shopItems=[];
+let pendingPurchase=null;
+let _makoBalance=0;
 
 /* ─────────────── HELPERS ─────────────── */
 function parseRoster(raw){
@@ -287,7 +597,7 @@ async function completeChallenge(){
   sessionStorage.setItem('completedEvents',JSON.stringify(completedEventIds));
 }
 
-/* ─────────────── WHEEL DATA ─────────────── */
+/* ─────────────── WHEEL ─────────────── */
 async function loadWheel(){
   try{
     const [iRes,sRes,spinRes]=await Promise.all([
@@ -309,18 +619,10 @@ async function loadWheel(){
 
 function updateWheelVisibility(){
   const sec=document.getElementById('wheelSection');
-  if(wheelSettings.enabled&&wheelItems.length>0){
-    sec.classList.add('visible');
-  } else {
-    sec.classList.remove('visible');
-  }
+  if(wheelSettings.enabled&&wheelItems.length>0){sec.classList.add('visible');}
+  else{sec.classList.remove('visible');}
 }
 
-/* ─────────────── OFFSCREEN CANVAS ─────────────── */
-/*
-  Key perf trick: draw all segments ONCE onto an offscreen canvas.
-  Each animation frame just draws that image rotated — no path math per frame.
-*/
 function buildOffscreen(){
   const canvas=document.getElementById('wheelCanvas');
   const SIZE=canvas.width;
@@ -330,26 +632,17 @@ function buildOffscreen(){
   const cx=SIZE/2,cy=SIZE/2,R=SIZE/2-3;
   const total=wheelItems.reduce((s,i)=>s+(i.weight||1),0);
   let angle=-Math.PI/2;
-
   wheelItems.forEach((item,idx)=>{
     const slice=(item.weight||1)/total*Math.PI*2;
     const col=WHEEL_SEG_COLORS[idx%WHEEL_SEG_COLORS.length];
-
-    // Segment fill
     ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,R,angle,angle+slice);ctx.closePath();
     ctx.fillStyle=col;ctx.fill();
-
-    // Subtle inner highlight
     ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,R,angle,angle+slice);ctx.closePath();
     const grad=ctx.createRadialGradient(cx,cy,0,cx,cy,R);
     grad.addColorStop(0,'rgba(255,255,255,0.18)');grad.addColorStop(1,'rgba(0,0,0,0)');
     ctx.fillStyle=grad;ctx.fill();
-
-    // Divider line
     ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(angle)*R,cy+Math.sin(angle)*R);
     ctx.strokeStyle='rgba(2,11,24,0.5)';ctx.lineWidth=2;ctx.stroke();
-
-    // Label — only draw if segment is wide enough to be readable
     if(slice>0.22){
       ctx.save();
       ctx.translate(cx,cy);ctx.rotate(angle+slice/2);
@@ -366,12 +659,8 @@ function buildOffscreen(){
     }
     angle+=slice;
   });
-
-  // Rim
   ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);
   ctx.strokeStyle='rgba(168,228,255,0.2)';ctx.lineWidth=3;ctx.stroke();
-
-  // Center hub
   ctx.beginPath();ctx.arc(cx,cy,18,0,Math.PI*2);
   ctx.fillStyle='rgba(2,11,24,0.95)';ctx.fill();
   ctx.strokeStyle='rgba(204,93,232,0.7)';ctx.lineWidth=3;ctx.stroke();
@@ -379,11 +668,6 @@ function buildOffscreen(){
   ctx.fillStyle='rgba(204,93,232,0.9)';ctx.fill();
 }
 
-/* ─────────────── DRAW LOOP ─────────────── */
-/*
-  Only operation per frame: clear, rotate context, draw offscreen image.
-  All GPU-composited — no layout touches.
-*/
 function drawWheel(angle){
   const canvas=document.getElementById('wheelCanvas');
   if(!canvas||!offscreen)return;
@@ -398,22 +682,15 @@ function drawWheel(angle){
   ctx.restore();
 }
 
-/* ─────────────── EASING ─────────────── */
-/* Quintic ease-out: blazing fast start, long smooth deceleration */
-function easeOut5(t){ return 1-Math.pow(1-t,5); }
+function easeOut5(t){return 1-Math.pow(1-t,5);}
 
-/* ─────────────── WEIGHTED RANDOM ─────────────── */
 function pickWinner(){
   const total=wheelItems.reduce((s,i)=>s+(i.weight||1),0);
   let r=Math.random()*total;
-  for(let i=0;i<wheelItems.length;i++){
-    r-=(wheelItems[i].weight||1);
-    if(r<=0)return i;
-  }
+  for(let i=0;i<wheelItems.length;i++){r-=(wheelItems[i].weight||1);if(r<=0)return i;}
   return wheelItems.length-1;
 }
 
-/* Compute the angle at center of segment idx */
 function segmentAngle(idx){
   const total=wheelItems.reduce((s,i)=>s+(i.weight||1),0);
   let a=-Math.PI/2;
@@ -422,37 +699,22 @@ function segmentAngle(idx){
   return a;
 }
 
-/* ─────────────── SPIN ─────────────── */
 async function startSpin(){
   if(isSpinning||wheelItems.length===0||timerEnded)return;
   if(!checkCooldown())return;
-
   isSpinning=true;
   document.getElementById('spinBtn').disabled=true;
   document.getElementById('spinBtn').classList.remove('ready');
-
-  // 1. Determine winner BEFORE animation
   spinTargetIdx=pickWinner();
   const winner=wheelItems[spinTargetIdx];
-
-  // 2. Compute how far to spin
-  // We want the wheel to land with the pointer (right side, 0°) pointing at the winner segment
-  // The pointer is at angle=0 relative to canvas, segments start at -PI/2
-  // targetAngle is the center of the winning segment in the wheel's local frame
-  const segCenter=segmentAngle(spinTargetIdx); // angle from wheel center to segment center
-  // We need: currentAngle + spinTotal ≡ -segCenter (mod 2π)
-  // Add 5 full rotations for drama
+  const segCenter=segmentAngle(spinTargetIdx);
   const fullRotations=5+Math.floor(Math.random()*3);
-  const targetOffset=( -segCenter - currentAngle % (Math.PI*2) + Math.PI*2*10 ) % (Math.PI*2);
-  spinTotalRotation=Math.PI*2*fullRotations + targetOffset;
+  const targetOffset=(-segCenter-currentAngle%(Math.PI*2)+Math.PI*2*10)%(Math.PI*2);
+  spinTotalRotation=Math.PI*2*fullRotations+targetOffset;
   spinStartAngle=currentAngle;
   spinStartTime=performance.now();
-
-  // 3. Save spin to Firebase (non-blocking)
   fetch(FB+'/wheelSpins/'+team+'.json',{method:'PUT',body:JSON.stringify({lastSpinAt:Date.now(),result:winner.label,points:winner.points||0})});
   lastSpinAt=Date.now();
-
-  // 4. Run RAF loop
   if(spinRAF)cancelAnimationFrame(spinRAF);
   spinRAF=requestAnimationFrame(rafSpin);
 }
@@ -463,22 +725,12 @@ function rafSpin(now){
   const eased=easeOut5(t);
   currentAngle=spinStartAngle+spinTotalRotation*eased;
   drawWheel(currentAngle);
-
-  if(t<1){
-    spinRAF=requestAnimationFrame(rafSpin);
-  } else {
-    spinRAF=null;
-    isSpinning=false;
-    currentAngle=spinStartAngle+spinTotalRotation; // snap to exact
-    drawWheel(currentAngle);
-    onSpinComplete();
-  }
+  if(t<1){spinRAF=requestAnimationFrame(rafSpin);}
+  else{spinRAF=null;isSpinning=false;currentAngle=spinStartAngle+spinTotalRotation;drawWheel(currentAngle);onSpinComplete();}
 }
 
 async function onSpinComplete(){
   const winner=wheelItems[spinTargetIdx];
-
-  // Award points
   if((winner.points||0)>0){
     const res=await fetch(FB+"/teams/"+team+".json");let current=await res.json();
     current=(current||0)+(winner.points||0);
@@ -487,8 +739,6 @@ async function onSpinComplete(){
     const logEntry={team,eventName:'🎡 '+winner.label,points:winner.points,time:Date.now()};
     await fetch(FB+'/completions/'+Date.now()+'_'+team+'.json',{method:'PUT',body:JSON.stringify(logEntry)});
   }
-
-  // Show result overlay
   const col=WHEEL_SEG_COLORS[spinTargetIdx%WHEEL_SEG_COLORS.length];
   const nameEl=document.getElementById('resultName');
   const ptsEl=document.getElementById('resultPts');
@@ -498,10 +748,7 @@ async function onSpinComplete(){
   ptsEl.textContent=(winner.points||0)>0?`+${winner.points} POINTS!`:'Better luck next time!';
   ptsEl.style.color=(winner.points||0)>0?'#f0c040':'rgba(168,228,255,0.5)';
   document.getElementById('resultOverlay').classList.add('show');
-
-  // Confetti — only on capable devices
   if(!LOW_END&&(winner.points||0)>0) spawnConfetti(col);
-
   updateSpinBtn();
 }
 
@@ -510,7 +757,6 @@ function dismissResult(){
   stopConfetti();
 }
 
-/* ─────────────── COOLDOWN ─────────────── */
 function checkCooldown(){
   const coolMs=wheelSettings.cooldownMinutes*60*1000;
   const elapsed=Date.now()-lastSpinAt;
@@ -520,11 +766,7 @@ function checkCooldown(){
 function updateSpinBtn(){
   const btn=document.getElementById('spinBtn');
   const msg=document.getElementById('wheelCooldownMsg');
-  if(timerEnded){
-    btn.disabled=true;btn.classList.remove('ready');
-    msg.textContent='⏰ Match over — wheel locked';
-    return;
-  }
+  if(timerEnded){btn.disabled=true;btn.classList.remove('ready');msg.textContent='⏰ Match over — wheel locked';return;}
   if(wheelItems.length===0){btn.disabled=true;msg.textContent='No wheel items set up yet';return;}
   const coolMs=wheelSettings.cooldownMinutes*60*1000;
   const remaining=coolMs-(Date.now()-lastSpinAt);
@@ -537,19 +779,12 @@ function updateSpinBtn(){
     msg.textContent=lastSpinAt>0?'Ready to spin again!':'';
   }
 }
-
-/* Tick cooldown display */
 setInterval(updateSpinBtn,1000);
 
 /* ─────────────── CONFETTI ─────────────── */
-/*
-  Lightweight — flat colored rectangles only, no shadows, no blur.
-  Auto-cancels after 3s. Skipped entirely on LOW_END devices.
-*/
 let confettiParticles=[];
 let confettiRAF=null;
 let confettiActive=false;
-
 const confettiCanvas=document.getElementById('confettiCanvas');
 const confettiCtx=confettiCanvas.getContext('2d');
 function resizeConfetti(){confettiCanvas.width=window.innerWidth;confettiCanvas.height=window.innerHeight;}
@@ -562,17 +797,12 @@ function spawnConfetti(accentColor){
   const colors=['#cc5de8','#f0c040','#6bcb77','#4d96ff','#ff6b6b','#ffd93d',accentColor];
   for(let i=0;i<60;i++){
     confettiParticles.push({
-      x:W*0.5+(Math.random()-0.5)*W*0.4,
-      y:H*0.35+(Math.random()-0.5)*H*0.2,
-      vx:(Math.random()-0.5)*7,
-      vy:-4-Math.random()*6,
-      rot:Math.random()*Math.PI*2,
-      rotV:(Math.random()-0.5)*0.18,
-      w:7+Math.random()*7,
-      h:4+Math.random()*4,
+      x:W*0.5+(Math.random()-0.5)*W*0.4,y:H*0.35+(Math.random()-0.5)*H*0.2,
+      vx:(Math.random()-0.5)*7,vy:-4-Math.random()*6,
+      rot:Math.random()*Math.PI*2,rotV:(Math.random()-0.5)*0.18,
+      w:7+Math.random()*7,h:4+Math.random()*4,
       color:colors[Math.floor(Math.random()*colors.length)],
-      alpha:1,
-      gravity:0.22
+      alpha:1,gravity:0.22
     });
   }
   confettiActive=true;
@@ -585,82 +815,50 @@ function tickConfetti(){
   confettiCtx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
   let alive=false;
   for(const p of confettiParticles){
-    if(p.alpha<=0.02)continue;
-    alive=true;
-    confettiCtx.save();
-    confettiCtx.globalAlpha=p.alpha;
-    confettiCtx.translate(p.x,p.y);
-    confettiCtx.rotate(p.rot);
-    confettiCtx.fillStyle=p.color;
-    confettiCtx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+    if(p.alpha<=0.02)continue;alive=true;
+    confettiCtx.save();confettiCtx.globalAlpha=p.alpha;
+    confettiCtx.translate(p.x,p.y);confettiCtx.rotate(p.rot);
+    confettiCtx.fillStyle=p.color;confettiCtx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
     confettiCtx.restore();
-    p.x+=p.vx;p.y+=p.vy;p.vy+=p.gravity;p.vx*=0.99;
-    p.rot+=p.rotV;p.alpha-=0.013;
+    p.x+=p.vx;p.y+=p.vy;p.vy+=p.gravity;p.vx*=0.99;p.rot+=p.rotV;p.alpha-=0.013;p.radius*=0.98||1;
   }
-  if(alive&&confettiActive) confettiRAF=requestAnimationFrame(tickConfetti);
-  else { confettiCtx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height); confettiRAF=null; }
+  if(alive&&confettiActive)confettiRAF=requestAnimationFrame(tickConfetti);
+  else{confettiCtx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);confettiRAF=null;}
 }
+function stopConfetti(){confettiActive=false;}
 
-function stopConfetti(){
-  confettiActive=false;
-}
-
-/* ─────────────── WHEEL CANVAS RESPONSIVE ─────────────── */
+/* ─────────────── WHEEL RESPONSIVE ─────────────── */
 function resizeWheel(){
-  const wrap=document.getElementById('wheelWrap');
-  if(!wrap)return;
+  const wrap=document.getElementById('wheelWrap');if(!wrap)return;
   const size=Math.min(280,window.innerWidth-80);
   wrap.style.width=size+'px';wrap.style.height=size+'px';
-  const canvas=document.getElementById('wheelCanvas');
-  canvas.width=size;canvas.height=size;
+  const canvas=document.getElementById('wheelCanvas');canvas.width=size;canvas.height=size;
   if(wheelItems.length>0){buildOffscreen();drawWheel(currentAngle);}
 }
 window.addEventListener('resize',resizeWheel,{passive:true});
 
-/* ─────────────── TIMER POLL & LOCK ─────────────── */
+/* ─────────────── TIMER ─────────────── */
 async function pollTimer(){
   try{
-    const res=await fetch(FB+'/timer.json');
-    const t=(await res.json())||{};
+    const res=await fetch(FB+'/timer.json');const t=(await res.json())||{};
     let remaining=t.remaining||0;
     if(t.state==='running'&&t.serverTime) remaining=Math.max(0,remaining-(Date.now()-t.serverTime)/1000);
     const ended=(t.state==='running'&&remaining<=0)||(t.state==='ended');
-    const wasEnded=timerEnded;
-    timerEnded=ended;
-    if(ended!==wasEnded) applyTimerLock(ended);
+    const wasEnded=timerEnded;timerEnded=ended;
+    if(ended!==wasEnded)applyTimerLock(ended);
   }catch(e){}
 }
 
 function applyTimerLock(ended){
-  /* ── Lap button ── */
   const lapBtn=document.getElementById('pointBtn');
-  lapBtn.disabled=ended;
-  lapBtn.style.opacity=ended?'0.4':'';
+  lapBtn.disabled=ended;lapBtn.style.opacity=ended?'0.4':'';
   lapBtn.style.cursor=ended?'not-allowed':'';
-  lapBtn.title=ended?'Timer has ended — laps are locked':'';
-
-  /* ── Spin button ── */
   const spinBtn=document.getElementById('spinBtn');
-  if(ended){
-    spinBtn.disabled=true;
-    spinBtn.classList.remove('ready');
-    document.getElementById('wheelCooldownMsg').textContent='⏰ Match over — wheel locked';
-  } else {
-    // Let updateSpinBtn() decide whether cooldown applies
-    updateSpinBtn();
-  }
-
-  /* ── Challenge complete button ── */
-  // Only lock if not already marked done
-  const completeBtn=document.getElementById('completeBtn');
-  if(ended) completeBtn.disabled=true;
-
-  /* ── Visual "ended" banner on lap button ── */
-  if(ended){
-    lapBtn.querySelector('span').textContent='⏰ TIME\'S UP';
-  } else {
-    lapBtn.querySelector('span').textContent='+2 LAPS';
-  }
+  if(ended){spinBtn.disabled=true;spinBtn.classList.remove('ready');document.getElementById('wheelCooldownMsg').textContent='⏰ Match over — wheel locked';}
+  else{updateSpinBtn();}
+  const completeBtn=document.getElementById('completeBtn');if(ended)completeBtn.disabled=true;
+  if(ended){lapBtn.querySelector('span').textContent='⏰ TIME\'S UP';}
+  else{lapBtn.querySelector('span').textContent='+2 LAPS';}
 }
 
 /* ─────────────── CURRENCY ─────────────── */
@@ -674,27 +872,195 @@ async function pollCurrency(){
     const mako=data.mako||0;
     if(gold!==_lastGold){
       document.getElementById('goldCount').textContent=gold;
-      if(_lastGold>=0&&gold>_lastGold) bump('goldBadge');
+      if(_lastGold>=0&&gold>_lastGold)bump('goldBadge');
       _lastGold=gold;
     }
     if(mako!==_lastMako){
       document.getElementById('makoCount').textContent=mako;
-      if(_lastMako>=0&&mako>_lastMako) bump('makoBadge');
+      document.getElementById('shopBalanceCount').textContent=mako;
+      if(_lastMako>=0&&mako>_lastMako)bump('makoBadge');
       _lastMako=mako;
+      _makoBalance=mako;
+      // Refresh afford state
+      renderShopAffordability();
     }
   }catch(e){}
 }
 
-document.getElementById('goldCoinImg').src=GOLD_COIN_IMG;
-document.getElementById('makoCoinImg').src=MAKO_COIN_IMG;
-
 function bump(id){
-  const el=document.getElementById(id);
-  el.classList.remove('bump');
-  void el.offsetWidth; // force reflow to restart animation
-  el.classList.add('bump');
-  setTimeout(()=>el.classList.remove('bump'),400);
+  const el=document.getElementById(id);el.classList.remove('bump');
+  void el.offsetWidth;el.classList.add('bump');setTimeout(()=>el.classList.remove('bump'),400);
 }
+
+/* ══════════════════════════════════════
+   MAKO SHOP ENGINE
+══════════════════════════════════════ */
+
+async function loadShop(){
+  try{
+    const [itemsRes, settingsRes] = await Promise.all([
+      fetch(FB+'/shopItems.json'),
+      fetch(FB+'/shopSettings.json')
+    ]);
+    const itemsData = (await itemsRes.json()) || {};
+    const settingsData = (await settingsRes.json()) || {};
+    const enabled = settingsData.enabled !== false; // default true if not set
+
+    shopItems = Object.entries(itemsData)
+      .map(([id, v]) => ({id, ...v}))
+      .filter(i => i.enabled !== false)
+      .sort((a,b) => (a.sortOrder||99) - (b.sortOrder||99) || a.name.localeCompare(b.name));
+
+    const section = document.getElementById('shopSection');
+    if(enabled && shopItems.length > 0){
+      section.classList.add('visible');
+      renderShop();
+    } else {
+      section.classList.remove('visible');
+    }
+  }catch(e){}
+}
+
+function getItemTypeClass(item){
+  if(item.type==='powerup') return 'powerup';
+  if(item.type==='sabotage') return 'sabotage';
+  return '';
+}
+
+function getItemTypeBadgeText(item){
+  if(item.type==='powerup') return '⚡ POWER-UP';
+  if(item.type==='sabotage') return '💀 SABOTAGE';
+  return '🛒 ITEM';
+}
+
+function renderShop(){
+  const grid = document.getElementById('shopGrid');
+  if(shopItems.length === 0){
+    grid.innerHTML = '<div class="shop-empty" style="grid-column:1/-1">No items in the shop yet!</div>';
+    return;
+  }
+  grid.innerHTML = shopItems.map(item => {
+    const typeClass = getItemTypeClass(item);
+    const cantAfford = _makoBalance < (item.price||0);
+    return `<div class="shop-item ${typeClass}${cantAfford?' cant-afford':''}" id="si_${item.id}">
+      <div class="shop-item-emoji">${item.emoji||'🛒'}</div>
+      <div class="shop-item-name">${item.name}</div>
+      ${item.description?`<div class="shop-item-desc">${item.description}</div>`:''}
+      <div class="shop-item-type-badge">${getItemTypeBadgeText(item)}</div>
+      <div class="shop-item-price">
+        <img class="shop-price-img" src="${MAKO_IMG}" alt="Mako">
+        ${item.price||0}
+      </div>
+      <button class="shop-buy-btn" onclick="openShopModal('${item.id}')" ${cantAfford||timerEnded?'disabled':''}>
+        <span>${cantAfford?'NOT ENOUGH':'BUY!'}</span>
+      </button>
+    </div>`;
+  }).join('');
+}
+
+function renderShopAffordability(){
+  // Only update afford state without full re-render (avoids DOM churn)
+  shopItems.forEach(item => {
+    const el = document.getElementById('si_'+item.id);
+    if(!el) return;
+    const cantAfford = _makoBalance < (item.price||0);
+    el.classList.toggle('cant-afford', cantAfford);
+    const btn = el.querySelector('.shop-buy-btn');
+    if(btn){
+      btn.disabled = cantAfford || timerEnded;
+      btn.querySelector('span').textContent = cantAfford ? 'NOT ENOUGH' : 'BUY!';
+    }
+  });
+}
+
+function openShopModal(itemId){
+  const item = shopItems.find(i => i.id === itemId);
+  if(!item) return;
+  if(_makoBalance < (item.price||0)) return;
+  pendingPurchase = item;
+
+  const inner = document.getElementById('shopModalInner');
+  inner.className = 'shop-modal ' + getItemTypeClass(item);
+  document.getElementById('shopModalEmoji').textContent = item.emoji || '🛒';
+  document.getElementById('shopModalName').textContent = item.name;
+  document.getElementById('shopModalDesc').textContent = item.description || '';
+  document.getElementById('shopModalCost').textContent = item.price || 0;
+  document.getElementById('shopModal').classList.add('open');
+}
+
+function closeShopModal(){
+  document.getElementById('shopModal').classList.remove('open');
+  pendingPurchase = null;
+}
+
+async function confirmPurchase(){
+  if(!pendingPurchase) return;
+  const item = pendingPurchase;
+  closeShopModal();
+
+  // Re-check balance (race condition guard)
+  const freshRes = await fetch(FB+'/currency/'+team+'.json');
+  const freshData = (await freshRes.json()) || {};
+  const currentMako = freshData.mako || 0;
+  if(currentMako < (item.price||0)){
+    showToast('Not enough Mako Coins!');
+    return;
+  }
+
+  // Deduct coins
+  const newMako = currentMako - (item.price||0);
+  await fetch(FB+'/currency/'+team+'/mako.json', {method:'PUT', body:JSON.stringify(newMako)});
+
+  // Log purchase
+  const logEntry = {
+    team,
+    itemId: item.id,
+    itemName: item.name,
+    itemType: item.type || 'item',
+    itemEmoji: item.emoji || '🛒',
+    cost: item.price || 0,
+    time: Date.now()
+  };
+  await fetch(FB+'/shopPurchases/'+Date.now()+'_'+team+'.json', {method:'PUT', body:JSON.stringify(logEntry)});
+
+  // Update local state
+  _makoBalance = newMako;
+  _lastMako = newMako;
+  document.getElementById('makoCount').textContent = newMako;
+  document.getElementById('shopBalanceCount').textContent = newMako;
+  bump('makoBadge');
+  renderShopAffordability();
+
+  // Show success
+  showPurchaseSuccess(item);
+  pendingPurchase = null;
+}
+
+function showPurchaseSuccess(item){
+  document.getElementById('purchaseSuccessEmoji').textContent = item.emoji || '🎉';
+  document.getElementById('purchaseSuccessName').textContent = item.name;
+  document.getElementById('purchaseSuccessCost').textContent = '-' + (item.price||0) + ' Mako';
+  const overlay = document.getElementById('purchaseSuccess');
+  overlay.classList.add('show');
+  if(!LOW_END) spawnConfetti('#4d96ff');
+  setTimeout(()=>{
+    overlay.classList.remove('show');
+    stopConfetti();
+  }, 2200);
+}
+
+function showToast(msg){
+  // Reuse body for simple inline toast
+  const t = document.createElement('div');
+  t.style.cssText='position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:rgba(5,20,40,0.95);border:1px solid rgba(0,229,255,0.3);border-radius:12px;padding:12px 28px;font-size:14px;font-weight:700;color:#a8e4ff;z-index:300;white-space:nowrap;font-family:Nunito,sans-serif';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 2400);
+}
+
+document.getElementById('shopModal').addEventListener('click', function(e){
+  if(e.target === this) closeShopModal();
+});
 
 /* ─────────────── INIT ─────────────── */
 loadInfo();
@@ -703,12 +1069,12 @@ loadWheel();
 resizeWheel();
 pollTimer();
 pollCurrency();
+loadShop();
 setInterval(loadScore,1500);
 setInterval(pollChallenge,1500);
 setInterval(pollTimer,2000);
 setInterval(pollCurrency,3000);
 setInterval(async()=>{
-  // Re-poll wheel settings so admin changes propagate live
   try{
     const [sRes,iRes]=await Promise.all([fetch(FB+'/wheelSettings.json'),fetch(FB+'/wheelItems.json')]);
     const sData=(await sRes.json())||{};const iData=(await iRes.json())||{};
@@ -721,6 +1087,8 @@ setInterval(async()=>{
     updateWheelVisibility();
   }catch(e){}
 },5000);
+// Poll shop every 8s (items don't change often)
+setInterval(loadShop, 8000);
 pollChallenge();
 </script>
 </body>
