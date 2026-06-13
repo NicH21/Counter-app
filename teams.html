@@ -42,7 +42,6 @@
     .coin-badge.mako{border-color:rgba(77,150,255,0.4);color:#74c0fc;text-shadow:0 0 10px rgba(77,150,255,0.5)}
     .coin-badge.bump{animation:coinBump 0.4s ease}
     @keyframes coinBump{0%{transform:scale(1)}40%{transform:scale(1.3)}100%{transform:scale(1)}}
-    .coin-icon{font-size:16px;line-height:1}
     .coin-icon-img{width:48px;height:48px;object-fit:contain;border-radius:50%;flex-shrink:0;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.6))}
 
     /* CHALLENGE BANNER */
@@ -76,17 +75,11 @@
     /* ══ WHEEL SECTION ══ */
     .wheel-section{width:100%;max-width:400px;display:none;flex-direction:column;align-items:center;gap:0}
     .wheel-section.visible{display:flex}
-
     .wheel-section-title{font-family:'Bangers',cursive;font-size:22px;letter-spacing:3px;color:#cc5de8;text-shadow:0 0 16px rgba(204,93,232,0.5);margin-bottom:12px;text-align:center}
-
-    /* Wheel container — fixed size, no layout shifts */
     .wheel-wrap{position:relative;width:280px;height:280px;flex-shrink:0}
     @media(max-width:360px){.wheel-wrap{width:240px;height:240px}}
     .wheel-canvas{display:block;border-radius:50%;will-change:transform}
-    /* Pointer arrow — pure CSS, zero JS */
     .wheel-pointer{position:absolute;top:50%;right:-18px;transform:translateY(-50%);width:0;height:0;border-top:14px solid transparent;border-bottom:14px solid transparent;border-right:26px solid #fff;filter:drop-shadow(0 0 6px rgba(255,255,255,0.7));z-index:10}
-
-    /* Spin button */
     .spin-btn{font-family:'Bangers',cursive;font-size:28px;letter-spacing:3px;padding:16px 44px;border-radius:16px;border:2px solid #cc5de8;background:rgba(5,20,40,0.85);color:white;cursor:pointer;box-shadow:0 0 22px rgba(204,93,232,0.4);transition:transform 0.12s,box-shadow 0.2s;position:relative;overflow:hidden;margin-top:16px;width:100%}
     .spin-btn::before{content:"";position:absolute;top:0;left:-120%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(204,93,232,0.7),transparent);transform:skewX(-20deg);animation:shine 2.2s linear infinite}
     .spin-btn span{position:relative;z-index:2}
@@ -95,10 +88,7 @@
     .spin-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
     .spin-btn.ready{animation:spinBtnPulse 2s ease-in-out infinite}
     @keyframes spinBtnPulse{0%,100%{box-shadow:0 0 22px rgba(204,93,232,0.4)}50%{box-shadow:0 0 44px rgba(204,93,232,0.8)}}
-
     .wheel-cooldown-msg{font-size:13px;color:rgba(168,228,255,0.5);letter-spacing:1px;margin-top:8px;text-align:center;height:18px}
-
-    /* Result overlay — opacity transition only (compositor) */
     .wheel-result-overlay{
       position:fixed;inset:0;
       background:rgba(2,11,24,0.92);
@@ -114,9 +104,64 @@
     .result-pts{font-family:'Bangers',cursive;font-size:clamp(28px,8vw,48px);color:#f0c040;text-shadow:0 0 24px rgba(240,192,64,0.6);letter-spacing:2px}
     .result-dismiss{font-family:'Bangers',cursive;font-size:22px;letter-spacing:2px;padding:14px 40px;border-radius:14px;border:2px solid #cc5de8;background:rgba(5,20,40,0.9);color:white;cursor:pointer;margin-top:8px;transition:transform 0.12s,box-shadow 0.2s;box-shadow:0 0 16px rgba(204,93,232,0.4)}
     .result-dismiss:hover{transform:scale(1.05);box-shadow:0 0 30px rgba(204,93,232,0.7)}
-
-    /* Confetti canvas — overlaid, pointer-events none */
     #confettiCanvas{position:fixed;inset:0;pointer-events:none;z-index:201}
+
+    /* ══ SHOP SECTION ══ */
+    .shop-section{width:100%;max-width:480px;background:rgba(5,20,40,0.75);backdrop-filter:blur(8px);border-radius:20px;border:2px solid rgba(77,150,255,0.3);padding:22px 22px 18px;box-shadow:0 0 30px rgba(77,150,255,0.12)}
+    .shop-title{font-family:'Bangers',cursive;font-size:28px;letter-spacing:3px;color:#74c0fc;text-shadow:0 0 18px rgba(77,150,255,0.5);text-align:center;margin-bottom:4px}
+    .shop-subtitle{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:rgba(77,150,255,0.5);text-align:center;margin-bottom:18px}
+    .shop-balance-bar{display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(2,11,24,0.5);border-radius:12px;padding:10px 18px;margin-bottom:18px;border:1px solid rgba(77,150,255,0.2)}
+    .shop-balance-bar .coin-icon-img{width:30px;height:30px}
+    .shop-balance-label{font-size:13px;color:rgba(168,228,255,0.6);letter-spacing:1px}
+    .shop-balance-val{font-family:'Bangers',cursive;font-size:26px;color:#74c0fc;text-shadow:0 0 10px rgba(77,150,255,0.5);margin-left:2px}
+    .shop-tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+    .shop-tab{font-family:'Bangers',cursive;font-size:15px;letter-spacing:1px;padding:7px 16px;border-radius:10px;border:1.5px solid rgba(77,150,255,0.25);background:rgba(2,11,24,0.6);color:rgba(168,228,255,0.5);cursor:pointer;transition:all 0.2s}
+    .shop-tab.active{background:rgba(77,150,255,0.15);border-color:rgba(77,150,255,0.7);color:#a8e4ff}
+    .shop-tab:hover:not(.active){background:rgba(77,150,255,0.07)}
+    .shop-items{display:flex;flex-direction:column;gap:10px;min-height:60px}
+    .shop-item{background:rgba(2,11,24,0.6);border-radius:14px;border:1px solid rgba(255,255,255,0.07);padding:14px 16px;display:flex;align-items:center;gap:12px;transition:border-color 0.2s,background 0.2s}
+    .shop-item:hover{border-color:rgba(77,150,255,0.3);background:rgba(5,30,55,0.6)}
+    .shop-item-emoji{font-size:28px;flex-shrink:0;line-height:1}
+    .shop-item-info{flex:1;min-width:0}
+    .shop-item-name{font-size:15px;font-weight:900;color:#a8e4ff;margin-bottom:3px}
+    .shop-item-desc{font-size:12px;color:rgba(168,228,255,0.45);line-height:1.4}
+    .shop-item-price{display:flex;align-items:center;gap:5px;flex-shrink:0}
+    .shop-item-price .coin-icon-img{width:22px;height:22px}
+    .shop-item-price-val{font-family:'Bangers',cursive;font-size:20px;color:#74c0fc}
+    .buy-btn{font-family:'Bangers',cursive;font-size:17px;letter-spacing:1px;padding:9px 18px;border-radius:10px;border:2px solid #74c0fc;background:rgba(2,11,24,0.85);color:white;cursor:pointer;transition:transform 0.1s,box-shadow 0.2s;white-space:nowrap;box-shadow:0 0 10px rgba(77,150,255,0.25);flex-shrink:0}
+    .buy-btn:hover:not(:disabled){transform:scale(1.05);box-shadow:0 0 22px rgba(77,150,255,0.6)}
+    .buy-btn:disabled{opacity:0.35;cursor:not-allowed;transform:none}
+    .shop-empty{font-size:13px;color:rgba(168,228,255,0.3);text-align:center;padding:20px 0;letter-spacing:1px}
+
+    /* purchase confirm overlay */
+    .purchase-overlay{
+      position:fixed;inset:0;background:rgba(2,11,24,0.92);backdrop-filter:blur(4px);
+      z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+      opacity:0;pointer-events:none;transition:opacity 0.3s ease;
+    }
+    .purchase-overlay.show{opacity:1;pointer-events:all}
+    .purchase-icon{font-size:64px;line-height:1;animation:flashIn 0.4s ease}
+    .purchase-name{font-family:'Bangers',cursive;font-size:clamp(28px,8vw,48px);letter-spacing:3px;color:#74c0fc;text-shadow:0 0 24px rgba(77,150,255,0.6);text-align:center;padding:0 20px}
+    .purchase-cost{font-family:'Bangers',cursive;font-size:26px;color:#ff6b6b;letter-spacing:2px}
+    .purchase-confirm{font-family:'Bangers',cursive;font-size:24px;letter-spacing:2px;padding:14px 40px;border-radius:14px;border:2px solid #6bcb77;background:rgba(5,20,40,0.9);color:white;cursor:pointer;box-shadow:0 0 16px rgba(107,203,119,0.4);transition:transform 0.12s,box-shadow 0.2s}
+    .purchase-confirm:hover{transform:scale(1.05);box-shadow:0 0 28px rgba(107,203,119,0.7)}
+    .purchase-cancel{font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;padding:9px 24px;border-radius:9px;border:1px solid rgba(168,228,255,0.2);background:transparent;color:rgba(168,228,255,0.5);cursor:pointer;transition:background 0.2s}
+    .purchase-cancel:hover{background:rgba(168,228,255,0.08);color:#a8e4ff}
+
+    /* purchase success flash */
+    .purchase-success{
+      position:fixed;inset:0;background:rgba(2,11,24,0.92);backdrop-filter:blur(4px);
+      z-index:210;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;
+      opacity:0;pointer-events:none;transition:opacity 0.3s ease;
+    }
+    .purchase-success.show{opacity:1}
+    .purchase-success-icon{font-size:72px;animation:flashIn 0.4s ease}
+    .purchase-success-text{font-family:'Bangers',cursive;font-size:clamp(28px,8vw,48px);letter-spacing:3px;color:#6bcb77;text-shadow:0 0 24px rgba(107,203,119,0.6);text-align:center;padding:0 20px}
+    .purchase-success-sub{font-size:14px;color:rgba(168,228,255,0.6);letter-spacing:1px;text-align:center}
+
+    /* toast */
+    .toast-bar{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:rgba(5,20,40,0.95);border:1px solid rgba(0,229,255,0.3);border-radius:12px;padding:12px 28px;font-size:14px;font-weight:700;color:#a8e4ff;z-index:300;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap}
+    .toast-bar.show{opacity:1}
   </style>
 </head>
 <body>
@@ -125,11 +170,11 @@
 <!-- CURRENCY HUD -->
 <div class="currency-hud">
   <div class="coin-badge gold" id="goldBadge">
-    <img class="coin-icon-img" src="" id="goldCoinImg" alt="Gold Mako">
+    <img class="coin-icon-img" src="./assets/gold-mako.png" id="goldCoinImg" alt="Gold Mako">
     <span id="goldCount">0</span>
   </div>
   <div class="coin-badge mako" id="makoBadge">
-    <img class="coin-icon-img" src="" id="makoCoinImg" alt="Mako Coin">
+    <img class="coin-icon-img" src="./assets/mako-coin.png" id="makoCoinImg" alt="Mako Coin">
     <span id="makoCount">0</span>
   </div>
 </div>
@@ -158,6 +203,21 @@
   <div class="wheel-cooldown-msg" id="wheelCooldownMsg"></div>
 </div>
 
+<!-- MAKO SHOP -->
+<div class="shop-section" id="shopSection" style="display:none">
+  <div class="shop-title">🛒 MAKO SHOP</div>
+  <div class="shop-subtitle">Spend your Mako Coins</div>
+  <div class="shop-balance-bar">
+    <img class="coin-icon-img" src="./assets/mako-coin.png" alt="Mako">
+    <span class="shop-balance-label">Your Mako:</span>
+    <span class="shop-balance-val" id="shopMakoBalance">0</span>
+  </div>
+  <div class="shop-tabs" id="shopTabs"></div>
+  <div class="shop-items" id="shopItems">
+    <div class="shop-empty">Loading shop…</div>
+  </div>
+</div>
+
 <!-- ROSTER -->
 <div class="roster-card" id="rosterCard" style="display:none">
   <div class="roster-title">👥 Team Members</div>
@@ -166,7 +226,7 @@
 
 <button class="back-btn" onclick="window.location.href='./leaderboard.html'">📊 Leaderboard</button>
 
-<!-- RESULT OVERLAY -->
+<!-- RESULT OVERLAY (wheel) -->
 <div class="wheel-result-overlay" id="resultOverlay">
   <div class="result-badge">🎡 You landed on…</div>
   <div class="result-name" id="resultName">—</div>
@@ -174,10 +234,29 @@
   <button class="result-dismiss" onclick="dismissResult()">NICE! ✓</button>
 </div>
 
+<!-- PURCHASE CONFIRM OVERLAY -->
+<div class="purchase-overlay" id="purchaseOverlay">
+  <div class="purchase-icon" id="purchaseIcon">🛒</div>
+  <div class="purchase-name" id="purchaseName">Item Name</div>
+  <div class="purchase-cost" id="purchaseCost">−0 Mako</div>
+  <button class="purchase-confirm" onclick="confirmPurchase()">✅ BUY IT!</button>
+  <button class="purchase-cancel" onclick="cancelPurchase()">Cancel</button>
+</div>
+
+<!-- PURCHASE SUCCESS FLASH -->
+<div class="purchase-success" id="purchaseSuccess">
+  <div class="purchase-success-icon">🎉</div>
+  <div class="purchase-success-text" id="purchaseSuccessText">PURCHASED!</div>
+  <div class="purchase-success-sub" id="purchaseSuccessSub"></div>
+</div>
+
+<div class="toast-bar" id="toastBar"></div>
+
 <script>
 /* ─────────────── CONFIG ─────────────── */
 const GOLD_IMG='./assets/gold-mako.png';
-const MAKO_IMG='./assets/mako-coin.png';const COLORS_TEAM={team1:'#ff6b6b',team2:'#ffd93d',team3:'#6bcb77',team4:'#4d96ff',team5:'#ff922b',team6:'#cc5de8',team7:'#20c997',team8:'#f06595',team9:'#74c0fc',team10:'#ff8787',team11:'#a9e34b',team12:'#ffa94d'};
+const MAKO_IMG='./assets/mako-coin.png';
+const COLORS_TEAM={team1:'#ff6b6b',team2:'#ffd93d',team3:'#6bcb77',team4:'#4d96ff',team5:'#ff922b',team6:'#cc5de8',team7:'#20c997',team8:'#f06595',team9:'#74c0fc',team10:'#ff8787',team11:'#a9e34b',team12:'#ffa94d'};
 const WHEEL_SEG_COLORS=['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#ff922b','#cc5de8','#20c997','#f06595','#74c0fc','#a9e34b','#ffa94d','#e64980','#339af0','#51cf66'];
 const FB="https://counterapp-5297b-default-rtdb.firebaseio.com";
 let team=localStorage.getItem("myTeam");
@@ -194,22 +273,26 @@ let completedEventIds=JSON.parse(sessionStorage.getItem('completedEvents')||'[]'
 let wheelItems=[];
 let wheelSettings={enabled:false,cooldownMinutes:10};
 let lastSpinAt=0;
-
-/* ─────────────── TIMER LOCK ─────────────── */
-let timerEnded=false; // true when match time is up — gates all scoring
-
-/* Offscreen canvas — segments drawn ONCE, reused every RAF frame */
+let timerEnded=false;
 let offscreen=null;
-
-/* Animation state */
 let spinRAF=null;
 let spinStartTime=0;
-let spinDuration=4200;   // ms — feels satisfying but not tedious
+let spinDuration=4200;
 let spinStartAngle=0;
 let spinTotalRotation=0;
 let spinTargetIdx=0;
 let isSpinning=false;
-let currentAngle=0;      // tracks current visual angle (persists between spins for nice feel)
+let currentAngle=0;
+
+/* ─────────────── SHOP STATE ─────────────── */
+let shopItems=[];
+let shopCategories=[];
+let activeShopTab='all';
+let pendingPurchase=null;
+let currentMako=0;
+
+/* ─────────────── TOAST ─────────────── */
+function toast(msg){const el=document.getElementById('toastBar');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2400);}
 
 /* ─────────────── HELPERS ─────────────── */
 function parseRoster(raw){
@@ -287,6 +370,138 @@ async function completeChallenge(){
   sessionStorage.setItem('completedEvents',JSON.stringify(completedEventIds));
 }
 
+/* ══════════════════════════════════════
+   SHOP ENGINE
+══════════════════════════════════════ */
+async function loadShop(){
+  try{
+    const [itemsRes,settingsRes]=await Promise.all([
+      fetch(FB+'/shopItems.json'),
+      fetch(FB+'/shopSettings.json')
+    ]);
+    const itemsData=(await itemsRes.json())||{};
+    const settingsData=(await settingsRes.json())||{};
+
+    const enabled=settingsData.enabled!==false; // default enabled if no setting
+    shopItems=Object.entries(itemsData)
+      .map(([id,v])=>({id,...v}))
+      .filter(i=>i.available!==false); // only show available items
+
+    // Build category list
+    const cats=new Set();
+    shopItems.forEach(i=>{ if(i.category) cats.add(i.category); });
+    shopCategories=Array.from(cats);
+
+    const shopEl=document.getElementById('shopSection');
+    if(enabled&&shopItems.length>0){
+      shopEl.style.display='block';
+      renderShopTabs();
+      renderShopItems();
+    } else {
+      shopEl.style.display='none';
+    }
+  }catch(e){
+    document.getElementById('shopSection').style.display='none';
+  }
+}
+
+function renderShopTabs(){
+  const tabsEl=document.getElementById('shopTabs');
+  if(shopCategories.length===0){tabsEl.innerHTML='';return;}
+  const all=['all',...shopCategories];
+  tabsEl.innerHTML=all.map(cat=>`
+    <button class="shop-tab${cat===activeShopTab?' active':''}" onclick="switchShopTab('${cat}')">
+      ${cat==='all'?'All':cat}
+    </button>`).join('');
+}
+
+function switchShopTab(cat){
+  activeShopTab=cat;
+  renderShopTabs();
+  renderShopItems();
+}
+
+function renderShopItems(){
+  const el=document.getElementById('shopItems');
+  const filtered=activeShopTab==='all'?shopItems:shopItems.filter(i=>i.category===activeShopTab);
+  if(filtered.length===0){
+    el.innerHTML='<div class="shop-empty">No items in this category</div>';
+    return;
+  }
+  el.innerHTML=filtered.map(item=>{
+    const canAfford=currentMako>=item.price;
+    return`<div class="shop-item">
+      <div class="shop-item-emoji">${item.emoji||'🎁'}</div>
+      <div class="shop-item-info">
+        <div class="shop-item-name">${item.name}</div>
+        ${item.description?`<div class="shop-item-desc">${item.description}</div>`:''}
+      </div>
+      <div class="shop-item-price">
+        <img class="coin-icon-img" src="${MAKO_IMG}" alt="Mako" style="width:22px;height:22px">
+        <span class="shop-item-price-val">${item.price}</span>
+      </div>
+      <button class="buy-btn" ${!canAfford||timerEnded?'disabled':''} onclick="openPurchase('${item.id}')">BUY</button>
+    </div>`;
+  }).join('');
+}
+
+function openPurchase(itemId){
+  const item=shopItems.find(i=>i.id===itemId);
+  if(!item)return;
+  if(currentMako<item.price){toast('❌ Not enough Mako Coins!');return;}
+  pendingPurchase=item;
+  document.getElementById('purchaseIcon').textContent=item.emoji||'🎁';
+  document.getElementById('purchaseName').textContent=item.name;
+  document.getElementById('purchaseCost').textContent=`−${item.price} Mako Coins`;
+  document.getElementById('purchaseOverlay').classList.add('show');
+}
+
+function cancelPurchase(){
+  pendingPurchase=null;
+  document.getElementById('purchaseOverlay').classList.remove('show');
+}
+
+async function confirmPurchase(){
+  if(!pendingPurchase)return;
+  const item=pendingPurchase;
+  document.getElementById('purchaseOverlay').classList.remove('show');
+
+  // Re-check balance (race condition guard)
+  const res=await fetch(FB+'/currency/'+team+'/mako.json');
+  const freshMako=(await res.json())||0;
+  if(freshMako<item.price){
+    toast('❌ Not enough Mako Coins!');
+    pendingPurchase=null;
+    return;
+  }
+
+  // Deduct cost
+  const newMako=freshMako-item.price;
+  await fetch(FB+'/currency/'+team+'/mako.json',{method:'PUT',body:JSON.stringify(newMako)});
+
+  // Log purchase
+  const logEntry={
+    team,
+    itemId:item.id,
+    itemName:item.name,
+    cost:item.price,
+    emoji:item.emoji||'🎁',
+    category:item.category||'',
+    time:Date.now()
+  };
+  await fetch(FB+'/shopPurchases/'+Date.now()+'_'+team+'.json',{method:'PUT',body:JSON.stringify(logEntry)});
+
+  // Show success flash
+  document.getElementById('purchaseSuccessText').textContent=item.name+' PURCHASED!';
+  document.getElementById('purchaseSuccessSub').textContent=`−${item.price} Mako Coins · ${newMako} remaining`;
+  const successEl=document.getElementById('purchaseSuccess');
+  successEl.classList.add('show');
+  if(!LOW_END) spawnConfetti(COLORS_TEAM[team]||'#74c0fc');
+  setTimeout(()=>successEl.classList.remove('show'),2200);
+
+  pendingPurchase=null;
+}
+
 /* ─────────────── WHEEL DATA ─────────────── */
 async function loadWheel(){
   try{
@@ -317,10 +532,6 @@ function updateWheelVisibility(){
 }
 
 /* ─────────────── OFFSCREEN CANVAS ─────────────── */
-/*
-  Key perf trick: draw all segments ONCE onto an offscreen canvas.
-  Each animation frame just draws that image rotated — no path math per frame.
-*/
 function buildOffscreen(){
   const canvas=document.getElementById('wheelCanvas');
   const SIZE=canvas.width;
@@ -330,48 +541,32 @@ function buildOffscreen(){
   const cx=SIZE/2,cy=SIZE/2,R=SIZE/2-3;
   const total=wheelItems.reduce((s,i)=>s+(i.weight||1),0);
   let angle=-Math.PI/2;
-
   wheelItems.forEach((item,idx)=>{
     const slice=(item.weight||1)/total*Math.PI*2;
     const col=WHEEL_SEG_COLORS[idx%WHEEL_SEG_COLORS.length];
-
-    // Segment fill
     ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,R,angle,angle+slice);ctx.closePath();
     ctx.fillStyle=col;ctx.fill();
-
-    // Subtle inner highlight
-    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,R,angle,angle+slice);ctx.closePath();
     const grad=ctx.createRadialGradient(cx,cy,0,cx,cy,R);
     grad.addColorStop(0,'rgba(255,255,255,0.18)');grad.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,R,angle,angle+slice);ctx.closePath();
     ctx.fillStyle=grad;ctx.fill();
-
-    // Divider line
     ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(angle)*R,cy+Math.sin(angle)*R);
     ctx.strokeStyle='rgba(2,11,24,0.5)';ctx.lineWidth=2;ctx.stroke();
-
-    // Label — only draw if segment is wide enough to be readable
     if(slice>0.22){
-      ctx.save();
-      ctx.translate(cx,cy);ctx.rotate(angle+slice/2);
-      ctx.textAlign='right';
-      ctx.fillStyle='rgba(255,255,255,0.97)';
+      ctx.save();ctx.translate(cx,cy);ctx.rotate(angle+slice/2);
+      ctx.textAlign='right';ctx.fillStyle='rgba(255,255,255,0.97)';
       ctx.shadowColor='rgba(0,0,0,0.6)';ctx.shadowBlur=3;
       const fontSize=Math.min(14,Math.max(9,R*0.16));
       ctx.font=`900 ${fontSize}px Nunito,sans-serif`;
       const maxLen=Math.floor(R*0.28);
       let txt=item.label;
       if(ctx.measureText(txt).width>maxLen) txt=txt.slice(0,Math.max(3,Math.floor(maxLen/fontSize*1.5)))+'…';
-      ctx.fillText(txt,R-8,fontSize*0.38);
-      ctx.restore();
+      ctx.fillText(txt,R-8,fontSize*0.38);ctx.restore();
     }
     angle+=slice;
   });
-
-  // Rim
   ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);
   ctx.strokeStyle='rgba(168,228,255,0.2)';ctx.lineWidth=3;ctx.stroke();
-
-  // Center hub
   ctx.beginPath();ctx.arc(cx,cy,18,0,Math.PI*2);
   ctx.fillStyle='rgba(2,11,24,0.95)';ctx.fill();
   ctx.strokeStyle='rgba(204,93,232,0.7)';ctx.lineWidth=3;ctx.stroke();
@@ -379,41 +574,25 @@ function buildOffscreen(){
   ctx.fillStyle='rgba(204,93,232,0.9)';ctx.fill();
 }
 
-/* ─────────────── DRAW LOOP ─────────────── */
-/*
-  Only operation per frame: clear, rotate context, draw offscreen image.
-  All GPU-composited — no layout touches.
-*/
 function drawWheel(angle){
   const canvas=document.getElementById('wheelCanvas');
   if(!canvas||!offscreen)return;
   const ctx=canvas.getContext('2d');
   const cx=canvas.width/2,cy=canvas.height/2;
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.save();
-  ctx.translate(cx,cy);
-  ctx.rotate(angle);
-  ctx.translate(-cx,-cy);
-  ctx.drawImage(offscreen,0,0);
-  ctx.restore();
+  ctx.save();ctx.translate(cx,cy);ctx.rotate(angle);ctx.translate(-cx,-cy);
+  ctx.drawImage(offscreen,0,0);ctx.restore();
 }
 
-/* ─────────────── EASING ─────────────── */
-/* Quintic ease-out: blazing fast start, long smooth deceleration */
 function easeOut5(t){ return 1-Math.pow(1-t,5); }
 
-/* ─────────────── WEIGHTED RANDOM ─────────────── */
 function pickWinner(){
   const total=wheelItems.reduce((s,i)=>s+(i.weight||1),0);
   let r=Math.random()*total;
-  for(let i=0;i<wheelItems.length;i++){
-    r-=(wheelItems[i].weight||1);
-    if(r<=0)return i;
-  }
+  for(let i=0;i<wheelItems.length;i++){r-=(wheelItems[i].weight||1);if(r<=0)return i;}
   return wheelItems.length-1;
 }
 
-/* Compute the angle at center of segment idx */
 function segmentAngle(idx){
   const total=wheelItems.reduce((s,i)=>s+(i.weight||1),0);
   let a=-Math.PI/2;
@@ -422,37 +601,22 @@ function segmentAngle(idx){
   return a;
 }
 
-/* ─────────────── SPIN ─────────────── */
 async function startSpin(){
   if(isSpinning||wheelItems.length===0||timerEnded)return;
   if(!checkCooldown())return;
-
   isSpinning=true;
   document.getElementById('spinBtn').disabled=true;
   document.getElementById('spinBtn').classList.remove('ready');
-
-  // 1. Determine winner BEFORE animation
   spinTargetIdx=pickWinner();
   const winner=wheelItems[spinTargetIdx];
-
-  // 2. Compute how far to spin
-  // We want the wheel to land with the pointer (right side, 0°) pointing at the winner segment
-  // The pointer is at angle=0 relative to canvas, segments start at -PI/2
-  // targetAngle is the center of the winning segment in the wheel's local frame
-  const segCenter=segmentAngle(spinTargetIdx); // angle from wheel center to segment center
-  // We need: currentAngle + spinTotal ≡ -segCenter (mod 2π)
-  // Add 5 full rotations for drama
+  const segCenter=segmentAngle(spinTargetIdx);
   const fullRotations=5+Math.floor(Math.random()*3);
   const targetOffset=( -segCenter - currentAngle % (Math.PI*2) + Math.PI*2*10 ) % (Math.PI*2);
   spinTotalRotation=Math.PI*2*fullRotations + targetOffset;
   spinStartAngle=currentAngle;
   spinStartTime=performance.now();
-
-  // 3. Save spin to Firebase (non-blocking)
   fetch(FB+'/wheelSpins/'+team+'.json',{method:'PUT',body:JSON.stringify({lastSpinAt:Date.now(),result:winner.label,points:winner.points||0})});
   lastSpinAt=Date.now();
-
-  // 4. Run RAF loop
   if(spinRAF)cancelAnimationFrame(spinRAF);
   spinRAF=requestAnimationFrame(rafSpin);
 }
@@ -463,22 +627,12 @@ function rafSpin(now){
   const eased=easeOut5(t);
   currentAngle=spinStartAngle+spinTotalRotation*eased;
   drawWheel(currentAngle);
-
-  if(t<1){
-    spinRAF=requestAnimationFrame(rafSpin);
-  } else {
-    spinRAF=null;
-    isSpinning=false;
-    currentAngle=spinStartAngle+spinTotalRotation; // snap to exact
-    drawWheel(currentAngle);
-    onSpinComplete();
-  }
+  if(t<1){spinRAF=requestAnimationFrame(rafSpin);}
+  else{spinRAF=null;isSpinning=false;currentAngle=spinStartAngle+spinTotalRotation;drawWheel(currentAngle);onSpinComplete();}
 }
 
 async function onSpinComplete(){
   const winner=wheelItems[spinTargetIdx];
-
-  // Award points
   if((winner.points||0)>0){
     const res=await fetch(FB+"/teams/"+team+".json");let current=await res.json();
     current=(current||0)+(winner.points||0);
@@ -487,30 +641,19 @@ async function onSpinComplete(){
     const logEntry={team,eventName:'🎡 '+winner.label,points:winner.points,time:Date.now()};
     await fetch(FB+'/completions/'+Date.now()+'_'+team+'.json',{method:'PUT',body:JSON.stringify(logEntry)});
   }
-
-  // Show result overlay
   const col=WHEEL_SEG_COLORS[spinTargetIdx%WHEEL_SEG_COLORS.length];
   const nameEl=document.getElementById('resultName');
   const ptsEl=document.getElementById('resultPts');
-  nameEl.textContent=winner.label;
-  nameEl.style.color=col;
-  nameEl.style.textShadow=`0 0 30px ${col}`;
+  nameEl.textContent=winner.label;nameEl.style.color=col;nameEl.style.textShadow=`0 0 30px ${col}`;
   ptsEl.textContent=(winner.points||0)>0?`+${winner.points} POINTS!`:'Better luck next time!';
   ptsEl.style.color=(winner.points||0)>0?'#f0c040':'rgba(168,228,255,0.5)';
   document.getElementById('resultOverlay').classList.add('show');
-
-  // Confetti — only on capable devices
   if(!LOW_END&&(winner.points||0)>0) spawnConfetti(col);
-
   updateSpinBtn();
 }
 
-function dismissResult(){
-  document.getElementById('resultOverlay').classList.remove('show');
-  stopConfetti();
-}
+function dismissResult(){document.getElementById('resultOverlay').classList.remove('show');stopConfetti();}
 
-/* ─────────────── COOLDOWN ─────────────── */
 function checkCooldown(){
   const coolMs=wheelSettings.cooldownMinutes*60*1000;
   const elapsed=Date.now()-lastSpinAt;
@@ -520,11 +663,7 @@ function checkCooldown(){
 function updateSpinBtn(){
   const btn=document.getElementById('spinBtn');
   const msg=document.getElementById('wheelCooldownMsg');
-  if(timerEnded){
-    btn.disabled=true;btn.classList.remove('ready');
-    msg.textContent='⏰ Match over — wheel locked';
-    return;
-  }
+  if(timerEnded){btn.disabled=true;btn.classList.remove('ready');msg.textContent='⏰ Match over — wheel locked';return;}
   if(wheelItems.length===0){btn.disabled=true;msg.textContent='No wheel items set up yet';return;}
   const coolMs=wheelSettings.cooldownMinutes*60*1000;
   const remaining=coolMs-(Date.now()-lastSpinAt);
@@ -537,135 +676,79 @@ function updateSpinBtn(){
     msg.textContent=lastSpinAt>0?'Ready to spin again!':'';
   }
 }
-
-/* Tick cooldown display */
 setInterval(updateSpinBtn,1000);
 
 /* ─────────────── CONFETTI ─────────────── */
-/*
-  Lightweight — flat colored rectangles only, no shadows, no blur.
-  Auto-cancels after 3s. Skipped entirely on LOW_END devices.
-*/
 let confettiParticles=[];
 let confettiRAF=null;
 let confettiActive=false;
-
 const confettiCanvas=document.getElementById('confettiCanvas');
 const confettiCtx=confettiCanvas.getContext('2d');
 function resizeConfetti(){confettiCanvas.width=window.innerWidth;confettiCanvas.height=window.innerHeight;}
 resizeConfetti();window.addEventListener('resize',resizeConfetti,{passive:true});
-
 function spawnConfetti(accentColor){
   if(LOW_END)return;
   confettiParticles=[];
   const W=confettiCanvas.width,H=confettiCanvas.height;
   const colors=['#cc5de8','#f0c040','#6bcb77','#4d96ff','#ff6b6b','#ffd93d',accentColor];
-  for(let i=0;i<60;i++){
-    confettiParticles.push({
-      x:W*0.5+(Math.random()-0.5)*W*0.4,
-      y:H*0.35+(Math.random()-0.5)*H*0.2,
-      vx:(Math.random()-0.5)*7,
-      vy:-4-Math.random()*6,
-      rot:Math.random()*Math.PI*2,
-      rotV:(Math.random()-0.5)*0.18,
-      w:7+Math.random()*7,
-      h:4+Math.random()*4,
-      color:colors[Math.floor(Math.random()*colors.length)],
-      alpha:1,
-      gravity:0.22
-    });
-  }
+  for(let i=0;i<60;i++){confettiParticles.push({x:W*0.5+(Math.random()-0.5)*W*0.4,y:H*0.35+(Math.random()-0.5)*H*0.2,vx:(Math.random()-0.5)*7,vy:-4-Math.random()*6,rot:Math.random()*Math.PI*2,rotV:(Math.random()-0.5)*0.18,w:7+Math.random()*7,h:4+Math.random()*4,color:colors[Math.floor(Math.random()*colors.length)],alpha:1,gravity:0.22});}
   confettiActive=true;
   if(confettiRAF)cancelAnimationFrame(confettiRAF);
   confettiRAF=requestAnimationFrame(tickConfetti);
   setTimeout(stopConfetti,3000);
 }
-
 function tickConfetti(){
   confettiCtx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
   let alive=false;
   for(const p of confettiParticles){
-    if(p.alpha<=0.02)continue;
-    alive=true;
-    confettiCtx.save();
-    confettiCtx.globalAlpha=p.alpha;
-    confettiCtx.translate(p.x,p.y);
-    confettiCtx.rotate(p.rot);
-    confettiCtx.fillStyle=p.color;
-    confettiCtx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
-    confettiCtx.restore();
-    p.x+=p.vx;p.y+=p.vy;p.vy+=p.gravity;p.vx*=0.99;
-    p.rot+=p.rotV;p.alpha-=0.013;
+    if(p.alpha<=0.02)continue;alive=true;
+    confettiCtx.save();confettiCtx.globalAlpha=p.alpha;confettiCtx.translate(p.x,p.y);confettiCtx.rotate(p.rot);
+    confettiCtx.fillStyle=p.color;confettiCtx.fillRect(-p.w/2,-p.h/2,p.w,p.h);confettiCtx.restore();
+    p.x+=p.vx;p.y+=p.vy;p.vy+=p.gravity;p.vx*=0.99;p.rot+=p.rotV;p.alpha-=0.013;p.radius*=0.98;
   }
   if(alive&&confettiActive) confettiRAF=requestAnimationFrame(tickConfetti);
-  else { confettiCtx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height); confettiRAF=null; }
+  else{confettiCtx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);confettiRAF=null;}
 }
+function stopConfetti(){confettiActive=false;}
 
-function stopConfetti(){
-  confettiActive=false;
-}
-
-/* ─────────────── WHEEL CANVAS RESPONSIVE ─────────────── */
+/* ─────────────── WHEEL RESPONSIVE ─────────────── */
 function resizeWheel(){
-  const wrap=document.getElementById('wheelWrap');
-  if(!wrap)return;
+  const wrap=document.getElementById('wheelWrap');if(!wrap)return;
   const size=Math.min(280,window.innerWidth-80);
   wrap.style.width=size+'px';wrap.style.height=size+'px';
-  const canvas=document.getElementById('wheelCanvas');
-  canvas.width=size;canvas.height=size;
+  const canvas=document.getElementById('wheelCanvas');canvas.width=size;canvas.height=size;
   if(wheelItems.length>0){buildOffscreen();drawWheel(currentAngle);}
 }
 window.addEventListener('resize',resizeWheel,{passive:true});
 
-/* ─────────────── TIMER POLL & LOCK ─────────────── */
+/* ─────────────── TIMER POLL ─────────────── */
 async function pollTimer(){
   try{
-    const res=await fetch(FB+'/timer.json');
-    const t=(await res.json())||{};
+    const res=await fetch(FB+'/timer.json');const t=(await res.json())||{};
     let remaining=t.remaining||0;
     if(t.state==='running'&&t.serverTime) remaining=Math.max(0,remaining-(Date.now()-t.serverTime)/1000);
     const ended=(t.state==='running'&&remaining<=0)||(t.state==='ended');
-    const wasEnded=timerEnded;
-    timerEnded=ended;
+    const wasEnded=timerEnded;timerEnded=ended;
     if(ended!==wasEnded) applyTimerLock(ended);
   }catch(e){}
 }
 
 function applyTimerLock(ended){
-  /* ── Lap button ── */
   const lapBtn=document.getElementById('pointBtn');
-  lapBtn.disabled=ended;
-  lapBtn.style.opacity=ended?'0.4':'';
-  lapBtn.style.cursor=ended?'not-allowed':'';
+  lapBtn.disabled=ended;lapBtn.style.opacity=ended?'0.4':'';lapBtn.style.cursor=ended?'not-allowed':'';
   lapBtn.title=ended?'Timer has ended — laps are locked':'';
-
-  /* ── Spin button ── */
   const spinBtn=document.getElementById('spinBtn');
-  if(ended){
-    spinBtn.disabled=true;
-    spinBtn.classList.remove('ready');
-    document.getElementById('wheelCooldownMsg').textContent='⏰ Match over — wheel locked';
-  } else {
-    // Let updateSpinBtn() decide whether cooldown applies
-    updateSpinBtn();
-  }
-
-  /* ── Challenge complete button ── */
-  // Only lock if not already marked done
+  if(ended){spinBtn.disabled=true;spinBtn.classList.remove('ready');document.getElementById('wheelCooldownMsg').textContent='⏰ Match over — wheel locked';}
+  else{updateSpinBtn();}
   const completeBtn=document.getElementById('completeBtn');
   if(ended) completeBtn.disabled=true;
-
-  /* ── Visual "ended" banner on lap button ── */
-  if(ended){
-    lapBtn.querySelector('span').textContent='⏰ TIME\'S UP';
-  } else {
-    lapBtn.querySelector('span').textContent='+2 LAPS';
-  }
+  lapBtn.querySelector('span').textContent=ended?'⏰ TIME\'S UP':'+2 LAPS';
+  // Re-render shop to disable buy buttons
+  if(shopItems.length>0) renderShopItems();
 }
 
 /* ─────────────── CURRENCY ─────────────── */
 let _lastGold=-1,_lastMako=-1;
-
 async function pollCurrency(){
   try{
     const res=await fetch(FB+'/currency/'+team+'.json');
@@ -679,36 +762,28 @@ async function pollCurrency(){
     }
     if(mako!==_lastMako){
       document.getElementById('makoCount').textContent=mako;
+      document.getElementById('shopMakoBalance').textContent=mako;
       if(_lastMako>=0&&mako>_lastMako) bump('makoBadge');
       _lastMako=mako;
+      currentMako=mako;
+      // Re-render shop items to update affordability
+      if(shopItems.length>0) renderShopItems();
     }
   }catch(e){}
 }
 
-document.getElementById('goldCoinImg').src=GOLD_COIN_IMG;
-document.getElementById('makoCoinImg').src=MAKO_COIN_IMG;
-
 function bump(id){
-  const el=document.getElementById(id);
-  el.classList.remove('bump');
-  void el.offsetWidth; // force reflow to restart animation
-  el.classList.add('bump');
+  const el=document.getElementById(id);el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump');
   setTimeout(()=>el.classList.remove('bump'),400);
 }
 
 /* ─────────────── INIT ─────────────── */
-loadInfo();
-loadScore();
-loadWheel();
-resizeWheel();
-pollTimer();
-pollCurrency();
+loadInfo();loadScore();loadWheel();resizeWheel();pollTimer();pollCurrency();loadShop();
 setInterval(loadScore,1500);
 setInterval(pollChallenge,1500);
 setInterval(pollTimer,2000);
 setInterval(pollCurrency,3000);
 setInterval(async()=>{
-  // Re-poll wheel settings so admin changes propagate live
   try{
     const [sRes,iRes]=await Promise.all([fetch(FB+'/wheelSettings.json'),fetch(FB+'/wheelItems.json')]);
     const sData=(await sRes.json())||{};const iData=(await iRes.json())||{};
@@ -721,6 +796,8 @@ setInterval(async()=>{
     updateWheelVisibility();
   }catch(e){}
 },5000);
+// Poll shop every 10s for live admin changes
+setInterval(loadShop,10000);
 pollChallenge();
 </script>
 </body>
