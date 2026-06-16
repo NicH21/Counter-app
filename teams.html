@@ -526,7 +526,8 @@ const LOW_END = (navigator.hardwareConcurrency||4) <= 2;
 
 /* ─────────────── STATE ─────────────── */
 let lastEventId=null;
-let completedEventIds=JSON.parse(sessionStorage.getItem('completedEvents')||'[]');
+// ── FIX: namespace all sessionStorage keys by team so purchases don't bleed across teams ──
+let completedEventIds=JSON.parse(sessionStorage.getItem('completedEvents_'+team)||'[]');
 let wheelItems=[];
 let wheelSettings={enabled:false,cooldownMinutes:10};
 let lastSpinAt=0;
@@ -545,10 +546,9 @@ let currentAngle=0;
 let shopItems=[];
 let pendingPurchase=null;
 let _makoBalance=0;
-// Track non-repurchasable items bought THIS SESSION: Set of item IDs
-let sessionPurchasedIds=new Set(JSON.parse(sessionStorage.getItem('sessionPurchasedIds')||'[]'));
-// Full purchase log for display
-let sessionPurchaseLog=JSON.parse(sessionStorage.getItem('sessionPurchaseLog')||'[]');
+// ── FIX: keyed by team so Team A's purchases don't mark items as owned for Team B ──
+let sessionPurchasedIds=new Set(JSON.parse(sessionStorage.getItem('sessionPurchasedIds_'+team)||'[]'));
+let sessionPurchaseLog=JSON.parse(sessionStorage.getItem('sessionPurchaseLog_'+team)||'[]');
 
 /* ─────────────── HELPERS ─────────────── */
 function parseRoster(raw){
@@ -623,7 +623,8 @@ async function completeChallenge(){
   const logEntry={team,eventName:lastEventId.name,points:lastEventId.points,time:Date.now()};
   await fetch(FB+'/completions/'+Date.now()+'_'+team+'.json',{method:'PUT',body:JSON.stringify(logEntry)});
   completedEventIds.push(key);
-  sessionStorage.setItem('completedEvents',JSON.stringify(completedEventIds));
+  // ── FIX: save under team-namespaced key ──
+  sessionStorage.setItem('completedEvents_'+team,JSON.stringify(completedEventIds));
 }
 
 /* ─────────────── WHEEL ─────────────── */
@@ -911,7 +912,7 @@ async function loadShop(){
 }
 
 function isAlreadyOwned(item){
-  // Only block repurchase if repurchasable===false AND we've bought it this session
+  // Only block repurchase if repurchasable===false AND this team bought it this session
   return item.repurchasable===false && sessionPurchasedIds.has(item.id);
 }
 
@@ -1021,15 +1022,17 @@ async function confirmPurchase(){
   document.getElementById('shopBalanceCount').textContent=newMako;
   bump('makoBadge');
 
-  // Track session purchase
+  // Track session purchase — keyed by team so it doesn't affect other teams
   if(item.repurchasable===false){
     sessionPurchasedIds.add(item.id);
-    sessionStorage.setItem('sessionPurchasedIds',JSON.stringify([...sessionPurchasedIds]));
+    // ── FIX: save under team-namespaced key ──
+    sessionStorage.setItem('sessionPurchasedIds_'+team,JSON.stringify([...sessionPurchasedIds]));
   }
 
-  // Add to session log
+  // Add to session log — keyed by team
   sessionPurchaseLog.unshift({emoji:item.emoji||'🛒',name:item.name,cost:item.price||0,time:Date.now()});
-  sessionStorage.setItem('sessionPurchaseLog',JSON.stringify(sessionPurchaseLog));
+  // ── FIX: save under team-namespaced key ──
+  sessionStorage.setItem('sessionPurchaseLog_'+team,JSON.stringify(sessionPurchaseLog));
   renderPurchaseLog();
   renderShopAffordability();
 
