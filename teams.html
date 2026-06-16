@@ -19,7 +19,7 @@
     @keyframes shine{0%{left:-120%}100%{left:160%}}
     .point-btn:hover{transform:scale(1.05)}.point-btn:active{transform:scale(0.96)}
 
-    /* CURRENCY HUD */
+    /* CURRENCY HUD — mako only */
     .currency-hud{
       position:fixed;top:14px;right:14px;z-index:50;
       display:flex;flex-direction:column;gap:6px;align-items:flex-end;
@@ -30,19 +30,18 @@
       backdrop-filter:blur(8px);
       border-radius:28px;
       padding:5px 16px 5px 5px;
-      border:1.5px solid rgba(255,255,255,0.1);
+      border:1.5px solid rgba(77,150,255,0.4);
       font-family:'Bangers',cursive;
       font-size:24px;
       letter-spacing:1px;
       transition:transform 0.15s;
       box-shadow:0 2px 14px rgba(0,0,0,0.4);
       min-width:100px;
+      color:#74c0fc;
+      text-shadow:0 0 10px rgba(77,150,255,0.5);
     }
-    .coin-badge.gold{border-color:rgba(240,192,64,0.4);color:#f0c040;text-shadow:0 0 10px rgba(240,192,64,0.5)}
-    .coin-badge.mako{border-color:rgba(77,150,255,0.4);color:#74c0fc;text-shadow:0 0 10px rgba(77,150,255,0.5)}
     .coin-badge.bump{animation:coinBump 0.4s ease}
     @keyframes coinBump{0%{transform:scale(1)}40%{transform:scale(1.3)}100%{transform:scale(1)}}
-    .coin-icon{font-size:16px;line-height:1}
     .coin-icon-img{width:48px;height:48px;object-fit:contain;border-radius:50%;flex-shrink:0;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.6))}
 
     /* CHALLENGE BANNER */
@@ -73,7 +72,7 @@
     .back-btn{font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;padding:10px 24px;border-radius:10px;border:1px solid rgba(0,229,255,0.3);cursor:pointer;background:rgba(5,20,40,0.6);color:#a8e4ff;letter-spacing:1px;transition:background 0.2s}
     .back-btn:hover{background:rgba(0,229,255,0.1)}
 
-    /* ══ WHEEL SECTION ══ */
+    /* WHEEL */
     .wheel-section{width:100%;max-width:400px;display:none;flex-direction:column;align-items:center;gap:0}
     .wheel-section.visible{display:flex}
     .wheel-section-title{font-family:'Bangers',cursive;font-size:22px;letter-spacing:3px;color:#cc5de8;text-shadow:0 0 16px rgba(204,93,232,0.5);margin-bottom:12px;text-align:center}
@@ -184,13 +183,30 @@
     .shop-item.sabotage { border-color: rgba(255,107,107,0.3); }
     .shop-item.sabotage::before { background: linear-gradient(135deg, rgba(255,107,107,0.08), transparent); }
 
-    .shop-item:hover:not(.cant-afford):not(:disabled) {
+    .shop-item:hover:not(.cant-afford):not(.already-owned) {
       transform: translateY(-3px) scale(1.02);
       box-shadow: 0 0 24px rgba(77,150,255,0.35);
     }
-    .shop-item.powerup:hover:not(.cant-afford) { box-shadow: 0 0 24px rgba(107,203,119,0.4); border-color: rgba(107,203,119,0.7); }
-    .shop-item.sabotage:hover:not(.cant-afford) { box-shadow: 0 0 24px rgba(255,107,107,0.4); border-color: rgba(255,107,107,0.7); }
+    .shop-item.powerup:hover:not(.cant-afford):not(.already-owned) { box-shadow: 0 0 24px rgba(107,203,119,0.4); border-color: rgba(107,203,119,0.7); }
+    .shop-item.sabotage:hover:not(.cant-afford):not(.already-owned) { box-shadow: 0 0 24px rgba(255,107,107,0.4); border-color: rgba(255,107,107,0.7); }
     .shop-item.cant-afford { opacity: 0.45; cursor: not-allowed; transform: none !important; }
+    .shop-item.already-owned { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+
+    /* "OWNED" ribbon on non-repurchasable bought items */
+    .owned-ribbon {
+      position: absolute;
+      top: 8px;
+      right: -22px;
+      background: #6bcb77;
+      color: #020b18;
+      font-family: 'Bangers', cursive;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      padding: 2px 28px;
+      transform: rotate(35deg);
+      box-shadow: 0 2px 8px rgba(107,203,119,0.5);
+      pointer-events: none;
+    }
 
     .shop-item-emoji { font-size: 32px; line-height: 1; }
     .shop-item-name {
@@ -216,8 +232,6 @@
     }
     .shop-item.powerup .shop-item-type-badge { background: rgba(107,203,119,0.15); color: #6bcb77; border: 1px solid rgba(107,203,119,0.35); }
     .shop-item.sabotage .shop-item-type-badge { background: rgba(255,107,107,0.15); color: #ff6b6b; border: 1px solid rgba(255,107,107,0.35); }
-    .shop-item-default .shop-item-type-badge { background: rgba(77,150,255,0.15); color: #74c0fc; border: 1px solid rgba(77,150,255,0.35); }
-
     .shop-item-price {
       display: flex;
       align-items: center;
@@ -259,6 +273,47 @@
       letter-spacing: 1px;
     }
 
+    /* ── MY PURCHASES LOG ── */
+    .purchases-log-section {
+      width: 100%;
+      max-width: 480px;
+      display: none;
+      flex-direction: column;
+      gap: 0;
+    }
+    .purchases-log-section.visible { display: flex; }
+    .purchases-log-title {
+      font-size: 11px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: rgba(168,228,255,0.5);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .purchases-log-list {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .purchase-log-row {
+      background: rgba(2,11,24,0.6);
+      border: 1px solid rgba(77,150,255,0.2);
+      border-radius: 10px;
+      padding: 9px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+    }
+    .pl-emoji { font-size: 20px; flex-shrink: 0; }
+    .pl-name { flex: 1; color: #a8e4ff; font-weight: 700; }
+    .pl-cost { font-family: 'Bangers', cursive; font-size: 16px; color: #74c0fc; white-space: nowrap; }
+    .pl-time { font-size: 11px; color: rgba(168,228,255,0.35); white-space: nowrap; }
+
     /* Purchase confirm modal */
     .shop-modal-overlay {
       display: none;
@@ -284,20 +339,8 @@
     .shop-modal.powerup { border-color: rgba(107,203,119,0.45); box-shadow: 0 0 40px rgba(107,203,119,0.2), 0 20px 60px rgba(0,0,0,0.5); }
     .shop-modal.sabotage { border-color: rgba(255,107,107,0.45); box-shadow: 0 0 40px rgba(255,107,107,0.2), 0 20px 60px rgba(0,0,0,0.5); }
     .shop-modal-emoji { font-size: 52px; line-height: 1; margin-bottom: 10px; }
-    .shop-modal-name {
-      font-family: 'Bangers', cursive;
-      font-size: 32px;
-      letter-spacing: 3px;
-      color: #a8e4ff;
-      margin-bottom: 6px;
-    }
-    .shop-modal-desc {
-      font-size: 13px;
-      color: rgba(168,228,255,0.55);
-      margin-bottom: 18px;
-      line-height: 1.5;
-      letter-spacing: 0.5px;
-    }
+    .shop-modal-name { font-family: 'Bangers', cursive; font-size: 32px; letter-spacing: 3px; color: #a8e4ff; margin-bottom: 6px; }
+    .shop-modal-desc { font-size: 13px; color: rgba(168,228,255,0.55); margin-bottom: 18px; line-height: 1.5; letter-spacing: 0.5px; }
     .shop-modal-cost {
       display: inline-flex;
       align-items: center;
@@ -363,41 +406,18 @@
     .purchase-success.show { opacity: 1; pointer-events: all; }
     .purchase-success-emoji { font-size: 72px; animation: popIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275); }
     @keyframes popIn { 0%{transform:scale(0.3);opacity:0} 100%{transform:scale(1);opacity:1} }
-    .purchase-success-title {
-      font-family: 'Bangers', cursive;
-      font-size: clamp(32px, 8vw, 52px);
-      letter-spacing: 3px;
-      color: #6bcb77;
-      text-shadow: 0 0 30px rgba(107,203,119,0.6);
-    }
-    .purchase-success-name {
-      font-family: 'Bangers', cursive;
-      font-size: clamp(20px, 5vw, 30px);
-      letter-spacing: 2px;
-      color: #a8e4ff;
-    }
-    .purchase-success-cost {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      font-family: 'Bangers', cursive;
-      font-size: 22px;
-      color: #74c0fc;
-      opacity: 0.8;
-    }
+    .purchase-success-title { font-family: 'Bangers', cursive; font-size: clamp(32px, 8vw, 52px); letter-spacing: 3px; color: #6bcb77; text-shadow: 0 0 30px rgba(107,203,119,0.6); }
+    .purchase-success-name { font-family: 'Bangers', cursive; font-size: clamp(20px, 5vw, 30px); letter-spacing: 2px; color: #a8e4ff; }
+    .purchase-success-cost { display: flex; align-items: center; gap: 7px; font-family: 'Bangers', cursive; font-size: 22px; color: #74c0fc; opacity: 0.8; }
     .purchase-success-cost-img { width: 24px; height: 24px; border-radius: 50%; object-fit: contain; }
   </style>
 </head>
 <body>
 <canvas id="confettiCanvas"></canvas>
 
-<!-- CURRENCY HUD -->
+<!-- CURRENCY HUD — mako only -->
 <div class="currency-hud">
-  <div class="coin-badge gold" id="goldBadge">
-    <img class="coin-icon-img" src="./assets/gold-mako.png" id="goldCoinImg" alt="Gold Mako">
-    <span id="goldCount">0</span>
-  </div>
-  <div class="coin-badge mako" id="makoBadge">
+  <div class="coin-badge" id="makoBadge">
     <img class="coin-icon-img" src="./assets/mako-coin.png" id="makoCoinImg" alt="Mako Coin">
     <span id="makoCount">0</span>
   </div>
@@ -427,18 +447,24 @@
   <div class="wheel-cooldown-msg" id="wheelCooldownMsg"></div>
 </div>
 
-<!-- ══ MAKO SHOP ══ -->
+<!-- MAKO SHOP -->
 <div class="shop-section" id="shopSection">
   <div class="shop-header">
     <div class="shop-title">🛒 MAKO SHOP</div>
     <div class="shop-balance">
-      <img class="shop-balance-img" src="./assets/mako-coin.png" id="shopBalanceImg" alt="Mako">
+      <img class="shop-balance-img" src="./assets/mako-coin.png" alt="Mako">
       <span id="shopBalanceCount">0</span>
     </div>
   </div>
   <div class="shop-grid" id="shopGrid">
     <div class="shop-empty" style="grid-column:1/-1">Loading shop…</div>
   </div>
+</div>
+
+<!-- MY PURCHASES -->
+<div class="purchases-log-section" id="purchasesLogSection">
+  <div class="purchases-log-title">🧾 My Purchases This Session</div>
+  <div class="purchases-log-list" id="purchasesLogList"></div>
 </div>
 
 <!-- ROSTER -->
@@ -464,7 +490,7 @@
     <div class="shop-modal-name" id="shopModalName">Item Name</div>
     <div class="shop-modal-desc" id="shopModalDesc">Description here</div>
     <div class="shop-modal-cost">
-      <img class="shop-modal-cost-img" src="./assets/mako-coin.png" id="shopModalCostImg" alt="Mako">
+      <img class="shop-modal-cost-img" src="./assets/mako-coin.png" alt="Mako">
       <span id="shopModalCost">0</span> MAKO
     </div>
     <div class="shop-modal-btns">
@@ -480,14 +506,13 @@
   <div class="purchase-success-title">PURCHASED!</div>
   <div class="purchase-success-name" id="purchaseSuccessName"></div>
   <div class="purchase-success-cost">
-    <img class="purchase-success-cost-img" src="./assets/mako-coin.png" id="purchaseSuccessCostImg" alt="Mako">
+    <img class="purchase-success-cost-img" src="./assets/mako-coin.png" alt="Mako">
     <span id="purchaseSuccessCost"></span>
   </div>
 </div>
 
 <script>
 /* ─────────────── CONFIG ─────────────── */
-const GOLD_IMG='./assets/gold-mako.png';
 const MAKO_IMG='./assets/mako-coin.png';
 const COLORS_TEAM={team1:'#ff6b6b',team2:'#ffd93d',team3:'#6bcb77',team4:'#4d96ff',team5:'#ff922b',team6:'#cc5de8',team7:'#20c997',team8:'#f06595',team9:'#74c0fc',team10:'#ff8787',team11:'#a9e34b',team12:'#ffa94d'};
 const WHEEL_SEG_COLORS=['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#ff922b','#cc5de8','#20c997','#f06595','#74c0fc','#a9e34b','#ffa94d','#e64980','#339af0','#51cf66'];
@@ -520,6 +545,10 @@ let currentAngle=0;
 let shopItems=[];
 let pendingPurchase=null;
 let _makoBalance=0;
+// Track non-repurchasable items bought THIS SESSION: Set of item IDs
+let sessionPurchasedIds=new Set(JSON.parse(sessionStorage.getItem('sessionPurchasedIds')||'[]'));
+// Full purchase log for display
+let sessionPurchaseLog=JSON.parse(sessionStorage.getItem('sessionPurchaseLog')||'[]');
 
 /* ─────────────── HELPERS ─────────────── */
 function parseRoster(raw){
@@ -674,23 +703,17 @@ function drawWheel(angle){
   const ctx=canvas.getContext('2d');
   const cx=canvas.width/2,cy=canvas.height/2;
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.save();
-  ctx.translate(cx,cy);
-  ctx.rotate(angle);
-  ctx.translate(-cx,-cy);
-  ctx.drawImage(offscreen,0,0);
-  ctx.restore();
+  ctx.save();ctx.translate(cx,cy);ctx.rotate(angle);ctx.translate(-cx,-cy);
+  ctx.drawImage(offscreen,0,0);ctx.restore();
 }
 
 function easeOut5(t){return 1-Math.pow(1-t,5);}
-
 function pickWinner(){
   const total=wheelItems.reduce((s,i)=>s+(i.weight||1),0);
   let r=Math.random()*total;
   for(let i=0;i<wheelItems.length;i++){r-=(wheelItems[i].weight||1);if(r<=0)return i;}
   return wheelItems.length-1;
 }
-
 function segmentAngle(idx){
   const total=wheelItems.reduce((s,i)=>s+(i.weight||1),0);
   let a=-Math.PI/2;
@@ -698,7 +721,6 @@ function segmentAngle(idx){
   a+=(wheelItems[idx].weight||1)/total*Math.PI*2/2;
   return a;
 }
-
 async function startSpin(){
   if(isSpinning||wheelItems.length===0||timerEnded)return;
   if(!checkCooldown())return;
@@ -711,24 +733,20 @@ async function startSpin(){
   const fullRotations=5+Math.floor(Math.random()*3);
   const targetOffset=(-segCenter-currentAngle%(Math.PI*2)+Math.PI*2*10)%(Math.PI*2);
   spinTotalRotation=Math.PI*2*fullRotations+targetOffset;
-  spinStartAngle=currentAngle;
-  spinStartTime=performance.now();
+  spinStartAngle=currentAngle;spinStartTime=performance.now();
   fetch(FB+'/wheelSpins/'+team+'.json',{method:'PUT',body:JSON.stringify({lastSpinAt:Date.now(),result:winner.label,points:winner.points||0})});
   lastSpinAt=Date.now();
   if(spinRAF)cancelAnimationFrame(spinRAF);
   spinRAF=requestAnimationFrame(rafSpin);
 }
-
 function rafSpin(now){
-  const elapsed=now-spinStartTime;
-  const t=Math.min(1,elapsed/spinDuration);
+  const elapsed=now-spinStartTime;const t=Math.min(1,elapsed/spinDuration);
   const eased=easeOut5(t);
   currentAngle=spinStartAngle+spinTotalRotation*eased;
   drawWheel(currentAngle);
   if(t<1){spinRAF=requestAnimationFrame(rafSpin);}
   else{spinRAF=null;isSpinning=false;currentAngle=spinStartAngle+spinTotalRotation;drawWheel(currentAngle);onSpinComplete();}
 }
-
 async function onSpinComplete(){
   const winner=wheelItems[spinTargetIdx];
   if((winner.points||0)>0){
@@ -740,32 +758,21 @@ async function onSpinComplete(){
     await fetch(FB+'/completions/'+Date.now()+'_'+team+'.json',{method:'PUT',body:JSON.stringify(logEntry)});
   }
   const col=WHEEL_SEG_COLORS[spinTargetIdx%WHEEL_SEG_COLORS.length];
-  const nameEl=document.getElementById('resultName');
-  const ptsEl=document.getElementById('resultPts');
-  nameEl.textContent=winner.label;
-  nameEl.style.color=col;
-  nameEl.style.textShadow=`0 0 30px ${col}`;
+  const nameEl=document.getElementById('resultName');const ptsEl=document.getElementById('resultPts');
+  nameEl.textContent=winner.label;nameEl.style.color=col;nameEl.style.textShadow=`0 0 30px ${col}`;
   ptsEl.textContent=(winner.points||0)>0?`+${winner.points} POINTS!`:'Better luck next time!';
   ptsEl.style.color=(winner.points||0)>0?'#f0c040':'rgba(168,228,255,0.5)';
   document.getElementById('resultOverlay').classList.add('show');
   if(!LOW_END&&(winner.points||0)>0) spawnConfetti(col);
   updateSpinBtn();
 }
-
-function dismissResult(){
-  document.getElementById('resultOverlay').classList.remove('show');
-  stopConfetti();
-}
-
+function dismissResult(){document.getElementById('resultOverlay').classList.remove('show');stopConfetti();}
 function checkCooldown(){
   const coolMs=wheelSettings.cooldownMinutes*60*1000;
-  const elapsed=Date.now()-lastSpinAt;
-  return elapsed>=coolMs||lastSpinAt===0;
+  return (Date.now()-lastSpinAt)>=coolMs||lastSpinAt===0;
 }
-
 function updateSpinBtn(){
-  const btn=document.getElementById('spinBtn');
-  const msg=document.getElementById('wheelCooldownMsg');
+  const btn=document.getElementById('spinBtn');const msg=document.getElementById('wheelCooldownMsg');
   if(timerEnded){btn.disabled=true;btn.classList.remove('ready');msg.textContent='⏰ Match over — wheel locked';return;}
   if(wheelItems.length===0){btn.disabled=true;msg.textContent='No wheel items set up yet';return;}
   const coolMs=wheelSettings.cooldownMinutes*60*1000;
@@ -782,14 +789,10 @@ function updateSpinBtn(){
 setInterval(updateSpinBtn,1000);
 
 /* ─────────────── CONFETTI ─────────────── */
-let confettiParticles=[];
-let confettiRAF=null;
-let confettiActive=false;
-const confettiCanvas=document.getElementById('confettiCanvas');
-const confettiCtx=confettiCanvas.getContext('2d');
+let confettiParticles=[];let confettiRAF=null;let confettiActive=false;
+const confettiCanvas=document.getElementById('confettiCanvas');const confettiCtx=confettiCanvas.getContext('2d');
 function resizeConfetti(){confettiCanvas.width=window.innerWidth;confettiCanvas.height=window.innerHeight;}
 resizeConfetti();window.addEventListener('resize',resizeConfetti,{passive:true});
-
 function spawnConfetti(accentColor){
   if(LOW_END)return;
   confettiParticles=[];
@@ -801,8 +804,7 @@ function spawnConfetti(accentColor){
       vx:(Math.random()-0.5)*7,vy:-4-Math.random()*6,
       rot:Math.random()*Math.PI*2,rotV:(Math.random()-0.5)*0.18,
       w:7+Math.random()*7,h:4+Math.random()*4,
-      color:colors[Math.floor(Math.random()*colors.length)],
-      alpha:1,gravity:0.22
+      color:colors[Math.floor(Math.random()*colors.length)],alpha:1,gravity:0.22
     });
   }
   confettiActive=true;
@@ -810,7 +812,6 @@ function spawnConfetti(accentColor){
   confettiRAF=requestAnimationFrame(tickConfetti);
   setTimeout(stopConfetti,3000);
 }
-
 function tickConfetti(){
   confettiCtx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);
   let alive=false;
@@ -820,7 +821,7 @@ function tickConfetti(){
     confettiCtx.translate(p.x,p.y);confettiCtx.rotate(p.rot);
     confettiCtx.fillStyle=p.color;confettiCtx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
     confettiCtx.restore();
-    p.x+=p.vx;p.y+=p.vy;p.vy+=p.gravity;p.vx*=0.99;p.rot+=p.rotV;p.alpha-=0.013;p.radius*=0.98||1;
+    p.x+=p.vx;p.y+=p.vy;p.vy+=p.gravity;p.vx*=0.99;p.rot+=p.rotV;p.alpha-=0.013;
   }
   if(alive&&confettiActive)confettiRAF=requestAnimationFrame(tickConfetti);
   else{confettiCtx.clearRect(0,0,confettiCanvas.width,confettiCanvas.height);confettiRAF=null;}
@@ -848,45 +849,34 @@ async function pollTimer(){
     if(ended!==wasEnded)applyTimerLock(ended);
   }catch(e){}
 }
-
 function applyTimerLock(ended){
   const lapBtn=document.getElementById('pointBtn');
-  lapBtn.disabled=ended;lapBtn.style.opacity=ended?'0.4':'';
-  lapBtn.style.cursor=ended?'not-allowed':'';
+  lapBtn.disabled=ended;lapBtn.style.opacity=ended?'0.4':'';lapBtn.style.cursor=ended?'not-allowed':'';
   const spinBtn=document.getElementById('spinBtn');
   if(ended){spinBtn.disabled=true;spinBtn.classList.remove('ready');document.getElementById('wheelCooldownMsg').textContent='⏰ Match over — wheel locked';}
   else{updateSpinBtn();}
   const completeBtn=document.getElementById('completeBtn');if(ended)completeBtn.disabled=true;
-  if(ended){lapBtn.querySelector('span').textContent='⏰ TIME\'S UP';}
-  else{lapBtn.querySelector('span').textContent='+2 LAPS';}
+  lapBtn.querySelector('span').textContent=ended?'⏰ TIME\'S UP':'+2 LAPS';
 }
 
 /* ─────────────── CURRENCY ─────────────── */
-let _lastGold=-1,_lastMako=-1;
+let _lastMako=-1;
 
 async function pollCurrency(){
   try{
     const res=await fetch(FB+'/currency/'+team+'.json');
     const data=(await res.json())||{};
-    const gold=data.gold||0;
     const mako=data.mako||0;
-    if(gold!==_lastGold){
-      document.getElementById('goldCount').textContent=gold;
-      if(_lastGold>=0&&gold>_lastGold)bump('goldBadge');
-      _lastGold=gold;
-    }
     if(mako!==_lastMako){
       document.getElementById('makoCount').textContent=mako;
       document.getElementById('shopBalanceCount').textContent=mako;
       if(_lastMako>=0&&mako>_lastMako)bump('makoBadge');
       _lastMako=mako;
       _makoBalance=mako;
-      // Refresh afford state
       renderShopAffordability();
     }
   }catch(e){}
 }
-
 function bump(id){
   const el=document.getElementById(id);el.classList.remove('bump');
   void el.offsetWidth;el.classList.add('bump');setTimeout(()=>el.classList.remove('bump'),400);
@@ -895,24 +885,23 @@ function bump(id){
 /* ══════════════════════════════════════
    MAKO SHOP ENGINE
 ══════════════════════════════════════ */
-
 async function loadShop(){
   try{
-    const [itemsRes, settingsRes] = await Promise.all([
+    const [itemsRes,settingsRes]=await Promise.all([
       fetch(FB+'/shopItems.json'),
       fetch(FB+'/shopSettings.json')
     ]);
-    const itemsData = (await itemsRes.json()) || {};
-    const settingsData = (await settingsRes.json()) || {};
-    const enabled = settingsData.enabled !== false; // default true if not set
+    const itemsData=(await itemsRes.json())||{};
+    const settingsData=(await settingsRes.json())||{};
+    const enabled=settingsData.enabled!==false;
 
-    shopItems = Object.entries(itemsData)
-      .map(([id, v]) => ({id, ...v}))
-      .filter(i => i.enabled !== false)
-      .sort((a,b) => (a.sortOrder||99) - (b.sortOrder||99) || a.name.localeCompare(b.name));
+    shopItems=Object.entries(itemsData)
+      .map(([id,v])=>({id,...v}))
+      .filter(i=>i.enabled!==false)
+      .sort((a,b)=>(a.sortOrder||99)-(b.sortOrder||99)||a.name.localeCompare(b.name));
 
-    const section = document.getElementById('shopSection');
-    if(enabled && shopItems.length > 0){
+    const section=document.getElementById('shopSection');
+    if(enabled&&shopItems.length>0){
       section.classList.add('visible');
       renderShop();
     } else {
@@ -921,12 +910,16 @@ async function loadShop(){
   }catch(e){}
 }
 
+function isAlreadyOwned(item){
+  // Only block repurchase if repurchasable===false AND we've bought it this session
+  return item.repurchasable===false && sessionPurchasedIds.has(item.id);
+}
+
 function getItemTypeClass(item){
   if(item.type==='powerup') return 'powerup';
   if(item.type==='sabotage') return 'sabotage';
   return '';
 }
-
 function getItemTypeBadgeText(item){
   if(item.type==='powerup') return '⚡ POWER-UP';
   if(item.type==='sabotage') return '💀 SABOTAGE';
@@ -934,15 +927,21 @@ function getItemTypeBadgeText(item){
 }
 
 function renderShop(){
-  const grid = document.getElementById('shopGrid');
-  if(shopItems.length === 0){
-    grid.innerHTML = '<div class="shop-empty" style="grid-column:1/-1">No items in the shop yet!</div>';
+  const grid=document.getElementById('shopGrid');
+  if(shopItems.length===0){
+    grid.innerHTML='<div class="shop-empty" style="grid-column:1/-1">No items in the shop yet!</div>';
     return;
   }
-  grid.innerHTML = shopItems.map(item => {
-    const typeClass = getItemTypeClass(item);
-    const cantAfford = _makoBalance < (item.price||0);
-    return `<div class="shop-item ${typeClass}${cantAfford?' cant-afford':''}" id="si_${item.id}">
+  grid.innerHTML=shopItems.map(item=>{
+    const typeClass=getItemTypeClass(item);
+    const cantAfford=_makoBalance<(item.price||0);
+    const owned=isAlreadyOwned(item);
+    const disabled=cantAfford||owned||timerEnded;
+    let btnLabel='BUY!';
+    if(owned) btnLabel='OWNED';
+    else if(cantAfford) btnLabel='NOT ENOUGH';
+    return `<div class="shop-item ${typeClass}${cantAfford&&!owned?' cant-afford':''}${owned?' already-owned':''}" id="si_${item.id}">
+      ${owned?'<div class="owned-ribbon">OWNED</div>':''}
       <div class="shop-item-emoji">${item.emoji||'🛒'}</div>
       <div class="shop-item-name">${item.name}</div>
       ${item.description?`<div class="shop-item-desc">${item.description}</div>`:''}
@@ -951,125 +950,135 @@ function renderShop(){
         <img class="shop-price-img" src="${MAKO_IMG}" alt="Mako">
         ${item.price||0}
       </div>
-      <button class="shop-buy-btn" onclick="openShopModal('${item.id}')" ${cantAfford||timerEnded?'disabled':''}>
-        <span>${cantAfford?'NOT ENOUGH':'BUY!'}</span>
+      <button class="shop-buy-btn" onclick="openShopModal('${item.id}')" ${disabled?'disabled':''}>
+        <span>${btnLabel}</span>
       </button>
     </div>`;
   }).join('');
 }
 
 function renderShopAffordability(){
-  // Only update afford state without full re-render (avoids DOM churn)
-  shopItems.forEach(item => {
-    const el = document.getElementById('si_'+item.id);
-    if(!el) return;
-    const cantAfford = _makoBalance < (item.price||0);
-    el.classList.toggle('cant-afford', cantAfford);
-    const btn = el.querySelector('.shop-buy-btn');
+  shopItems.forEach(item=>{
+    const el=document.getElementById('si_'+item.id);if(!el)return;
+    const cantAfford=_makoBalance<(item.price||0);
+    const owned=isAlreadyOwned(item);
+    el.classList.toggle('cant-afford',cantAfford&&!owned);
+    el.classList.toggle('already-owned',owned);
+    const btn=el.querySelector('.shop-buy-btn');
     if(btn){
-      btn.disabled = cantAfford || timerEnded;
-      btn.querySelector('span').textContent = cantAfford ? 'NOT ENOUGH' : 'BUY!';
+      btn.disabled=cantAfford||owned||timerEnded;
+      let lbl='BUY!';
+      if(owned) lbl='OWNED';
+      else if(cantAfford) lbl='NOT ENOUGH';
+      btn.querySelector('span').textContent=lbl;
     }
   });
 }
 
 function openShopModal(itemId){
-  const item = shopItems.find(i => i.id === itemId);
-  if(!item) return;
-  if(_makoBalance < (item.price||0)) return;
-  pendingPurchase = item;
-
-  const inner = document.getElementById('shopModalInner');
-  inner.className = 'shop-modal ' + getItemTypeClass(item);
-  document.getElementById('shopModalEmoji').textContent = item.emoji || '🛒';
-  document.getElementById('shopModalName').textContent = item.name;
-  document.getElementById('shopModalDesc').textContent = item.description || '';
-  document.getElementById('shopModalCost').textContent = item.price || 0;
+  const item=shopItems.find(i=>i.id===itemId);
+  if(!item)return;
+  if(_makoBalance<(item.price||0)||isAlreadyOwned(item))return;
+  pendingPurchase=item;
+  const inner=document.getElementById('shopModalInner');
+  inner.className='shop-modal '+getItemTypeClass(item);
+  document.getElementById('shopModalEmoji').textContent=item.emoji||'🛒';
+  document.getElementById('shopModalName').textContent=item.name;
+  document.getElementById('shopModalDesc').textContent=item.description||'';
+  document.getElementById('shopModalCost').textContent=item.price||0;
   document.getElementById('shopModal').classList.add('open');
 }
-
 function closeShopModal(){
   document.getElementById('shopModal').classList.remove('open');
-  pendingPurchase = null;
+  pendingPurchase=null;
 }
 
 async function confirmPurchase(){
-  if(!pendingPurchase) return;
-  const item = pendingPurchase;
+  if(!pendingPurchase)return;
+  const item=pendingPurchase;
   closeShopModal();
 
-  // Re-check balance (race condition guard)
-  const freshRes = await fetch(FB+'/currency/'+team+'.json');
-  const freshData = (await freshRes.json()) || {};
-  const currentMako = freshData.mako || 0;
-  if(currentMako < (item.price||0)){
-    showToast('Not enough Mako Coins!');
-    return;
-  }
+  // Re-check balance
+  const freshRes=await fetch(FB+'/currency/'+team+'.json');
+  const freshData=(await freshRes.json())||{};
+  const currentMako=freshData.mako||0;
+  if(currentMako<(item.price||0)){showToast('Not enough Mako Coins!');return;}
 
-  // Deduct coins
-  const newMako = currentMako - (item.price||0);
-  await fetch(FB+'/currency/'+team+'/mako.json', {method:'PUT', body:JSON.stringify(newMako)});
+  // Deduct
+  const newMako=currentMako-(item.price||0);
+  await fetch(FB+'/currency/'+team+'/mako.json',{method:'PUT',body:JSON.stringify(newMako)});
 
-  // Log purchase
-  const logEntry = {
-    team,
-    itemId: item.id,
-    itemName: item.name,
-    itemType: item.type || 'item',
-    itemEmoji: item.emoji || '🛒',
-    cost: item.price || 0,
-    time: Date.now()
+  // Log to Firebase
+  const logEntry={
+    team,itemId:item.id,itemName:item.name,itemType:item.type||'item',
+    itemEmoji:item.emoji||'🛒',cost:item.price||0,time:Date.now()
   };
-  await fetch(FB+'/shopPurchases/'+Date.now()+'_'+team+'.json', {method:'PUT', body:JSON.stringify(logEntry)});
+  await fetch(FB+'/shopPurchases/'+Date.now()+'_'+team+'.json',{method:'PUT',body:JSON.stringify(logEntry)});
 
   // Update local state
-  _makoBalance = newMako;
-  _lastMako = newMako;
-  document.getElementById('makoCount').textContent = newMako;
-  document.getElementById('shopBalanceCount').textContent = newMako;
+  _makoBalance=newMako;_lastMako=newMako;
+  document.getElementById('makoCount').textContent=newMako;
+  document.getElementById('shopBalanceCount').textContent=newMako;
   bump('makoBadge');
+
+  // Track session purchase
+  if(item.repurchasable===false){
+    sessionPurchasedIds.add(item.id);
+    sessionStorage.setItem('sessionPurchasedIds',JSON.stringify([...sessionPurchasedIds]));
+  }
+
+  // Add to session log
+  sessionPurchaseLog.unshift({emoji:item.emoji||'🛒',name:item.name,cost:item.price||0,time:Date.now()});
+  sessionStorage.setItem('sessionPurchaseLog',JSON.stringify(sessionPurchaseLog));
+  renderPurchaseLog();
   renderShopAffordability();
 
-  // Show success
   showPurchaseSuccess(item);
-  pendingPurchase = null;
+  pendingPurchase=null;
+}
+
+function renderPurchaseLog(){
+  const section=document.getElementById('purchasesLogSection');
+  const list=document.getElementById('purchasesLogList');
+  if(sessionPurchaseLog.length===0){
+    section.classList.remove('visible');
+    return;
+  }
+  section.classList.add('visible');
+  list.innerHTML=sessionPurchaseLog.map(p=>{
+    const d=new Date(p.time);
+    const timeStr=d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    return`<div class="purchase-log-row">
+      <span class="pl-emoji">${p.emoji}</span>
+      <span class="pl-name">${p.name}</span>
+      <span class="pl-cost">-${p.cost} 🪙</span>
+      <span class="pl-time">${timeStr}</span>
+    </div>`;
+  }).join('');
 }
 
 function showPurchaseSuccess(item){
-  document.getElementById('purchaseSuccessEmoji').textContent = item.emoji || '🎉';
-  document.getElementById('purchaseSuccessName').textContent = item.name;
-  document.getElementById('purchaseSuccessCost').textContent = '-' + (item.price||0) + ' Mako';
-  const overlay = document.getElementById('purchaseSuccess');
+  document.getElementById('purchaseSuccessEmoji').textContent=item.emoji||'🎉';
+  document.getElementById('purchaseSuccessName').textContent=item.name;
+  document.getElementById('purchaseSuccessCost').textContent='-'+(item.price||0)+' Mako';
+  const overlay=document.getElementById('purchaseSuccess');
   overlay.classList.add('show');
   if(!LOW_END) spawnConfetti('#4d96ff');
-  setTimeout(()=>{
-    overlay.classList.remove('show');
-    stopConfetti();
-  }, 2200);
+  setTimeout(()=>{overlay.classList.remove('show');stopConfetti();},2200);
 }
 
 function showToast(msg){
-  // Reuse body for simple inline toast
-  const t = document.createElement('div');
+  const t=document.createElement('div');
   t.style.cssText='position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:rgba(5,20,40,0.95);border:1px solid rgba(0,229,255,0.3);border-radius:12px;padding:12px 28px;font-size:14px;font-weight:700;color:#a8e4ff;z-index:300;white-space:nowrap;font-family:Nunito,sans-serif';
-  t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(()=>t.remove(), 2400);
+  t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2400);
 }
 
-document.getElementById('shopModal').addEventListener('click', function(e){
-  if(e.target === this) closeShopModal();
-});
+document.getElementById('shopModal').addEventListener('click',function(e){if(e.target===this)closeShopModal();});
 
 /* ─────────────── INIT ─────────────── */
-loadInfo();
-loadScore();
-loadWheel();
-resizeWheel();
-pollTimer();
-pollCurrency();
-loadShop();
+loadInfo();loadScore();loadWheel();resizeWheel();pollTimer();pollCurrency();loadShop();
+renderPurchaseLog(); // restore from sessionStorage on page load
+
 setInterval(loadScore,1500);
 setInterval(pollChallenge,1500);
 setInterval(pollTimer,2000);
@@ -1078,17 +1087,15 @@ setInterval(async()=>{
   try{
     const [sRes,iRes]=await Promise.all([fetch(FB+'/wheelSettings.json'),fetch(FB+'/wheelItems.json')]);
     const sData=(await sRes.json())||{};const iData=(await iRes.json())||{};
-    const prevEnabled=wheelSettings.enabled;
-    wheelSettings={enabled:!!sData.enabled,cooldownMinutes:sData.cooldownMinutes||10};
     const newItems=Object.entries(iData).map(([id,v])=>({id,...v}));
     const changed=JSON.stringify(newItems)!==JSON.stringify(wheelItems);
+    wheelSettings={enabled:!!sData.enabled,cooldownMinutes:sData.cooldownMinutes||10};
     wheelItems=newItems;
     if(changed&&wheelItems.length>0){buildOffscreen();drawWheel(currentAngle);}
     updateWheelVisibility();
   }catch(e){}
 },5000);
-// Poll shop every 8s (items don't change often)
-setInterval(loadShop, 8000);
+setInterval(loadShop,8000);
 pollChallenge();
 </script>
 </body>
