@@ -61,6 +61,183 @@
     .done-flash.show{display:block}
     @keyframes flashIn{0%{transform:scale(0.6);opacity:0}100%{transform:scale(1);opacity:1}}
 
+    /* ══ SWIMMER LAPS SECTION ══ */
+    .swimmers-section {
+      width: 100%;
+      max-width: 480px;
+      display: none;
+      flex-direction: column;
+      gap: 0;
+    }
+    .swimmers-section.visible { display: flex; }
+    .swimmers-title {
+      font-size: 11px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: rgba(168,228,255,0.55);
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    .swimmers-hint {
+      font-size: 12px;
+      color: rgba(168,228,255,0.4);
+      text-align: center;
+      margin-bottom: 14px;
+      letter-spacing: 0.5px;
+    }
+
+    /* The ACTIVE swimmer card — big, obvious, hard to miss */
+    .active-swimmer-card {
+      background: rgba(5,20,40,0.85);
+      backdrop-filter: blur(8px);
+      border: 2.5px solid var(--tc, #00e5ff);
+      border-radius: 22px;
+      padding: 22px 22px 18px;
+      text-align: center;
+      box-shadow: 0 0 30px color-mix(in srgb, var(--tc, #00e5ff) 35%, transparent);
+      margin-bottom: 16px;
+    }
+    .active-swimmer-label {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(168,228,255,0.5);
+      margin-bottom: 6px;
+    }
+    .active-swimmer-name {
+      font-family: 'Bangers', cursive;
+      font-size: clamp(26px, 7vw, 38px);
+      letter-spacing: 2px;
+      color: var(--tc, #a8e4ff);
+      text-shadow: 0 0 18px color-mix(in srgb, var(--tc, #a8e4ff) 50%, transparent);
+      margin-bottom: 4px;
+      line-height: 1.1;
+      word-break: break-word;
+    }
+    .active-swimmer-laps {
+      font-family: 'Bangers', cursive;
+      font-size: clamp(42px, 13vw, 64px);
+      color: #f0c040;
+      text-shadow: 0 0 24px rgba(240,192,64,0.5);
+      line-height: 1;
+      margin: 6px 0 16px;
+    }
+    .active-swimmer-laps-label {
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(168,228,255,0.4);
+      margin-top: -10px;
+      margin-bottom: 14px;
+    }
+    .swimmer-big-btn {
+      font-family: 'Bangers', cursive;
+      font-size: 28px;
+      letter-spacing: 3px;
+      padding: 18px 0;
+      width: 100%;
+      border-radius: 16px;
+      border: 2.5px solid var(--tc, #00e5ff);
+      background: rgba(2,11,24,0.85);
+      color: white;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 22px color-mix(in srgb, var(--tc, #00e5ff) 40%, transparent);
+      transition: transform 0.1s, box-shadow 0.2s;
+    }
+    .swimmer-big-btn::before { content:""; position:absolute;top:0;left:-120%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent);transform:skewX(-20deg);animation:shine 2s linear infinite; }
+    .swimmer-big-btn span { position: relative; z-index: 2; }
+    .swimmer-big-btn:hover:not(:disabled) { transform: scale(1.03); }
+    .swimmer-big-btn:active:not(:disabled) { transform: scale(0.96); }
+    .swimmer-big-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .swimmer-undo-btn {
+      margin-top: 10px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 7px 16px;
+      border-radius: 9px;
+      border: 1px solid rgba(255,107,107,0.35);
+      background: transparent;
+      color: #ff8787;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .swimmer-undo-btn:hover { background: rgba(255,64,64,0.1); }
+
+    /* The roster list of OTHER (inactive) swimmers — small, deliberately low-tap-target */
+    .swimmer-list {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .swimmer-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(5,20,40,0.6);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .swimmer-row:hover { border-color: rgba(0,229,255,0.4); background: rgba(5,20,40,0.8); }
+    .swimmer-row.is-active {
+      display: none; /* the active swimmer is shown big above, not in the small list */
+    }
+    .swimmer-row-name {
+      flex: 1;
+      font-size: 14px;
+      font-weight: 700;
+      color: #a8e4ff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .swimmer-row-captain {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #f0c040;
+      background: rgba(240,192,64,0.15);
+      border: 1px solid rgba(240,192,64,0.4);
+      border-radius: 5px;
+      padding: 2px 6px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .swimmer-row-laps {
+      font-family: 'Bangers', cursive;
+      font-size: 18px;
+      color: #f0c040;
+      min-width: 28px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+    .swimmer-row-select {
+      font-family: 'Nunito', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: rgba(168,228,255,0.5);
+      border: 1px solid rgba(0,229,255,0.25);
+      border-radius: 8px;
+      padding: 5px 10px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      background: rgba(0,229,255,0.06);
+    }
+    .swimmer-team-total-note {
+      font-size: 11px;
+      color: rgba(168,228,255,0.35);
+      text-align: center;
+      margin-top: 14px;
+      letter-spacing: 0.5px;
+    }
+
     /* ROSTER */
     .roster-card{background:rgba(5,20,40,0.75);backdrop-filter:blur(8px);border-radius:14px;border:1px solid rgba(0,229,255,0.15);padding:16px 22px;width:100%;max-width:340px}
     .roster-title{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(168,228,255,0.5);margin-bottom:10px}
@@ -425,7 +602,30 @@
 
 <div class="team-name" id="title">Loading...</div>
 <div class="score" id="score">0</div>
-<button class="point-btn" id="pointBtn" onclick="update()"><span>+2 LAPS</span></button>
+
+<!-- Fallback team-wide button — only shown when there is NO roster set up -->
+<button class="point-btn" id="pointBtn" onclick="update()" style="display:none"><span>+2 LAPS</span></button>
+
+<!-- ══ SWIMMER LAPS ══ -->
+<div class="swimmers-section" id="swimmersSection">
+  <div class="swimmers-title">🏊 Swimmer Lap Counter</div>
+  <div class="swimmers-hint">Tap a name below to make them active, then use the big button</div>
+
+  <!-- ACTIVE swimmer — big, can't be missed -->
+  <div class="active-swimmer-card" id="activeSwimmerCard">
+    <div class="active-swimmer-label">Currently Counting For</div>
+    <div class="active-swimmer-name" id="activeSwimmerName">—</div>
+    <div class="active-swimmer-laps" id="activeSwimmerLaps">0</div>
+    <div class="active-swimmer-laps-label">laps</div>
+    <button class="swimmer-big-btn" id="swimmerBigBtn" onclick="addLapToActiveSwimmer()"><span>+2 LAPS</span></button>
+    <button class="swimmer-undo-btn" id="swimmerUndoBtn" onclick="undoLapForActiveSwimmer()">↺ Undo last +2</button>
+  </div>
+
+  <!-- Other swimmers — small rows, tap to switch active swimmer -->
+  <div class="swimmer-list" id="swimmerList"></div>
+
+  <div class="swimmer-team-total-note">Every swimmer's laps add up to the team score above</div>
+</div>
 
 <!-- CHALLENGE BANNER -->
 <div class="challenge-banner" id="challengeBanner">
@@ -542,6 +742,15 @@ let spinTargetIdx=0;
 let isSpinning=false;
 let currentAngle=0;
 
+/* ─────────────── SWIMMER LAPS STATE ─────────────── */
+let roster=[]; // [{name, captain}]
+let swimmerLaps={}; // { idx: lapCount }
+// Active swimmer is remembered per-team in sessionStorage so a refresh mid-event doesn't lose it,
+// but it's namespaced by team and never persists into another team's session.
+let activeSwimmerIdx = sessionStorage.getItem('activeSwimmerIdx_'+team);
+activeSwimmerIdx = (activeSwimmerIdx===null || activeSwimmerIdx==='') ? null : parseInt(activeSwimmerIdx);
+let lastSwimmerAction = null; // {idx, amount} for undo
+
 /* ─────────────── SHOP STATE ─────────────── */
 let shopItems=[];
 let pendingPurchase=null;
@@ -561,7 +770,7 @@ async function loadInfo(){
   try{
     const [nameRes,rosterRes]=await Promise.all([fetch(FB+'/teamNames/'+team+'.json'),fetch(FB+'/rosters/'+team+'.json')]);
     const name=await nameRes.json();const rawRoster=await rosterRes.json();
-    const roster=parseRoster(rawRoster);
+    roster=parseRoster(rawRoster);
     const displayName=(name&&name!=='null')?name:`Team ${num}`;
     document.getElementById("title").textContent=displayName;
     if(roster&&roster.length>0){
@@ -570,8 +779,17 @@ async function loadInfo(){
         const isCap=m.captain;
         return`<div class="member-chip${isCap?' captain-chip':''}"><span>👤 ${m.name}</span>${isCap?'<span class="captain-badge">★ Captain</span>':''}</div>`;
       }).join('');
+      await loadSwimmerLaps();
+      setupSwimmersUI();
+    } else {
+      // No roster set up — fall back to the original team-wide button
+      document.getElementById('pointBtn').style.display='inline-block';
+      document.getElementById('swimmersSection').classList.remove('visible');
     }
-  }catch(e){document.getElementById("title").textContent=`Team ${num}`;}
+  }catch(e){
+    document.getElementById("title").textContent=`Team ${num}`;
+    document.getElementById('pointBtn').style.display='inline-block';
+  }
 }
 
 async function update(){
@@ -584,6 +802,118 @@ async function update(){
 async function loadScore(){
   const res=await fetch(FB+"/teams/"+team+".json");const value=await res.json();
   document.getElementById("score").innerText=value||0;
+}
+
+/* ─────────────── SWIMMER LAPS ENGINE ─────────────── */
+async function loadSwimmerLaps(){
+  try{
+    const res=await fetch(FB+'/swimmerLaps/'+team+'.json');
+    const data=(await res.json())||{};
+    swimmerLaps={};
+    roster.forEach((m,i)=>{ swimmerLaps[i]=data[i]||0; });
+  }catch(e){
+    roster.forEach((m,i)=>{ if(swimmerLaps[i]===undefined) swimmerLaps[i]=0; });
+  }
+}
+
+function setupSwimmersUI(){
+  document.getElementById('swimmersSection').classList.add('visible');
+  document.getElementById('pointBtn').style.display='none';
+  // If there's no valid active swimmer (first load, or roster changed), default to the first swimmer
+  if(activeSwimmerIdx===null || !roster[activeSwimmerIdx]){
+    activeSwimmerIdx = 0;
+    sessionStorage.setItem('activeSwimmerIdx_'+team, String(activeSwimmerIdx));
+  }
+  renderSwimmers();
+}
+
+function selectSwimmer(idx){
+  if(timerEnded)return;
+  activeSwimmerIdx = idx;
+  sessionStorage.setItem('activeSwimmerIdx_'+team, String(idx));
+  lastSwimmerAction = null;
+  renderSwimmers();
+}
+
+function renderSwimmers(){
+  if(!roster.length)return;
+  const active = roster[activeSwimmerIdx];
+  const tc = COLORS_TEAM[team]||'#00e5ff';
+  const card = document.getElementById('activeSwimmerCard');
+  card.style.setProperty('--tc', tc);
+
+  document.getElementById('activeSwimmerName').textContent = active ? active.name + (active.captain ? ' ★' : '') : '—';
+  document.getElementById('activeSwimmerLaps').textContent = swimmerLaps[activeSwimmerIdx] || 0;
+
+  document.getElementById('swimmerUndoBtn').style.display = lastSwimmerAction ? 'inline-block' : 'none';
+
+  const list = document.getElementById('swimmerList');
+  list.innerHTML = roster.map((m,i)=>{
+    if(i===activeSwimmerIdx) return ''; // active swimmer shown big above, not duplicated here
+    const laps = swimmerLaps[i]||0;
+    return `<div class="swimmer-row" onclick="selectSwimmer(${i})">
+      <span class="swimmer-row-name">${m.name}</span>
+      ${m.captain?'<span class="swimmer-row-captain">★ CAPT</span>':''}
+      <span class="swimmer-row-laps">${laps}</span>
+      <span class="swimmer-row-select">Select</span>
+    </div>`;
+  }).join('');
+
+  applySwimmerTimerLock();
+}
+
+async function addLapToActiveSwimmer(){
+  if(timerEnded || activeSwimmerIdx===null || !roster[activeSwimmerIdx]) return;
+  const idx = activeSwimmerIdx;
+  const amount = 2;
+
+  // Update this swimmer's personal lap count
+  const newLaps = (swimmerLaps[idx]||0) + amount;
+  swimmerLaps[idx] = newLaps;
+  document.getElementById('activeSwimmerLaps').textContent = newLaps;
+  await fetch(FB+'/swimmerLaps/'+team+'/'+idx+'.json',{method:'PUT',body:JSON.stringify(newLaps)});
+
+  // Add to the team's grand total, same as the original whole-team button did
+  const res=await fetch(FB+"/teams/"+team+".json");let value=await res.json();
+  value=(value||0)+amount;
+  await fetch(FB+"/teams/"+team+".json",{method:"PUT",body:JSON.stringify(value)});
+  document.getElementById("score").innerText=value;
+
+  lastSwimmerAction = {idx, amount};
+  document.getElementById('swimmerUndoBtn').style.display='inline-block';
+  renderSwimmerRowLaps(idx);
+}
+
+async function undoLapForActiveSwimmer(){
+  if(!lastSwimmerAction || lastSwimmerAction.idx!==activeSwimmerIdx) return;
+  const {idx, amount} = lastSwimmerAction;
+
+  const newLaps = Math.max(0,(swimmerLaps[idx]||0) - amount);
+  swimmerLaps[idx] = newLaps;
+  document.getElementById('activeSwimmerLaps').textContent = newLaps;
+  await fetch(FB+'/swimmerLaps/'+team+'/'+idx+'.json',{method:'PUT',body:JSON.stringify(newLaps)});
+
+  const res=await fetch(FB+"/teams/"+team+".json");let value=await res.json();
+  value=Math.max(0,(value||0) - amount);
+  await fetch(FB+"/teams/"+team+".json",{method:"PUT",body:JSON.stringify(value)});
+  document.getElementById("score").innerText=value;
+
+  lastSwimmerAction = null;
+  document.getElementById('swimmerUndoBtn').style.display='none';
+  renderSwimmerRowLaps(idx);
+}
+
+function renderSwimmerRowLaps(idx){
+  // cheap full re-render of the small list to keep counts in sync
+  if(idx===activeSwimmerIdx) return; // already reflected in the big card
+  renderSwimmers();
+}
+
+function applySwimmerTimerLock(){
+  const bigBtn=document.getElementById('swimmerBigBtn');
+  if(!bigBtn) return;
+  bigBtn.disabled = timerEnded;
+  bigBtn.querySelector('span').textContent = timerEnded ? '⏰ TIME\'S UP' : '+2 LAPS';
 }
 
 async function pollChallenge(){
@@ -853,11 +1183,12 @@ async function pollTimer(){
 function applyTimerLock(ended){
   const lapBtn=document.getElementById('pointBtn');
   lapBtn.disabled=ended;lapBtn.style.opacity=ended?'0.4':'';lapBtn.style.cursor=ended?'not-allowed':'';
+  lapBtn.querySelector('span').textContent=ended?'⏰ TIME\'S UP':'+2 LAPS';
+  applySwimmerTimerLock();
   const spinBtn=document.getElementById('spinBtn');
   if(ended){spinBtn.disabled=true;spinBtn.classList.remove('ready');document.getElementById('wheelCooldownMsg').textContent='⏰ Match over — wheel locked';}
   else{updateSpinBtn();}
   const completeBtn=document.getElementById('completeBtn');if(ended)completeBtn.disabled=true;
-  lapBtn.querySelector('span').textContent=ended?'⏰ TIME\'S UP':'+2 LAPS';
 }
 
 /* ─────────────── CURRENCY ─────────────── */
