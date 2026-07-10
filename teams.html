@@ -1018,6 +1018,7 @@ async function addLapToActiveSwimmer(){
   const newLaps = (swimmerLaps[idx]||0) + amount;
   swimmerLaps[idx] = newLaps;
   document.getElementById('activeSwimmerLaps').textContent = newLaps;
+  updateActiveSwimmerRaisedDisplay(idx, newLaps); // reflects the full +2 laps worth of money, right away
   await fetch(FB+'/swimmerLaps/'+team+'/'+idx+'.json',{method:'PUT',body:JSON.stringify(newLaps)});
 
   // Add to the team's grand total, same as the original whole-team button did
@@ -1041,6 +1042,7 @@ async function undoLapForActiveSwimmer(){
   const newLaps = Math.max(0,(swimmerLaps[idx]||0) - amount);
   swimmerLaps[idx] = newLaps;
   document.getElementById('activeSwimmerLaps').textContent = newLaps;
+  updateActiveSwimmerRaisedDisplay(idx, newLaps);
   await fetch(FB+'/swimmerLaps/'+team+'/'+idx+'.json',{method:'PUT',body:JSON.stringify(newLaps)});
 
   const res=await fetch(FB+"/teams/"+team+".json");let value=await res.json();
@@ -1054,6 +1056,20 @@ async function undoLapForActiveSwimmer(){
   lastSwimmerAction = null;
   document.getElementById('swimmerUndoBtn').style.display='none';
   renderSwimmerRowLaps(idx);
+}
+
+function updateActiveSwimmerRaisedDisplay(idx, laps){
+  // Called right when a swimmer's own lap count changes, so their "raised so
+  // far" text jumps by the full 2 laps worth of money the moment the button
+  // is pressed, instead of waiting for the next full re-render.
+  const rate = (fundRoster[idx] && fundRoster[idx].rate) || 0;
+  const raisedEl = document.getElementById('activeSwimmerRaised');
+  if(rate>0){
+    raisedEl.textContent = `💵 ${fmtRand(laps*rate)} raised (${fmtRand(rate)}/lap)`;
+    raisedEl.style.display = 'block';
+  } else {
+    raisedEl.style.display = 'none';
+  }
 }
 
 function renderSwimmerRowLaps(idx){
