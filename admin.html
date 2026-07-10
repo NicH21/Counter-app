@@ -64,6 +64,10 @@
     .member-row.is-captain{border-color:rgba(240,192,64,0.5);background:rgba(40,30,5,0.4)}
     .member-input{flex:1;background:rgba(5,30,55,0.8);border:1px solid rgba(0,229,255,0.2);border-radius:8px;padding:8px 12px;color:#a8e4ff;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;outline:none;transition:border-color 0.2s}
     .member-input:focus{border-color:rgba(0,229,255,0.6)}
+    .member-rate-wrap{display:flex;align-items:center;gap:4px;flex-shrink:0}
+    .member-rate-label{font-size:10px;font-weight:700;letter-spacing:1px;color:rgba(240,192,64,0.55);white-space:nowrap}
+    .member-rate-inp{width:58px;padding:7px 6px;border-radius:7px;border:1px solid rgba(240,192,64,0.35);background:rgba(5,30,55,0.8);color:#f0c040;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;text-align:center;outline:none;transition:border-color 0.2s}
+    .member-rate-inp:focus{border-color:rgba(240,192,64,0.8)}
     .captain-btn{flex-shrink:0;font-size:11px;font-weight:700;letter-spacing:1px;padding:5px 9px;border-radius:7px;border:1.5px solid rgba(240,192,64,0.3);background:transparent;color:rgba(240,192,64,0.45);cursor:pointer;transition:all 0.18s;white-space:nowrap;font-family:'Nunito',sans-serif}
     .captain-btn:hover{border-color:rgba(240,192,64,0.7);color:#f0c040;background:rgba(240,192,64,0.1)}
     .captain-btn.active{border-color:#f0c040;color:#020b18;background:#f0c040;box-shadow:0 0 10px rgba(240,192,64,0.5)}
@@ -109,9 +113,9 @@
     .add-event-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
     .ev-name-inp{flex:2;min-width:140px;background:rgba(5,30,55,0.8);border:1px solid rgba(0,229,255,0.25);border-radius:9px;padding:9px 12px;color:#a8e4ff;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;outline:none;transition:border-color 0.2s}
     .ev-name-inp:focus{border-color:rgba(0,229,255,0.6)}
-    .ev-pts-inp{width:70px;background:rgba(5,30,55,0.8);border:1px solid rgba(240,192,64,0.25);border-radius:9px;padding:9px 10px;color:#f0c040;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;text-align:center;outline:none;transition:border-color 0.2s}
+    .ev-pts-inp{width:70px;background:rgba(5,30,55,0.8);border:1px solid rgba(240,192,64,0.25);border-radius:9px;padding:9px 10px;color:#f0c040;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;text-align:center;outline:none}
     .ev-pts-inp:focus{border-color:rgba(240,192,64,0.6)}
-    .ev-dur-inp{width:70px;background:rgba(5,30,55,0.8);border:1px solid rgba(107,203,119,0.25);border-radius:9px;padding:9px 10px;color:#6bcb77;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;text-align:center;outline:none;transition:border-color 0.2s}
+    .ev-dur-inp{width:70px;background:rgba(5,30,55,0.8);border:1px solid rgba(107,203,119,0.25);border-radius:9px;padding:9px 10px;color:#6bcb77;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;text-align:center;outline:none}
     .ev-dur-inp:focus{border-color:rgba(107,203,119,0.6)}
     .add-ev-btn{font-family:'Bangers',cursive;font-size:18px;letter-spacing:1px;padding:9px 20px;border-radius:10px;border:2px solid #4d96ff;box-shadow:0 0 10px rgba(77,150,255,0.3);cursor:pointer;background:rgba(2,11,24,0.85);color:white;transition:transform 0.1s,box-shadow 0.2s;white-space:nowrap}
     .add-ev-btn:hover{transform:translateY(-2px);box-shadow:0 0 20px rgba(77,150,255,0.6)}
@@ -266,6 +270,25 @@
     .slot-btn{font-family:'Bangers',cursive;font-size:15px;letter-spacing:1px;padding:10px 6px;border-radius:12px;border:1.5px solid;background:rgba(2,11,24,0.7);color:white;cursor:pointer;transition:transform 0.12s,opacity 0.2s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .slot-btn:hover{transform:scale(1.03)}.slot-btn.taken{opacity:0.4;cursor:default;transform:none}
 
+    /* FUNDRAISING */
+    .fund-card { border-color: rgba(240,192,64,0.3); }
+    .fund-grid { display:flex; flex-direction:column; gap:10px; margin-bottom: 16px; }
+    .fund-row { background: rgba(2,11,24,0.6); border-radius: 12px; border: 1px solid rgba(255,255,255,0.07); padding: 12px 14px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; transition: border-color 0.2s; }
+    .fund-row.on { border-color: rgba(240,192,64,0.4); }
+    .fund-name { font-size: 14px; font-weight: 900; color: #a8e4ff; flex: 1 1 100px; min-width: 90px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .fund-rate-wrap { display:flex; align-items:center; gap:6px; }
+    .fund-rate-wrap label { font-size: 11px; color: rgba(168,228,255,0.45); letter-spacing: 1px; white-space: nowrap; }
+    .fund-rate-inp { width: 76px; padding: 7px 8px; border-radius: 8px; border: 1px solid rgba(240,192,64,0.35); background: rgba(5,30,55,0.8); color: #f0c040; font-family:'Nunito',sans-serif; font-size: 14px; font-weight: 700; text-align: center; outline: none; }
+    .fund-rate-inp:focus { border-color: rgba(240,192,64,0.8); }
+    .fund-stats { font-size: 12px; color: rgba(168,228,255,0.5); white-space: nowrap; }
+    .fund-total { font-family:'Bangers',cursive; font-size: 20px; color: #f0c040; text-shadow: 0 0 8px rgba(240,192,64,0.4); white-space: nowrap; min-width: 90px; text-align: right; }
+    .fund-save-row { display:flex; justify-content:flex-end; }
+    .fund-save-btn { font-family:'Bangers',cursive; font-size:19px; letter-spacing:2px; padding:11px 26px; border-radius:12px; border:2px solid #f0c040; box-shadow:0 0 14px rgba(240,192,64,0.3); cursor:pointer; background:rgba(2,11,24,0.85); color:white; transition:transform 0.12s,box-shadow 0.2s; }
+    .fund-save-btn:hover{ transform:translateY(-2px); box-shadow:0 0 26px rgba(240,192,64,0.6); }
+    .fund-grand-total { text-align:center; font-size: 13px; color: rgba(240,192,64,0.7); letter-spacing:1px; margin-bottom: 16px; }
+    .fund-grand-total b { font-family:'Bangers',cursive; font-size: 22px; color: #f0c040; letter-spacing: 1px; }
+    .fund-hint { font-size:11px;color:rgba(168,228,255,0.3);margin-top:4px;margin-bottom:14px;letter-spacing:1px; }
+
     /* NAV */
     .nav-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:10px}
     .nav-link{font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;padding:11px 24px;border-radius:10px;border:1px solid rgba(0,229,255,0.3);cursor:pointer;background:rgba(5,20,40,0.7);color:#a8e4ff;letter-spacing:1px;transition:background 0.2s,border-color 0.2s;text-decoration:none;display:inline-block}
@@ -317,6 +340,17 @@
     <div class="card-title">👥 Team Rosters</div>
     <div class="roster-tabs" id="rosterTabs"></div>
     <div id="rosterPanels"></div>
+  </div>
+
+  <!-- FUNDRAISING (PAY-PER-LAP) -->
+  <div class="card fund-card">
+    <div class="card-title">💵 Fundraising (Rand per Lap)</div>
+    <div class="fund-hint">For teams with a roster: set each swimmer's own R/lap sponsor rate up in "Team Rosters" — this card just totals them up automatically. For teams with no roster (using the whole-team button), use the flat team rate below instead. Either way it's tracked off real laps swum, not bonus points from challenges or the wheel.</div>
+    <div class="fund-grid" id="fundGrid">Loading...</div>
+    <div class="fund-grand-total" id="fundGrandTotal">Total raised across all fundraising teams: <b>R0.00</b></div>
+    <div class="fund-save-row">
+      <button class="fund-save-btn" onclick="saveFundraising()">💾 SAVE FUNDRAISING</button>
+    </div>
   </div>
 
   <!-- RANDOM EVENTS -->
@@ -466,7 +500,8 @@ let timerState={}, nextEventAt=null, eventScheduleInterval=null;
 let adminTimerEnded=false;
 
 function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2400);}
-function parseRoster(raw){if(!raw||!Array.isArray(raw))return[];return raw.map(m=>{if(typeof m==='string')return{name:m,captain:false};return{name:m.name||'',captain:!!m.captain};});}
+function parseRoster(raw){if(!raw||!Array.isArray(raw))return[];return raw.map(m=>{if(typeof m==='string')return{name:m,captain:false,rate:0};return{name:m.name||'',captain:!!m.captain,rate:parseFloat(m.rate)||0};});}
+function fmtRand(n){return 'R'+(n||0).toLocaleString('en-ZA',{minimumFractionDigits:2,maximumFractionDigits:2});}
 
 /* ── TIMER ── */
 function fmtTime(s){const h=Math.floor(s/3600);const m=Math.floor((s%3600)/60);const sec=s%60;return`${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;}
@@ -532,13 +567,13 @@ function renderNamesGrid(){
   const grid=document.getElementById('namesGrid');
   grid.innerHTML=TEAMS.map(k=>{const num=k.replace('team','');const val=teamNames[k]||`Team ${num}`;return`<div class="name-row"><input class="name-input" id="ni_${k}" type="text" value="${val}" placeholder="Team ${num}" maxlength="20"></div>`;}).join('');
 }
-async function saveTeamNames(){const u={};TEAMS.forEach(k=>{const v=document.getElementById('ni_'+k).value.trim();u[k]=v||`Team ${k.replace('team','')}`;});await fetch(FB+'/teamNames.json',{method:'PUT',body:JSON.stringify(u)});teamNames=u;renderScoreGrid();renderRosterTabs();toast('✅ Names saved!');}
+async function saveTeamNames(){const u={};TEAMS.forEach(k=>{const v=document.getElementById('ni_'+k).value.trim();u[k]=v||`Team ${k.replace('team','')}`;});await fetch(FB+'/teamNames.json',{method:'PUT',body:JSON.stringify(u)});teamNames=u;renderScoreGrid();renderRosterTabs();renderFundGrid();toast('✅ Names saved!');}
 
 /* ── ROSTERS ── */
 async function loadRosters(){
   const res=await fetch(FB+'/rosters.json');const data=(await res.json())||{};
   rosters={};TEAMS.forEach(k=>{rosters[k]=parseRoster(data[k]);});
-  renderRosterTabs();renderRosterPanel(activeRosterTab);
+  renderRosterTabs();renderRosterPanel(activeRosterTab);renderFundGrid();
 }
 function renderRosterTabs(){
   const el=document.getElementById('rosterTabs');
@@ -553,16 +588,133 @@ function renderRosterPanel(team){
 function memberRowHTML(team,idx,member){
   const isCap=member.captain;
   const capBtn=isCap?`<span class="captain-label">★ Captain</span>`:`<button class="captain-btn" onclick="setCaptain('${team}',${idx})">Set Captain</button>`;
-  return`<div class="member-row${isCap?' is-captain':''}" id="mr_${team}_${idx}"><input class="member-input" id="mi_${team}_${idx}" type="text" value="${member.name}" placeholder="Member name" maxlength="30">${capBtn}<button class="member-del" onclick="removeMember('${team}',${idx})">✕</button></div>`;
+  const rate=member.rate||0;
+  return`<div class="member-row${isCap?' is-captain':''}" id="mr_${team}_${idx}"><input class="member-input" id="mi_${team}_${idx}" type="text" value="${member.name}" placeholder="Member name" maxlength="30"><div class="member-rate-wrap" title="Rand this swimmer's sponsor pays per lap — leave at 0 if they aren't fundraising"><span class="member-rate-label">R/lap</span><input class="member-rate-inp" id="mrate_${team}_${idx}" type="number" min="0" step="0.5" value="${rate}" oninput="renderFundGrid()"></div>${capBtn}<button class="member-del" onclick="removeMember('${team}',${idx})">✕</button></div>`;
 }
 function setCaptain(team,idx){syncMemberInputs(team);rosters[team].forEach((m,i)=>m.captain=(i===idx));renderRosterPanel(team);}
-function syncMemberInputs(team){(rosters[team]||[]).forEach((m,i)=>{const el=document.getElementById(`mi_${team}_${i}`);if(el)m.name=el.value;});}
-function addMember(team){syncMemberInputs(team);if(!rosters[team])rosters[team]=[];rosters[team].push({name:'',captain:false});renderRosterPanel(team);const idx=rosters[team].length-1;setTimeout(()=>{const el=document.getElementById(`mi_${team}_${idx}`);if(el)el.focus();},50);}
+function syncMemberInputs(team){(rosters[team]||[]).forEach((m,i)=>{const el=document.getElementById(`mi_${team}_${i}`);if(el)m.name=el.value;const rEl=document.getElementById(`mrate_${team}_${i}`);if(rEl)m.rate=Math.max(0,parseFloat(rEl.value)||0);});}
+function addMember(team){syncMemberInputs(team);if(!rosters[team])rosters[team]=[];rosters[team].push({name:'',captain:false,rate:0});renderRosterPanel(team);const idx=rosters[team].length-1;setTimeout(()=>{const el=document.getElementById(`mi_${team}_${idx}`);if(el)el.focus();},50);}
 function removeMember(team,idx){syncMemberInputs(team);rosters[team].splice(idx,1);renderRosterPanel(team);}
 async function saveRoster(team){
   syncMemberInputs(team);
-  const saved=(rosters[team]||[]).filter(m=>m.name.trim().length>0).map(m=>({name:m.name.trim(),captain:!!m.captain}));
-  rosters[team]=saved;await fetch(FB+'/rosters/'+team+'.json',{method:'PUT',body:JSON.stringify(saved)});renderRosterPanel(team);toast(`✅ ${teamNames[team]||'Team'} roster saved!`);
+  const saved=(rosters[team]||[]).filter(m=>m.name.trim().length>0).map(m=>({name:m.name.trim(),captain:!!m.captain,rate:Math.max(0,parseFloat(m.rate)||0)}));
+  rosters[team]=saved;await fetch(FB+'/rosters/'+team+'.json',{method:'PUT',body:JSON.stringify(saved)});renderRosterPanel(team);renderFundGrid();toast(`✅ ${teamNames[team]||'Team'} roster saved!`);
+}
+
+/* ── FUNDRAISING (RAND PER LAP) ──
+   Teams WITH a roster: each swimmer has their own R/lap sponsor rate (set in
+   the Team Rosters card above) — this card just totals those up per team.
+   Teams WITHOUT a roster (using the plain whole-team button): fall back to
+   a flat team-wide R/lap rate + on/off toggle, editable right here. */
+let fundraising={}; // { teamKey: { enabled: bool, rate: number } } — flat fallback only
+let teamLaps={};    // { teamKey: number } — real lap count for flat-fallback teams
+let allSwimmerLaps={}; // { teamKey: { idx: number } } — real lap counts per roster swimmer
+
+async function loadFundraising(){
+  const [fRes,lRes,slRes]=await Promise.all([fetch(FB+'/fundraising.json'),fetch(FB+'/teamLaps.json'),fetch(FB+'/swimmerLaps.json')]);
+  const fData=(await fRes.json())||{};const lData=(await lRes.json())||{};const slData=(await slRes.json())||{};
+  fundraising={};teamLaps={};allSwimmerLaps={};
+  TEAMS.forEach(k=>{
+    fundraising[k]={enabled:!!(fData[k]&&fData[k].enabled),rate:(fData[k]&&fData[k].rate)||0};
+    teamLaps[k]=lData[k]||0;
+    allSwimmerLaps[k]=slData[k]||{};
+  });
+  renderFundGrid();
+}
+function teamRaisedTotal(k){
+  const roster=rosters[k]||[];
+  if(roster.length>0){
+    let total=0;
+    roster.forEach((m,i)=>{
+      const laps=(allSwimmerLaps[k]&&allSwimmerLaps[k][i])||0;
+      total+=laps*(m.rate||0);
+    });
+    return total;
+  }
+  const f=fundraising[k]||{enabled:false,rate:0};
+  return f.enabled?(teamLaps[k]||0)*(f.rate||0):0;
+}
+function renderFundGrid(){
+  const grid=document.getElementById('fundGrid');
+  grid.innerHTML=TEAMS.map(k=>{
+    const name=teamNames[k]||'Team '+k.replace('team','');
+    const roster=rosters[k]||[];
+    if(roster.length>0){
+      const fundraisers=roster.filter(m=>(m.rate||0)>0);
+      const total=teamRaisedTotal(k);
+      const memberRows=fundraisers.map(m=>{
+        const realIdx=roster.indexOf(m);
+        const laps=(allSwimmerLaps[k]&&allSwimmerLaps[k][realIdx])||0;
+        const raised=laps*(m.rate||0);
+        return `<div style="display:flex;justify-content:space-between;gap:10px;font-size:12px;color:rgba(168,228,255,0.6);padding:3px 0"><span>${m.name} (${fmtRand(m.rate)}/lap × ${laps})</span><span style="color:#f0c040;font-weight:700;white-space:nowrap">${fmtRand(raised)}</span></div>`;
+      }).join('');
+      return `<div class="fund-row on" id="fundrow_${k}">
+        <div style="flex:1;min-width:160px">
+          <div class="fund-name" style="color:${COLORS[k]};margin-bottom:4px">${name} <span style="font-size:10px;color:rgba(168,228,255,0.35);font-weight:400">(${fundraisers.length} fundraising)</span></div>
+          ${fundraisers.length>0?memberRows:'<div style="font-size:11px;color:rgba(168,228,255,0.3)">No swimmers have a rate set — edit in Team Rosters above</div>'}
+        </div>
+        <span class="fund-total">${fmtRand(total)}</span>
+      </div>`;
+    }
+    const f=fundraising[k]||{enabled:false,rate:0};
+    const laps=teamLaps[k]||0;
+    const raised=laps*(f.rate||0);
+    return `<div class="fund-row${f.enabled?' on':''}" id="fundrow_${k}">
+      <label class="toggle-switch" title="${f.enabled?'Raising money':'Not raising money'}">
+        <input type="checkbox" id="fen_${k}" ${f.enabled?'checked':''} onchange="onFundToggle('${k}',this.checked)">
+        <span class="toggle-slider"></span>
+      </label>
+      <span class="fund-name" style="color:${COLORS[k]}">${name} <span style="font-size:10px;color:rgba(168,228,255,0.35);font-weight:400">(no roster set)</span></span>
+      <div class="fund-rate-wrap">
+        <label>R / lap</label>
+        <input class="fund-rate-inp" type="number" id="frate_${k}" value="${f.rate||0}" min="0" step="0.5" oninput="renderFundRowTotal('${k}')">
+      </div>
+      <span class="fund-stats">${laps} laps</span>
+      <span class="fund-total" id="ftotal_${k}">${fmtRand(raised)}</span>
+    </div>`;
+  }).join('');
+  renderFundGrandTotal();
+}
+function onFundToggle(team,enabled){
+  const row=document.getElementById('fundrow_'+team);if(row)row.classList.toggle('on',enabled);
+  renderFundGrandTotal();
+}
+function renderFundRowTotal(team){
+  const rateEl=document.getElementById('frate_'+team);if(!rateEl)return;
+  const rate=parseFloat(rateEl.value)||0;const laps=teamLaps[team]||0;
+  const totalEl=document.getElementById('ftotal_'+team);if(totalEl)totalEl.textContent=fmtRand(laps*rate);
+  renderFundGrandTotal();
+}
+function renderFundGrandTotal(){
+  let grand=0;
+  TEAMS.forEach(k=>{
+    const roster=rosters[k]||[];
+    if(roster.length>0){
+      grand+=teamRaisedTotal(k);
+    } else {
+      const enEl=document.getElementById('fen_'+k);const rateEl=document.getElementById('frate_'+k);
+      const enabled=enEl?enEl.checked:(fundraising[k]&&fundraising[k].enabled);
+      const rate=rateEl?(parseFloat(rateEl.value)||0):((fundraising[k]&&fundraising[k].rate)||0);
+      if(enabled) grand+=(teamLaps[k]||0)*rate;
+    }
+  });
+  const el=document.getElementById('fundGrandTotal');
+  if(el) el.innerHTML=`Total raised across all fundraising teams: <b>${fmtRand(grand)}</b>`;
+}
+async function saveFundraising(){
+  const update={};
+  TEAMS.forEach(k=>{
+    const enEl=document.getElementById('fen_'+k);
+    if(!enEl) return; // this team has a roster — its rates are saved via "SAVE ROSTER" instead
+    const enabled=enEl.checked;
+    const rate=Math.max(0,parseFloat(document.getElementById('frate_'+k).value)||0);
+    fundraising[k]={enabled,rate};
+    update[k]={enabled,rate};
+  });
+  if(Object.keys(update).length===0){toast('All teams use individual roster rates — nothing to save here');return;}
+  await fetch(FB+'/fundraising.json',{method:'PATCH',body:JSON.stringify(update)});
+  toast('✅ Fundraising settings saved!');
+  renderFundGrandTotal();
 }
 
 /* ── SLOTS ── */
@@ -869,11 +1021,11 @@ function drawWheelPreview(){
 async function init(){
   await loadTeamNames();
   loadScores();loadSlots();loadRosters();loadEvents();loadCompletionsLog();loadWheelData();loadCurrency();
-  loadShopData();loadShopLog();
+  loadShopData();loadShopLog();loadFundraising();
   setInterval(loadScores,3000);setInterval(loadSlots,3000);setInterval(syncTimerUI,1000);
   setInterval(updateNextEventRow,1000);setInterval(loadCompletionsLog,3000);
   setInterval(tickActiveEventTimer,1000);setInterval(loadCurrency,5000);
-  setInterval(loadShopLog,5000);
+  setInterval(loadShopLog,5000);setInterval(loadFundraising,4000);
   syncTimerUI();
 }
 init();
