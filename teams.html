@@ -61,6 +61,47 @@
     .done-flash.show{display:block}
     @keyframes flashIn{0%{transform:scale(0.6);opacity:0}100%{transform:scale(1);opacity:1}}
 
+    /* ══ FUNDRAISING WIDGET (Rand per lap) ══ */
+    .fund-banner {
+      display: none;
+      width: 100%;
+      max-width: 420px;
+      background: linear-gradient(135deg, rgba(240,192,64,0.14), rgba(240,140,20,0.07));
+      border: 2px solid rgba(240,192,64,0.55);
+      border-radius: 20px;
+      padding: 18px 22px 16px;
+      text-align: center;
+      box-shadow: 0 0 26px rgba(240,192,64,0.2);
+    }
+    .fund-banner.visible { display: block; }
+    .fund-banner-label {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(240,192,64,0.75);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .fund-banner-label .badge-dot { background: #f0c040; }
+    .fund-banner-amount {
+      font-family: 'Bangers', cursive;
+      font-size: clamp(34px, 9vw, 54px);
+      letter-spacing: 2px;
+      color: #f0c040;
+      text-shadow: 0 0 24px rgba(240,192,64,0.55);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .fund-banner-sub {
+      font-size: 12px;
+      color: rgba(168,228,255,0.55);
+      letter-spacing: 0.5px;
+    }
+    .fund-banner-sub b { color: #f0c040; font-weight: 900; }
+
     /* ══ SWIMMER LAPS SECTION ══ */
     .swimmers-section {
       width: 100%;
@@ -129,6 +170,23 @@
       color: rgba(168,228,255,0.4);
       margin-top: -10px;
       margin-bottom: 14px;
+    }
+    .active-swimmer-raised {
+      display: none;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #f0c040;
+      text-shadow: 0 0 10px rgba(240,192,64,0.4);
+      margin-top: -8px;
+      margin-bottom: 14px;
+    }
+    .swimmer-row-raised {
+      font-family: 'Bangers', cursive;
+      font-size: 13px;
+      color: #f0c040;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
     .swimmer-big-btn {
       font-family: 'Bangers', cursive;
@@ -603,6 +661,13 @@
 <div class="team-name" id="title">Loading...</div>
 <div class="score" id="score">0</div>
 
+<!-- ══ FUNDRAISING WIDGET (only shown for teams admin has enabled) ══ -->
+<div class="fund-banner" id="fundBanner">
+  <div class="fund-banner-label"><span class="badge-dot"></span> RAISING MONEY <span class="badge-dot"></span></div>
+  <div class="fund-banner-amount" id="fundAmount">R0.00</div>
+  <div class="fund-banner-sub" id="fundSub">R0.00 per lap · 0 laps so far</div>
+</div>
+
 <!-- Fallback team-wide button — only shown when there is NO roster set up -->
 <button class="point-btn" id="pointBtn" onclick="update()" style="display:none"><span>+2 LAPS</span></button>
 
@@ -617,6 +682,7 @@
     <div class="active-swimmer-name" id="activeSwimmerName">—</div>
     <div class="active-swimmer-laps" id="activeSwimmerLaps">0</div>
     <div class="active-swimmer-laps-label">laps</div>
+    <div class="active-swimmer-raised" id="activeSwimmerRaised"></div>
     <button class="swimmer-big-btn" id="swimmerBigBtn" onclick="addLapToActiveSwimmer()"><span>+2 LAPS</span></button>
     <button class="swimmer-undo-btn" id="swimmerUndoBtn" onclick="undoLapForActiveSwimmer()">↺ Undo last +2</button>
   </div>
@@ -751,6 +817,19 @@ let activeSwimmerIdx = sessionStorage.getItem('activeSwimmerIdx_'+team);
 activeSwimmerIdx = (activeSwimmerIdx===null || activeSwimmerIdx==='') ? null : parseInt(activeSwimmerIdx);
 let lastSwimmerAction = null; // {idx, amount} for undo
 
+/* ─────────────── FUNDRAISING STATE (Rand per lap) ───────────────
+   Each roster swimmer can have their own sponsor rate (R/lap), set by the
+   admin. This team's total raised = sum of (swimmer's laps × their rate).
+   Kept separate from the "score" (which also includes bonus points from
+   challenges / the wheel and shouldn't count toward money raised).
+   fundRoster mirrors `roster` but is refreshed independently so rate changes
+   show up live without disturbing the swimmer-selection UI.
+   For teams with NO roster (using the flat whole-team button), fall back
+   to a single flat team-wide rate + its own separate lap counter. */
+let fundRoster = [];
+let fundSettings = { enabled:false, rate:0 }; // flat fallback only
+let teamLapCount = 0; // flat fallback lap counter only
+
 /* ─────────────── SHOP STATE ─────────────── */
 let shopItems=[];
 let pendingPurchase=null;
@@ -762,8 +841,9 @@ let sessionPurchaseLog=JSON.parse(sessionStorage.getItem('sessionPurchaseLog_'+t
 /* ─────────────── HELPERS ─────────────── */
 function parseRoster(raw){
   if(!raw||!Array.isArray(raw))return[];
-  return raw.map(m=>typeof m==='string'?{name:m,captain:false}:{name:m.name||'',captain:!!m.captain});
+  return raw.map(m=>typeof m==='string'?{name:m,captain:false,rate:0}:{name:m.name||'',captain:!!m.captain,rate:parseFloat(m.rate)||0});
 }
+function fmtRand(n){return 'R'+(n||0).toLocaleString('en-ZA',{minimumFractionDigits:2,maximumFractionDigits:2});}
 
 /* ─────────────── GAME ─────────────── */
 async function loadInfo(){
@@ -798,10 +878,64 @@ async function update(){
   value=(value||0)+2;
   await fetch(FB+"/teams/"+team+".json",{method:"PUT",body:JSON.stringify(value)});
   document.getElementById("score").innerText=value;
+  await bumpTeamLaps(2); // flat fallback fundraising counter (no-roster teams only)
 }
 async function loadScore(){
   const res=await fetch(FB+"/teams/"+team+".json");const value=await res.json();
   document.getElementById("score").innerText=value||0;
+}
+
+/* ─────────────── FUNDRAISING (RAND PER LAP, PER SWIMMER) ─────────────── */
+async function bumpTeamLaps(delta){
+  // Flat-fallback path only (teams with no roster). Keeps /teamLaps/{team}
+  // in sync with actual laps swum, independent of the team "score" which
+  // also picks up challenge/wheel bonus points.
+  try{
+    const res=await fetch(FB+'/teamLaps/'+team+'.json');
+    let laps=(await res.json())||0;
+    laps=Math.max(0,laps+delta);
+    await fetch(FB+'/teamLaps/'+team+'.json',{method:'PUT',body:JSON.stringify(laps)});
+    teamLapCount=laps;
+    renderFundBannerFlat();
+  }catch(e){}
+}
+async function loadFundraising(){
+  try{
+    const rosterRes=await fetch(FB+'/rosters/'+team+'.json');
+    const rawRoster=await rosterRes.json();
+    fundRoster=parseRoster(rawRoster);
+    if(fundRoster.length>0){
+      renderFundBannerFromRoster();
+      // refresh per-swimmer raised amounts if the swimmer widget is on screen
+      if(document.getElementById('swimmersSection').classList.contains('visible')) renderSwimmers();
+    } else {
+      const [fRes,lRes]=await Promise.all([fetch(FB+'/fundraising/'+team+'.json'),fetch(FB+'/teamLaps/'+team+'.json')]);
+      const fData=(await fRes.json())||{};
+      fundSettings={enabled:!!fData.enabled,rate:fData.rate||0};
+      teamLapCount=(await lRes.json())||0;
+      renderFundBannerFlat();
+    }
+  }catch(e){}
+}
+function renderFundBannerFromRoster(){
+  const banner=document.getElementById('fundBanner');
+  const fundraisers=fundRoster.filter(m=>(m.rate||0)>0);
+  if(fundraisers.length===0){banner.classList.remove('visible');return;}
+  let total=0;
+  fundRoster.forEach((m,i)=>{
+    if((m.rate||0)>0) total+=(swimmerLaps[i]||0)*m.rate;
+  });
+  banner.classList.add('visible');
+  document.getElementById('fundAmount').textContent=fmtRand(total);
+  document.getElementById('fundSub').innerHTML=`<b>${fundraisers.length}</b> swimmer${fundraisers.length!==1?'s':''} raising funds for sponsors`;
+}
+function renderFundBannerFlat(){
+  const banner=document.getElementById('fundBanner');
+  if(!fundSettings.enabled||!(fundSettings.rate>0)){banner.classList.remove('visible');return;}
+  banner.classList.add('visible');
+  const raised=teamLapCount*fundSettings.rate;
+  document.getElementById('fundAmount').textContent=fmtRand(raised);
+  document.getElementById('fundSub').innerHTML=`${fmtRand(fundSettings.rate)} per lap · <b>${teamLapCount}</b> laps so far`;
 }
 
 /* ─────────────── SWIMMER LAPS ENGINE ─────────────── */
@@ -845,15 +979,28 @@ function renderSwimmers(){
   document.getElementById('activeSwimmerName').textContent = active ? active.name + (active.captain ? ' ★' : '') : '—';
   document.getElementById('activeSwimmerLaps').textContent = swimmerLaps[activeSwimmerIdx] || 0;
 
+  const activeRate = (fundRoster[activeSwimmerIdx] && fundRoster[activeSwimmerIdx].rate) || 0;
+  const raisedEl = document.getElementById('activeSwimmerRaised');
+  if(activeRate>0){
+    const raised = (swimmerLaps[activeSwimmerIdx]||0) * activeRate;
+    raisedEl.textContent = `💵 ${fmtRand(raised)} raised (${fmtRand(activeRate)}/lap)`;
+    raisedEl.style.display = 'block';
+  } else {
+    raisedEl.style.display = 'none';
+  }
+
   document.getElementById('swimmerUndoBtn').style.display = lastSwimmerAction ? 'inline-block' : 'none';
 
   const list = document.getElementById('swimmerList');
   list.innerHTML = roster.map((m,i)=>{
     if(i===activeSwimmerIdx) return ''; // active swimmer shown big above, not duplicated here
     const laps = swimmerLaps[i]||0;
+    const rate = (fundRoster[i] && fundRoster[i].rate) || 0;
+    const raisedTag = rate>0 ? `<span class="swimmer-row-raised">${fmtRand(laps*rate)}</span>` : '';
     return `<div class="swimmer-row" onclick="selectSwimmer(${i})">
       <span class="swimmer-row-name">${m.name}</span>
       ${m.captain?'<span class="swimmer-row-captain">★ CAPT</span>':''}
+      ${raisedTag}
       <span class="swimmer-row-laps">${laps}</span>
       <span class="swimmer-row-select">Select</span>
     </div>`;
@@ -879,6 +1026,9 @@ async function addLapToActiveSwimmer(){
   await fetch(FB+"/teams/"+team+".json",{method:"PUT",body:JSON.stringify(value)});
   document.getElementById("score").innerText=value;
 
+  // Refresh this swimmer's individual fundraising total (per-swimmer R/lap)
+  renderFundBannerFromRoster();
+
   lastSwimmerAction = {idx, amount};
   document.getElementById('swimmerUndoBtn').style.display='inline-block';
   renderSwimmerRowLaps(idx);
@@ -897,6 +1047,9 @@ async function undoLapForActiveSwimmer(){
   value=Math.max(0,(value||0) - amount);
   await fetch(FB+"/teams/"+team+".json",{method:"PUT",body:JSON.stringify(value)});
   document.getElementById("score").innerText=value;
+
+  // Refresh this swimmer's individual fundraising total (per-swimmer R/lap)
+  renderFundBannerFromRoster();
 
   lastSwimmerAction = null;
   document.getElementById('swimmerUndoBtn').style.display='none';
@@ -955,6 +1108,8 @@ async function completeChallenge(){
   completedEventIds.push(key);
   // ── FIX: save under team-namespaced key ──
   sessionStorage.setItem('completedEvents_'+team,JSON.stringify(completedEventIds));
+  // NOTE: challenge/wheel bonus points intentionally do NOT count toward the
+  // fundraising lap counter — sponsors are paying per lap swum, not per bonus point.
 }
 
 /* ─────────────── WHEEL ─────────────── */
@@ -1410,13 +1565,14 @@ function showToast(msg){
 document.getElementById('shopModal').addEventListener('click',function(e){if(e.target===this)closeShopModal();});
 
 /* ─────────────── INIT ─────────────── */
-loadInfo();loadScore();loadWheel();resizeWheel();pollTimer();pollCurrency();loadShop();
+loadInfo();loadScore();loadWheel();resizeWheel();pollTimer();pollCurrency();loadShop();loadFundraising();
 renderPurchaseLog(); // restore from sessionStorage on page load
 
 setInterval(loadScore,1500);
 setInterval(pollChallenge,1500);
 setInterval(pollTimer,2000);
 setInterval(pollCurrency,3000);
+setInterval(loadFundraising,4000);
 setInterval(async()=>{
   try{
     const [sRes,iRes]=await Promise.all([fetch(FB+'/wheelSettings.json'),fetch(FB+'/wheelItems.json')]);
