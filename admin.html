@@ -293,6 +293,23 @@
     .fund-grand-total b { font-family:'Bangers',cursive; font-size: 22px; color: #f0c040; letter-spacing: 1px; }
     .fund-hint { font-size:11px;color:rgba(168,228,255,0.3);margin-top:4px;margin-bottom:14px;letter-spacing:1px; }
 
+    /* TEAM SUMMARY */
+    .summary-team-block { background: rgba(2,11,24,0.55); border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 10px; overflow: hidden; }
+    .summary-team-header { display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding:12px 16px; border-left:4px solid rgba(255,255,255,0.3); cursor:pointer; transition:background 0.15s; }
+    .summary-team-header:hover { background: rgba(255,255,255,0.03); }
+    .summary-team-name { font-size:15px; font-weight:900; flex:1 1 120px; min-width:100px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .summary-team-score { font-size:12px; color: rgba(168,228,255,0.5); white-space:nowrap; }
+    .summary-team-laps { font-size:13px; color: #a8e4ff; font-weight:700; white-space:nowrap; }
+    .summary-team-raised { font-family:'Bangers',cursive; font-size:18px; color:#f0c040; text-shadow:0 0 6px rgba(240,192,64,0.35); white-space:nowrap; min-width:80px; text-align:right; }
+    .summary-swimmer-list { display:flex; flex-direction:column; gap:1px; border-top:1px solid rgba(255,255,255,0.06); }
+    .summary-swimmer-row { display:flex; align-items:center; gap:10px; padding:8px 16px 8px 24px; font-size:13px; border-bottom:1px solid rgba(255,255,255,0.04); }
+    .summary-swimmer-row:last-child { border-bottom:none; }
+    .summary-swimmer-name { flex:1; color:#a8e4ff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .summary-swimmer-laps { color: rgba(168,228,255,0.6); white-space:nowrap; min-width:60px; text-align:right; }
+    .summary-swimmer-raised { color:#f0c040; font-weight:700; white-space:nowrap; min-width:80px; text-align:right; }
+    .summary-copy-btn { font-family:'Nunito',sans-serif; font-size:12px; font-weight:700; padding:6px 14px; border-radius:8px; border:1px solid rgba(0,229,255,0.3); background:transparent; color:#a8e4ff; cursor:pointer; transition:background 0.2s; }
+    .summary-copy-btn:hover { background: rgba(0,229,255,0.1); }
+
     /* NAV */
     .nav-row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:10px}
     .nav-link{font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;padding:11px 24px;border-radius:10px;border:1px solid rgba(0,229,255,0.3);cursor:pointer;background:rgba(5,20,40,0.7);color:#a8e4ff;letter-spacing:1px;transition:background 0.2s,border-color 0.2s;text-decoration:none;display:inline-block}
@@ -477,6 +494,16 @@
     <div class="wheel-hint">Pts = points awarded &nbsp;·&nbsp; Weight = relative chance (e.g. 2 = twice as likely)</div>
   </div>
 
+  <!-- TEAM SUMMARY -->
+  <div class="card">
+    <div class="card-title">
+      <span>📋 Team Summary — Laps &amp; Fundraising</span>
+      <button class="summary-copy-btn" onclick="copySummaryTSV()">📋 Copy as TSV</button>
+    </div>
+    <div class="fund-grand-total" id="summaryGrandTotal">Grand total: <b>0 laps</b> · <b>R0.00</b> raised</div>
+    <div id="teamSummaryList">Loading...</div>
+  </div>
+
   <!-- DANGER ZONE -->
   <div class="card">
     <div class="card-title">⚠️ Danger Zone</div>
@@ -603,7 +630,7 @@ function removeMember(team,idx){syncMemberInputs(team);rosters[team].splice(idx,
 async function saveRoster(team){
   syncMemberInputs(team);
   const saved=(rosters[team]||[]).filter(m=>m.name.trim().length>0).map(m=>({name:m.name.trim(),captain:!!m.captain,rate:Math.max(0,parseFloat(m.rate)||0)}));
-  rosters[team]=saved;await fetch(FB+'/rosters/'+team+'.json',{method:'PUT',body:JSON.stringify(saved)});renderRosterPanel(team);renderFundGrid();toast(`✅ ${teamNames[team]||'Team'} roster saved!`);
+  rosters[team]=saved;await fetch(FB+'/rosters/'+team+'.json',{method:'PUT',body:JSON.stringify(saved)});renderRosterPanel(team);renderFundGrid();renderTeamSummary();toast(`✅ ${teamNames[team]||'Team'} roster saved!`);
 }
 
 /* ── FUNDRAISING (RAND PER LAP) ──
@@ -625,6 +652,7 @@ async function loadFundraising(){
     allSwimmerLaps[k]=slData[k]||{};
   });
   renderFundGrid();
+  renderTeamSummary();
 }
 function teamRaisedTotal(k){
   const roster=rosters[k]||[];
@@ -638,6 +666,15 @@ function teamRaisedTotal(k){
   }
   const f=fundraising[k]||{enabled:false,rate:0};
   return f.enabled?(teamLaps[k]||0)*(f.rate||0):0;
+}
+function teamLapsTotal(k){
+  const roster=rosters[k]||[];
+  if(roster.length>0){
+    let total=0;
+    roster.forEach((m,i)=>{ total+=(allSwimmerLaps[k]&&allSwimmerLaps[k][i])||0; });
+    return total;
+  }
+  return teamLaps[k]||0;
 }
 function renderFundGrid(){
   const grid=document.getElementById('fundGrid');
@@ -741,6 +778,7 @@ async function resetFundraising(team){
     teamLaps[team]=0;
   }
   renderFundGrid();
+  renderTeamSummary();
   toast(`↺ ${name}'s raised total reset to R0.00`);
 }
 
@@ -762,7 +800,78 @@ async function resetAllFundraising(){
   if(Object.keys(flatUpdates).length>0) tasks.push(fetch(FB+'/teamLaps.json',{method:'PATCH',body:JSON.stringify(flatUpdates)}));
   await Promise.all(tasks);
   renderFundGrid();
+  renderTeamSummary();
   toast('🗑 All teams\' raised totals reset to R0.00');
+}
+
+/* ── TEAM SUMMARY (bottom-of-page rollup) ──
+   Pulls together everything already loaded elsewhere on this page — scores,
+   rosters, per-swimmer laps/rates, and the flat no-roster fallback — into one
+   place so an organiser can see, per team, the total laps swum and total
+   Rand raised, plus a breakdown per swimmer. Re-rendered whenever any of the
+   underlying data refreshes (scores, rosters, fundraising poll). */
+function renderTeamSummary(){
+  const listEl=document.getElementById('teamSummaryList');
+  if(!listEl)return;
+  let grandLaps=0,grandRaised=0;
+  const blocks=TEAMS.map(k=>{
+    const name=teamNames[k]||'Team '+k.replace('team','');
+    const roster=rosters[k]||[];
+    let laps=0,raised=0,swimmerRowsHTML='';
+    if(roster.length>0){
+      roster.forEach((m,i)=>{
+        const l=(allSwimmerLaps[k]&&allSwimmerLaps[k][i])||0;
+        const rate=m.rate||0;
+        const r=l*rate;
+        laps+=l;raised+=r;
+        swimmerRowsHTML+=`<div class="summary-swimmer-row"><span class="summary-swimmer-name">${m.name||'(unnamed)'}${m.captain?' ★':''}</span><span class="summary-swimmer-laps">${l} laps</span><span class="summary-swimmer-raised">${rate>0?fmtRand(r):'—'}</span></div>`;
+      });
+      if(swimmerRowsHTML==='') swimmerRowsHTML='<div class="summary-swimmer-row"><span class="summary-swimmer-name" style="opacity:0.4">No members yet</span></div>';
+    } else {
+      laps=teamLaps[k]||0;
+      const f=fundraising[k]||{enabled:false,rate:0};
+      raised=f.enabled?laps*(f.rate||0):0;
+      swimmerRowsHTML=`<div class="summary-swimmer-row"><span class="summary-swimmer-name" style="opacity:0.6">No roster set — flat team rate ${f.enabled?fmtRand(f.rate)+'/lap':'(fundraising off)'}</span><span class="summary-swimmer-laps">${laps} laps</span><span class="summary-swimmer-raised">${fmtRand(raised)}</span></div>`;
+    }
+    grandLaps+=laps;grandRaised+=raised;
+    return `<div class="summary-team-block">
+      <div class="summary-team-header" style="border-left-color:${COLORS[k]}" onclick="this.parentElement.querySelector('.summary-swimmer-list').style.display=this.parentElement.querySelector('.summary-swimmer-list').style.display==='none'?'flex':'none'">
+        <span class="summary-team-name" style="color:${COLORS[k]}">${name}</span>
+        <span class="summary-team-score">Score: ${scores[k]||0}</span>
+        <span class="summary-team-laps">🏊 ${laps} laps</span>
+        <span class="summary-team-raised">${fmtRand(raised)}</span>
+      </div>
+      <div class="summary-swimmer-list">${swimmerRowsHTML}</div>
+    </div>`;
+  }).join('');
+  listEl.innerHTML=blocks;
+  const gEl=document.getElementById('summaryGrandTotal');
+  if(gEl) gEl.innerHTML=`Grand total: <b>${grandLaps} laps</b> · <b>${fmtRand(grandRaised)}</b> raised`;
+}
+
+function copySummaryTSV(){
+  let tsv="Team\tScore\tSwimmer\tCaptain\tLaps\tRate (R per lap)\tRaised (R)\n";
+  TEAMS.forEach(k=>{
+    const name=teamNames[k]||'Team '+k.replace('team','');
+    const roster=rosters[k]||[];
+    if(roster.length>0){
+      roster.forEach((m,i)=>{
+        const l=(allSwimmerLaps[k]&&allSwimmerLaps[k][i])||0;
+        const rate=m.rate||0;const r=l*rate;
+        tsv+=`${name}\t${scores[k]||0}\t${m.name}\t${m.captain?'Yes':'No'}\t${l}\t${rate.toFixed(2)}\t${r.toFixed(2)}\n`;
+      });
+    } else {
+      const laps=teamLaps[k]||0;
+      const f=fundraising[k]||{enabled:false,rate:0};
+      const raised=f.enabled?laps*(f.rate||0):0;
+      tsv+=`${name}\t${scores[k]||0}\t(flat team rate — no roster)\t\t${laps}\t${(f.rate||0).toFixed(2)}\t${raised.toFixed(2)}\n`;
+    }
+  });
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(tsv).then(()=>toast('📋 Summary copied — paste into a spreadsheet!')).catch(()=>toast('⚠️ Copy failed — clipboard blocked by browser'));
+  } else {
+    toast('⚠️ Clipboard not available in this browser');
+  }
 }
 
 /* ── SLOTS ── */
@@ -1074,6 +1183,7 @@ async function init(){
   setInterval(updateNextEventRow,1000);setInterval(loadCompletionsLog,3000);
   setInterval(tickActiveEventTimer,1000);setInterval(loadCurrency,5000);
   setInterval(loadShopLog,5000);setInterval(loadFundraising,4000);
+  setInterval(renderTeamSummary,3000);
   syncTimerUI();
 }
 init();
