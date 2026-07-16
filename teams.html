@@ -893,7 +893,7 @@ function updateLapCooldownUI(){
   const swimBtn = document.getElementById('swimmerBigBtn');
   if(remaining <= 0){
     if(lapCooldownInterval){ clearInterval(lapCooldownInterval); lapCooldownInterval = null; }
-    if(pointBtn && !timerEnded){ pointBtn.disabled=false; pointBtn.querySelector('span').textContent='+2 LAPS'; }
+    if(pointBtn && !timerEnded){ pointBtn.disabled=false; pointBtn.style.opacity=''; pointBtn.style.cursor=''; pointBtn.querySelector('span').textContent='+2 LAPS'; }
     if(swimBtn && !timerEnded){ swimBtn.disabled=false; swimBtn.querySelector('span').textContent='+2 LAPS'; }
     return;
   }
@@ -1020,7 +1020,7 @@ function renderSwimmers(){
   const card = document.getElementById('activeSwimmerCard');
   card.style.setProperty('--tc', tc);
 
-  document.getElementById('activeSwimmerName').textContent = active ? active.name + (active.captain ? ' ★' : '') : '—';
+  document.getElementById('activeSwimmerName').innerHTML = active ? (active.name + (active.captain ? ' <span style="display:inline-block;font-size:11px;font-weight:700;letter-spacing:1px;color:#f0c040;background:rgba(240,192,64,0.15);border:1px solid rgba(240,192,64,0.4);border-radius:6px;padding:2px 8px;vertical-align:middle;font-family:Nunito,sans-serif;">★ CAPTAIN</span>' : '')) : '—';
   document.getElementById('activeSwimmerLaps').textContent = swimmerLaps[activeSwimmerIdx] || 0;
 
   const activeRate = (fundRoster[activeSwimmerIdx] && fundRoster[activeSwimmerIdx].rate) || 0;
