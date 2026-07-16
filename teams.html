@@ -898,7 +898,7 @@ function updateLapCooldownUI(){
     return;
   }
   const secs = Math.ceil(remaining/1000);
-  if(pointBtn){ pointBtn.disabled=true; pointBtn.querySelector('span').textContent=`⏳ WAIT ${secs}s`; }
+  if(pointBtn){ pointBtn.disabled=true; pointBtn.style.opacity='0.4'; pointBtn.style.cursor='not-allowed'; pointBtn.querySelector('span').textContent=`⏳ WAIT ${secs}s`; }
   if(swimBtn){ swimBtn.disabled=true; swimBtn.querySelector('span').textContent=`⏳ WAIT ${secs}s`; }
 }
 
@@ -938,7 +938,7 @@ async function loadFundraising(){
     ]);
     const rawRoster=await rosterRes.json();
     fundRoster=parseRoster(rawRoster);
-    startingBalance=(await sbRes.json())||0;
+    startingBalance=Number(await sbRes.json())||0;
     if(fundRoster.length>0){
       renderFundBannerFromRoster();
       // refresh per-swimmer raised amounts if the swimmer widget is on screen
@@ -964,7 +964,7 @@ function renderFundBannerFromRoster(){
   banner.classList.add('visible');
   document.getElementById('fundAmount').textContent=fmtRand(total);
   const parts=[];
-  if(startingBalance>0) parts.push(`🏦 ${fmtRand(startingBalance)} starting`);
+  if(startingBalance>0) parts.push(`Starting: ${fmtRand(startingBalance)}`);
   if(fundraisers.length>0) parts.push(`${fmtRand(lapMoney)} raised by <b>${fundraisers.length}</b> swimmer${fundraisers.length!==1?'s':''}`);
   document.getElementById('fundSub').innerHTML=parts.length?parts.join(' + '):'No fundraising set up yet';
 }
@@ -977,7 +977,7 @@ function renderFundBannerFlat(){
   banner.classList.add('visible');
   document.getElementById('fundAmount').textContent=fmtRand(total);
   const parts=[];
-  if(startingBalance>0) parts.push(`🏦 ${fmtRand(startingBalance)} starting`);
+  if(startingBalance>0) parts.push(`Starting: ${fmtRand(startingBalance)}`);
   if(lapEnabled) parts.push(`${fmtRand(fundSettings.rate)}/lap × <b>${teamLapCount}</b> laps`);
   document.getElementById('fundSub').innerHTML=parts.length?parts.join(' + '):'No fundraising set up yet';
 }
@@ -1126,6 +1126,7 @@ function renderSwimmerRowLaps(idx){
 function applySwimmerTimerLock(){
   const bigBtn=document.getElementById('swimmerBigBtn');
   if(!bigBtn) return;
+  if(isLapOnCooldown()){ updateLapCooldownUI(); return; } // don't clobber an active cooldown countdown
   bigBtn.disabled = timerEnded;
   bigBtn.querySelector('span').textContent = timerEnded ? '⏰ TIME\'S UP' : '+2 LAPS';
 }
@@ -1398,8 +1399,10 @@ async function pollTimer(){
 }
 function applyTimerLock(ended){
   const lapBtn=document.getElementById('pointBtn');
-  lapBtn.disabled=ended;lapBtn.style.opacity=ended?'0.4':'';lapBtn.style.cursor=ended?'not-allowed':'';
-  lapBtn.querySelector('span').textContent=ended?'⏰ TIME\'S UP':'+2 LAPS';
+  if(ended||!isLapOnCooldown()){
+    lapBtn.disabled=ended;lapBtn.style.opacity=ended?'0.4':'';lapBtn.style.cursor=ended?'not-allowed':'';
+    lapBtn.querySelector('span').textContent=ended?'⏰ TIME\'S UP':'+2 LAPS';
+  }
   applySwimmerTimerLock();
   const spinBtn=document.getElementById('spinBtn');
   if(ended){spinBtn.disabled=true;spinBtn.classList.remove('ready');document.getElementById('wheelCooldownMsg').textContent='⏰ Match over — wheel locked';}
