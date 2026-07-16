@@ -829,6 +829,7 @@ let lastSwimmerAction = null; // {idx, amount} for undo
 let fundRoster = [];
 let fundSettings = { enabled:false, rate:0 }; // flat fallback only
 let teamLapCount = 0; // flat fallback lap counter only
+let startingBalance = 0; // this team's starting Rand balance, set by admin
 
 /* ─────────────── SHOP STATE ─────────────── */
 let shopItems=[];
@@ -901,9 +902,13 @@ async function bumpTeamLaps(delta){
 }
 async function loadFundraising(){
   try{
-    const rosterRes=await fetch(FB+'/rosters/'+team+'.json');
+    const [rosterRes,sbRes]=await Promise.all([
+      fetch(FB+'/rosters/'+team+'.json'),
+      fetch(FB+'/startingBalances/'+team+'.json')
+    ]);
     const rawRoster=await rosterRes.json();
     fundRoster=parseRoster(rawRoster);
+    startingBalance=(await sbRes.json())||0;
     if(fundRoster.length>0){
       renderFundBannerFromRoster();
       // refresh per-swimmer raised amounts if the swimmer widget is on screen
@@ -920,22 +925,31 @@ async function loadFundraising(){
 function renderFundBannerFromRoster(){
   const banner=document.getElementById('fundBanner');
   const fundraisers=fundRoster.filter(m=>(m.rate||0)>0);
-  if(fundraisers.length===0){banner.classList.remove('visible');return;}
-  let total=0;
+  if(fundraisers.length===0&&startingBalance<=0){banner.classList.remove('visible');return;}
+  let lapMoney=0;
   fundRoster.forEach((m,i)=>{
-    if((m.rate||0)>0) total+=(swimmerLaps[i]||0)*m.rate;
+    if((m.rate||0)>0) lapMoney+=(swimmerLaps[i]||0)*m.rate;
   });
+  const total=startingBalance+lapMoney;
   banner.classList.add('visible');
   document.getElementById('fundAmount').textContent=fmtRand(total);
-  document.getElementById('fundSub').innerHTML=`<b>${fundraisers.length}</b> swimmer${fundraisers.length!==1?'s':''} raising funds for sponsors`;
+  const parts=[];
+  if(startingBalance>0) parts.push(`🏦 ${fmtRand(startingBalance)} starting`);
+  if(fundraisers.length>0) parts.push(`${fmtRand(lapMoney)} raised by <b>${fundraisers.length}</b> swimmer${fundraisers.length!==1?'s':''}`);
+  document.getElementById('fundSub').innerHTML=parts.length?parts.join(' + '):'No fundraising set up yet';
 }
 function renderFundBannerFlat(){
   const banner=document.getElementById('fundBanner');
-  if(!fundSettings.enabled||!(fundSettings.rate>0)){banner.classList.remove('visible');return;}
+  const lapEnabled=fundSettings.enabled&&fundSettings.rate>0;
+  if(!lapEnabled&&startingBalance<=0){banner.classList.remove('visible');return;}
+  const lapMoney=lapEnabled?teamLapCount*fundSettings.rate:0;
+  const total=startingBalance+lapMoney;
   banner.classList.add('visible');
-  const raised=teamLapCount*fundSettings.rate;
-  document.getElementById('fundAmount').textContent=fmtRand(raised);
-  document.getElementById('fundSub').innerHTML=`${fmtRand(fundSettings.rate)} per lap · <b>${teamLapCount}</b> laps so far`;
+  document.getElementById('fundAmount').textContent=fmtRand(total);
+  const parts=[];
+  if(startingBalance>0) parts.push(`🏦 ${fmtRand(startingBalance)} starting`);
+  if(lapEnabled) parts.push(`${fmtRand(fundSettings.rate)}/lap × <b>${teamLapCount}</b> laps`);
+  document.getElementById('fundSub').innerHTML=parts.length?parts.join(' + '):'No fundraising set up yet';
 }
 
 /* ─────────────── SWIMMER LAPS ENGINE ─────────────── */
