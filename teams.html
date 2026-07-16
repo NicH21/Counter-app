@@ -831,6 +831,11 @@ let fundSettings = { enabled:false, rate:0 }; // flat fallback only
 let teamLapCount = 0; // flat fallback lap counter only
 let startingBalance = 0; // this team's starting Rand balance, set by admin
 
+/* ─────────────── LAP BUTTON COOLDOWN ─────────────── */
+const LAP_COOLDOWN_MS = 25000;
+let lapCooldownUntil = 0;
+let lapCooldownInterval = null;
+
 /* ─────────────── SHOP STATE ─────────────── */
 let shopItems=[];
 let pendingPurchase=null;
@@ -873,13 +878,38 @@ async function loadInfo(){
   }
 }
 
+function isLapOnCooldown(){
+  return Date.now() < lapCooldownUntil;
+}
+function startLapCooldown(){
+  lapCooldownUntil = Date.now() + LAP_COOLDOWN_MS;
+  updateLapCooldownUI();
+  if(lapCooldownInterval) clearInterval(lapCooldownInterval);
+  lapCooldownInterval = setInterval(updateLapCooldownUI, 250);
+}
+function updateLapCooldownUI(){
+  const remaining = lapCooldownUntil - Date.now();
+  const pointBtn = document.getElementById('pointBtn');
+  const swimBtn = document.getElementById('swimmerBigBtn');
+  if(remaining <= 0){
+    if(lapCooldownInterval){ clearInterval(lapCooldownInterval); lapCooldownInterval = null; }
+    if(pointBtn && !timerEnded){ pointBtn.disabled=false; pointBtn.querySelector('span').textContent='+2 LAPS'; }
+    if(swimBtn && !timerEnded){ swimBtn.disabled=false; swimBtn.querySelector('span').textContent='+2 LAPS'; }
+    return;
+  }
+  const secs = Math.ceil(remaining/1000);
+  if(pointBtn){ pointBtn.disabled=true; pointBtn.querySelector('span').textContent=`⏳ WAIT ${secs}s`; }
+  if(swimBtn){ swimBtn.disabled=true; swimBtn.querySelector('span').textContent=`⏳ WAIT ${secs}s`; }
+}
+
 async function update(){
-  if(timerEnded)return;
+  if(timerEnded||isLapOnCooldown())return;
   let res=await fetch(FB+"/teams/"+team+".json");let value=await res.json();
   value=(value||0)+2;
   await fetch(FB+"/teams/"+team+".json",{method:"PUT",body:JSON.stringify(value)});
   document.getElementById("score").innerText=value;
   await bumpTeamLaps(2); // flat fallback fundraising counter (no-roster teams only)
+  startLapCooldown();
 }
 async function loadScore(){
   const res=await fetch(FB+"/teams/"+team+".json");const value=await res.json();
@@ -1024,7 +1054,7 @@ function renderSwimmers(){
 }
 
 async function addLapToActiveSwimmer(){
-  if(timerEnded || activeSwimmerIdx===null || !roster[activeSwimmerIdx]) return;
+  if(timerEnded || isLapOnCooldown() || activeSwimmerIdx===null || !roster[activeSwimmerIdx]) return;
   const idx = activeSwimmerIdx;
   const amount = 2;
 
@@ -1047,6 +1077,7 @@ async function addLapToActiveSwimmer(){
   lastSwimmerAction = {idx, amount};
   document.getElementById('swimmerUndoBtn').style.display='inline-block';
   renderSwimmerRowLaps(idx);
+  startLapCooldown();
 }
 
 async function undoLapForActiveSwimmer(){
