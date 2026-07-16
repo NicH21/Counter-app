@@ -363,10 +363,21 @@
     <div id="rosterPanels"></div>
   </div>
 
+  <!-- STARTING BALANCE -->
+  <div class="card fund-card">
+    <div class="card-title">🏦 Starting Money Balance</div>
+    <div class="fund-hint">Set a starting Rand balance for each team before fundraising begins. Every team's total balance shown below (in Fundraising &amp; Team Summary) = this starting balance + whatever they raise per lap.</div>
+    <div class="fund-grid" id="startingBalanceGrid">Loading...</div>
+    <div class="fund-grand-total" id="startingBalanceGrandTotal">Total starting balance across all teams: <b>R0.00</b></div>
+    <div class="fund-save-row">
+      <button class="fund-save-btn" onclick="saveStartingBalances()">💾 SAVE STARTING BALANCES</button>
+    </div>
+  </div>
+
   <!-- FUNDRAISING (PAY-PER-LAP) -->
   <div class="card fund-card">
     <div class="card-title">💵 Fundraising (Rand per Lap)</div>
-    <div class="fund-hint">For teams with a roster: set each swimmer's own R/lap sponsor rate up in "Team Rosters" — this card just totals them up automatically. For teams with no roster (using the whole-team button), use the flat team rate below instead. Either way it's tracked off real laps swum, not bonus points from challenges or the wheel. Use "Reset" on a team to zero out its raised total.</div>
+    <div class="fund-hint">For teams with a roster: set each swimmer's own R/lap sponsor rate up in "Team Rosters" — this card just totals them up automatically. For teams with no roster (using the whole-team button), use the flat team rate below instead. Either way it's tracked off real laps swum, not bonus points from challenges or the wheel. Each team's total below also includes the starting balance set in the 🏦 Starting Money Balance card above. Use "Reset" on a team to zero out its lap-based earnings (starting balance stays).</div>
     <div class="fund-grid" id="fundGrid">Loading...</div>
     <div class="fund-grand-total" id="fundGrandTotal">Total raised across all fundraising teams: <b>R0.00</b></div>
     <div class="fund-save-row">
@@ -599,7 +610,7 @@ function renderNamesGrid(){
   const grid=document.getElementById('namesGrid');
   grid.innerHTML=TEAMS.map(k=>{const num=k.replace('team','');const val=teamNames[k]||`Team ${num}`;return`<div class="name-row"><input class="name-input" id="ni_${k}" type="text" value="${val}" placeholder="Team ${num}" maxlength="20"></div>`;}).join('');
 }
-async function saveTeamNames(){const u={};TEAMS.forEach(k=>{const v=document.getElementById('ni_'+k).value.trim();u[k]=v||`Team ${k.replace('team','')}`;});await fetch(FB+'/teamNames.json',{method:'PUT',body:JSON.stringify(u)});teamNames=u;renderScoreGrid();renderRosterTabs();renderFundGrid();toast('✅ Names saved!');}
+async function saveTeamNames(){const u={};TEAMS.forEach(k=>{const v=document.getElementById('ni_'+k).value.trim();u[k]=v||`Team ${k.replace('team','')}`;});await fetch(FB+'/teamNames.json',{method:'PUT',body:JSON.stringify(u)});teamNames=u;renderScoreGrid();renderRosterTabs();renderFundGrid();renderStartingBalanceGrid();toast('✅ Names saved!');}
 
 /* ── ROSTERS ── */
 async function loadRosters(){
@@ -633,11 +644,62 @@ async function saveRoster(team){
   rosters[team]=saved;await fetch(FB+'/rosters/'+team+'.json',{method:'PUT',body:JSON.stringify(saved)});renderRosterPanel(team);renderFundGrid();renderTeamSummary();toast(`✅ ${teamNames[team]||'Team'} roster saved!`);
 }
 
+/* ── STARTING MONEY BALANCE ──
+   A one-time-set Rand amount each team starts with before any laps are
+   swum. This is added on top of whatever they raise per lap (via the
+   Fundraising card below) to make up their total displayed balance,
+   in teamRaisedTotal(), the Fundraising card, and the Team Summary. */
+let startingBalances={}; // { teamKey: number }
+TEAMS.forEach(k=>{startingBalances[k]=0;});
+
+async function loadStartingBalances(){
+  const res=await fetch(FB+'/startingBalances.json');const data=(await res.json())||{};
+  TEAMS.forEach(k=>{startingBalances[k]=data[k]||0;});
+  renderStartingBalanceGrid();
+}
+function renderStartingBalanceGrid(){
+  const grid=document.getElementById('startingBalanceGrid');
+  if(!grid)return;
+  grid.innerHTML=TEAMS.map(k=>{
+    const name=teamNames[k]||'Team '+k.replace('team','');
+    return `<div class="fund-row on" id="sbrow_${k}">
+      <span class="fund-name" style="color:${COLORS[k]}">${name}</span>
+      <div class="fund-rate-wrap">
+        <label>R start</label>
+        <input class="fund-rate-inp" type="number" id="sbal_${k}" value="${startingBalances[k]||0}" min="0" step="1" oninput="renderStartingBalanceGrandTotal()">
+      </div>
+    </div>`;
+  }).join('');
+  renderStartingBalanceGrandTotal();
+}
+function renderStartingBalanceGrandTotal(){
+  let grand=0;
+  TEAMS.forEach(k=>{
+    const el=document.getElementById('sbal_'+k);
+    grand+=el?(parseFloat(el.value)||0):(startingBalances[k]||0);
+  });
+  const el=document.getElementById('startingBalanceGrandTotal');
+  if(el) el.innerHTML=`Total starting balance across all teams: <b>${fmtRand(grand)}</b>`;
+}
+async function saveStartingBalances(){
+  const update={};
+  TEAMS.forEach(k=>{
+    const el=document.getElementById('sbal_'+k);
+    const val=Math.max(0,parseFloat(el.value)||0);
+    startingBalances[k]=val;update[k]=val;
+  });
+  await fetch(FB+'/startingBalances.json',{method:'PATCH',body:JSON.stringify(update)});
+  toast('✅ Starting balances saved!');
+  renderFundGrid();renderTeamSummary();renderStartingBalanceGrandTotal();
+}
+
 /* ── FUNDRAISING (RAND PER LAP) ──
    Teams WITH a roster: each swimmer has their own R/lap sponsor rate (set in
    the Team Rosters card above) — this card just totals those up per team.
    Teams WITHOUT a roster (using the plain whole-team button): fall back to
-   a flat team-wide R/lap rate + on/off toggle, editable right here. */
+   a flat team-wide R/lap rate + on/off toggle, editable right here.
+   Every team's total additionally includes their Starting Balance (set
+   above), via teamRaisedTotal(). */
 let fundraising={}; // { teamKey: { enabled: bool, rate: number } } — flat fallback only
 let teamLaps={};    // { teamKey: number } — real lap count for flat-fallback teams
 let allSwimmerLaps={}; // { teamKey: { idx: number } } — real lap counts per roster swimmer
@@ -656,8 +718,9 @@ async function loadFundraising(){
 }
 function teamRaisedTotal(k){
   const roster=rosters[k]||[];
+  const startBal=startingBalances[k]||0;
   if(roster.length>0){
-    let total=0;
+    let total=startBal;
     roster.forEach((m,i)=>{
       const laps=(allSwimmerLaps[k]&&allSwimmerLaps[k][i])||0;
       total+=laps*(m.rate||0);
@@ -665,7 +728,7 @@ function teamRaisedTotal(k){
     return total;
   }
   const f=fundraising[k]||{enabled:false,rate:0};
-  return f.enabled?(teamLaps[k]||0)*(f.rate||0):0;
+  return startBal+(f.enabled?(teamLaps[k]||0)*(f.rate||0):0);
 }
 function teamLapsTotal(k){
   const roster=rosters[k]||[];
@@ -681,6 +744,7 @@ function renderFundGrid(){
   grid.innerHTML=TEAMS.map(k=>{
     const name=teamNames[k]||'Team '+k.replace('team','');
     const roster=rosters[k]||[];
+    const startBal=startingBalances[k]||0;
     if(roster.length>0){
       const fundraisers=roster.filter(m=>(m.rate||0)>0);
       const total=teamRaisedTotal(k);
@@ -692,29 +756,29 @@ function renderFundGrid(){
       }).join('');
       return `<div class="fund-row on" id="fundrow_${k}">
         <div style="flex:1;min-width:160px">
-          <div class="fund-name" style="color:${COLORS[k]};margin-bottom:4px">${name} <span style="font-size:10px;color:rgba(168,228,255,0.35);font-weight:400">(${fundraisers.length} fundraising)</span></div>
+          <div class="fund-name" style="color:${COLORS[k]};margin-bottom:4px">${name} <span style="font-size:10px;color:rgba(168,228,255,0.35);font-weight:400">(${fundraisers.length} fundraising · start ${fmtRand(startBal)})</span></div>
           ${fundraisers.length>0?memberRows:'<div style="font-size:11px;color:rgba(168,228,255,0.3)">No swimmers have a rate set — edit in Team Rosters above</div>'}
         </div>
         <span class="fund-total">${fmtRand(total)}</span>
-        <button class="fund-reset-btn" onclick="resetFundraising('${k}')" title="Zero out this team's raised total">↺ Reset</button>
+        <button class="fund-reset-btn" onclick="resetFundraising('${k}')" title="Zero out this team's lap-based earnings">↺ Reset</button>
       </div>`;
     }
     const f=fundraising[k]||{enabled:false,rate:0};
     const laps=teamLaps[k]||0;
-    const raised=laps*(f.rate||0);
+    const raised=teamRaisedTotal(k);
     return `<div class="fund-row${f.enabled?' on':''}" id="fundrow_${k}">
       <label class="toggle-switch" title="${f.enabled?'Raising money':'Not raising money'}">
         <input type="checkbox" id="fen_${k}" ${f.enabled?'checked':''} onchange="onFundToggle('${k}',this.checked)">
         <span class="toggle-slider"></span>
       </label>
-      <span class="fund-name" style="color:${COLORS[k]}">${name} <span style="font-size:10px;color:rgba(168,228,255,0.35);font-weight:400">(no roster set)</span></span>
+      <span class="fund-name" style="color:${COLORS[k]}">${name} <span style="font-size:10px;color:rgba(168,228,255,0.35);font-weight:400">(no roster set · start ${fmtRand(startBal)})</span></span>
       <div class="fund-rate-wrap">
         <label>R / lap</label>
         <input class="fund-rate-inp" type="number" id="frate_${k}" value="${f.rate||0}" min="0" step="0.5" oninput="renderFundRowTotal('${k}')">
       </div>
       <span class="fund-stats">${laps} laps</span>
       <span class="fund-total" id="ftotal_${k}">${fmtRand(raised)}</span>
-      <button class="fund-reset-btn" onclick="resetFundraising('${k}')" title="Zero out this team's raised total">↺ Reset</button>
+      <button class="fund-reset-btn" onclick="resetFundraising('${k}')" title="Zero out this team's lap-based earnings">↺ Reset</button>
     </div>`;
   }).join('');
   renderFundGrandTotal();
@@ -726,7 +790,7 @@ function onFundToggle(team,enabled){
 function renderFundRowTotal(team){
   const rateEl=document.getElementById('frate_'+team);if(!rateEl)return;
   const rate=parseFloat(rateEl.value)||0;const laps=teamLaps[team]||0;
-  const totalEl=document.getElementById('ftotal_'+team);if(totalEl)totalEl.textContent=fmtRand(laps*rate);
+  const totalEl=document.getElementById('ftotal_'+team);if(totalEl)totalEl.textContent=fmtRand(laps*rate+(startingBalances[team]||0));
   renderFundGrandTotal();
 }
 function renderFundGrandTotal(){
@@ -739,6 +803,7 @@ function renderFundGrandTotal(){
       const enEl=document.getElementById('fen_'+k);const rateEl=document.getElementById('frate_'+k);
       const enabled=enEl?enEl.checked:(fundraising[k]&&fundraising[k].enabled);
       const rate=rateEl?(parseFloat(rateEl.value)||0):((fundraising[k]&&fundraising[k].rate)||0);
+      grand+=(startingBalances[k]||0);
       if(enabled) grand+=(teamLaps[k]||0)*rate;
     }
   });
@@ -761,13 +826,14 @@ async function saveFundraising(){
   renderFundGrandTotal();
 }
 
-/* Zero out a single team's raised total. This works by zeroing the underlying
-   lap counts that the money calc is based on (per-swimmer laps for roster
-   teams, or the flat team lap counter for no-roster teams) — the rates
-   themselves are left untouched so nothing needs re-entering. */
+/* Zero out a single team's LAP-BASED earnings (their Starting Balance is left
+   untouched). This works by zeroing the underlying lap counts that the money
+   calc is based on (per-swimmer laps for roster teams, or the flat team lap
+   counter for no-roster teams) — the rates themselves are left untouched so
+   nothing needs re-entering. */
 async function resetFundraising(team){
   const name=teamNames[team]||'Team '+team.replace('team','');
-  if(!confirm(`Reset ${name}'s raised total to R0.00? This zeroes their lap counts used for fundraising.`))return;
+  if(!confirm(`Reset ${name}'s lap-based earnings to R0.00? Their starting balance stays untouched. This zeroes their lap counts used for fundraising.`))return;
   const roster=rosters[team]||[];
   if(roster.length>0){
     const zeroed={};roster.forEach((m,i)=>{zeroed[i]=0;});
@@ -779,12 +845,12 @@ async function resetFundraising(team){
   }
   renderFundGrid();
   renderTeamSummary();
-  toast(`↺ ${name}'s raised total reset to R0.00`);
+  toast(`↺ ${name}'s lap earnings reset (starting balance kept)`);
 }
 
-/* Zero out every team's raised total in one go. */
+/* Zero out every team's LAP-BASED earnings in one go (starting balances kept). */
 async function resetAllFundraising(){
-  if(!confirm('Reset the RAISED TOTAL for every team to R0.00? This zeroes all lap counts used for fundraising.'))return;
+  if(!confirm('Reset the LAP-BASED earnings for every team to R0.00? Starting balances stay untouched. This zeroes all lap counts used for fundraising.'))return;
   const swimmerUpdates={};const flatUpdates={};
   TEAMS.forEach(k=>{
     const roster=rosters[k]||[];
@@ -801,14 +867,15 @@ async function resetAllFundraising(){
   await Promise.all(tasks);
   renderFundGrid();
   renderTeamSummary();
-  toast('🗑 All teams\' raised totals reset to R0.00');
+  toast('🗑 All teams\' lap earnings reset (starting balances kept)');
 }
 
 /* ── TEAM SUMMARY (bottom-of-page rollup) ──
    Pulls together everything already loaded elsewhere on this page — scores,
-   rosters, per-swimmer laps/rates, and the flat no-roster fallback — into one
-   place so an organiser can see, per team, the total laps swum and total
-   Rand raised, plus a breakdown per swimmer. Re-rendered whenever any of the
+   rosters, per-swimmer laps/rates, starting balances, and the flat no-roster
+   fallback — into one place so an organiser can see, per team, the total
+   laps swum and total Rand balance (starting balance + money raised per
+   lap), plus a breakdown per swimmer. Re-rendered whenever any of the
    underlying data refreshes (scores, rosters, fundraising poll). */
 function renderTeamSummary(){
   const listEl=document.getElementById('teamSummaryList');
@@ -817,7 +884,9 @@ function renderTeamSummary(){
   const blocks=TEAMS.map(k=>{
     const name=teamNames[k]||'Team '+k.replace('team','');
     const roster=rosters[k]||[];
-    let laps=0,raised=0,swimmerRowsHTML='';
+    const startBal=startingBalances[k]||0;
+    let laps=0,raised=startBal,swimmerRowsHTML='';
+    const startRowHTML=`<div class="summary-swimmer-row"><span class="summary-swimmer-name" style="opacity:0.7">🏦 Starting balance</span><span class="summary-swimmer-laps">—</span><span class="summary-swimmer-raised">${fmtRand(startBal)}</span></div>`;
     if(roster.length>0){
       roster.forEach((m,i)=>{
         const l=(allSwimmerLaps[k]&&allSwimmerLaps[k][i])||0;
@@ -827,11 +896,13 @@ function renderTeamSummary(){
         swimmerRowsHTML+=`<div class="summary-swimmer-row"><span class="summary-swimmer-name">${m.name||'(unnamed)'}${m.captain?' ★':''}</span><span class="summary-swimmer-laps">${l} laps</span><span class="summary-swimmer-raised">${rate>0?fmtRand(r):'—'}</span></div>`;
       });
       if(swimmerRowsHTML==='') swimmerRowsHTML='<div class="summary-swimmer-row"><span class="summary-swimmer-name" style="opacity:0.4">No members yet</span></div>';
+      swimmerRowsHTML=startRowHTML+swimmerRowsHTML;
     } else {
       laps=teamLaps[k]||0;
       const f=fundraising[k]||{enabled:false,rate:0};
-      raised=f.enabled?laps*(f.rate||0):0;
-      swimmerRowsHTML=`<div class="summary-swimmer-row"><span class="summary-swimmer-name" style="opacity:0.6">No roster set — flat team rate ${f.enabled?fmtRand(f.rate)+'/lap':'(fundraising off)'}</span><span class="summary-swimmer-laps">${laps} laps</span><span class="summary-swimmer-raised">${fmtRand(raised)}</span></div>`;
+      const lapRaised=f.enabled?laps*(f.rate||0):0;
+      raised+=lapRaised;
+      swimmerRowsHTML=startRowHTML+`<div class="summary-swimmer-row"><span class="summary-swimmer-name" style="opacity:0.6">No roster set — flat team rate ${f.enabled?fmtRand(f.rate)+'/lap':'(fundraising off)'}</span><span class="summary-swimmer-laps">${laps} laps</span><span class="summary-swimmer-raised">${fmtRand(lapRaised)}</span></div>`;
     }
     grandLaps+=laps;grandRaised+=raised;
     return `<div class="summary-team-block">
@@ -846,25 +917,27 @@ function renderTeamSummary(){
   }).join('');
   listEl.innerHTML=blocks;
   const gEl=document.getElementById('summaryGrandTotal');
-  if(gEl) gEl.innerHTML=`Grand total: <b>${grandLaps} laps</b> · <b>${fmtRand(grandRaised)}</b> raised`;
+  if(gEl) gEl.innerHTML=`Grand total: <b>${grandLaps} laps</b> · <b>${fmtRand(grandRaised)}</b> balance (incl. starting balances)`;
 }
 
 function copySummaryTSV(){
-  let tsv="Team\tScore\tSwimmer\tCaptain\tLaps\tRate (R per lap)\tRaised (R)\n";
+  let tsv="Team\tScore\tSwimmer\tCaptain\tLaps\tRate (R per lap)\tRaised (R)\tStarting Balance (R)\tTeam Total Balance (R)\n";
   TEAMS.forEach(k=>{
     const name=teamNames[k]||'Team '+k.replace('team','');
     const roster=rosters[k]||[];
+    const startBal=startingBalances[k]||0;
+    const totalBal=teamRaisedTotal(k);
     if(roster.length>0){
       roster.forEach((m,i)=>{
         const l=(allSwimmerLaps[k]&&allSwimmerLaps[k][i])||0;
         const rate=m.rate||0;const r=l*rate;
-        tsv+=`${name}\t${scores[k]||0}\t${m.name}\t${m.captain?'Yes':'No'}\t${l}\t${rate.toFixed(2)}\t${r.toFixed(2)}\n`;
+        tsv+=`${name}\t${scores[k]||0}\t${m.name}\t${m.captain?'Yes':'No'}\t${l}\t${rate.toFixed(2)}\t${r.toFixed(2)}\t${startBal.toFixed(2)}\t${totalBal.toFixed(2)}\n`;
       });
     } else {
       const laps=teamLaps[k]||0;
       const f=fundraising[k]||{enabled:false,rate:0};
       const raised=f.enabled?laps*(f.rate||0):0;
-      tsv+=`${name}\t${scores[k]||0}\t(flat team rate — no roster)\t\t${laps}\t${(f.rate||0).toFixed(2)}\t${raised.toFixed(2)}\n`;
+      tsv+=`${name}\t${scores[k]||0}\t(flat team rate — no roster)\t\t${laps}\t${(f.rate||0).toFixed(2)}\t${raised.toFixed(2)}\t${startBal.toFixed(2)}\t${totalBal.toFixed(2)}\n`;
     }
   });
   if(navigator.clipboard&&navigator.clipboard.writeText){
@@ -1177,6 +1250,7 @@ function drawWheelPreview(){
 /* ── INIT ── */
 async function init(){
   await loadTeamNames();
+  await loadStartingBalances();
   loadScores();loadSlots();loadRosters();loadEvents();loadCompletionsLog();loadWheelData();loadCurrency();
   loadShopData();loadShopLog();loadFundraising();
   setInterval(loadScores,3000);setInterval(loadSlots,3000);setInterval(syncTimerUI,1000);
