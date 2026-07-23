@@ -163,6 +163,7 @@
     .wheel-item-row{background:rgba(2,11,24,0.6);border-radius:10px;border:1px solid rgba(255,255,255,0.07);padding:10px 12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
     .wi-color{width:22px;height:22px;border-radius:6px;flex-shrink:0;border:1px solid rgba(255,255,255,0.2)}
     .wi-name{flex:1;font-size:14px;font-weight:700;color:#a8e4ff;min-width:80px}
+    .wi-msg{width:100%;font-size:12px;color:rgba(168,228,255,0.5);font-style:italic;padding-left:30px;margin-top:-4px}
     .wi-pts{font-size:13px;color:#f0c040;font-weight:700;white-space:nowrap}
     .wi-weight{font-size:12px;color:#cc5de8;font-weight:700;white-space:nowrap}
     .wi-del{width:26px;height:26px;border-radius:6px;border:1px solid rgba(255,107,107,0.3);background:rgba(2,11,24,0.8);color:#ff6b6b;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:transform 0.1s;flex-shrink:0}
@@ -172,6 +173,8 @@
     .wi-name-inp:focus{border-color:rgba(0,229,255,0.6)}
     .wi-pts-inp{width:60px;background:rgba(5,30,55,0.8);border:1px solid rgba(240,192,64,0.25);border-radius:9px;padding:8px 9px;color:#f0c040;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;text-align:center;outline:none}
     .wi-weight-inp{width:60px;background:rgba(5,30,55,0.8);border:1px solid rgba(204,93,232,0.25);border-radius:9px;padding:8px 9px;color:#cc5de8;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;text-align:center;outline:none}
+    .wi-msg-inp{flex:3;min-width:160px;background:rgba(5,30,55,0.8);border:1px solid rgba(0,229,255,0.15);border-radius:9px;padding:8px 11px;color:rgba(168,228,255,0.8);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;outline:none;transition:border-color 0.2s}
+    .wi-msg-inp:focus{border-color:rgba(0,229,255,0.5)}
     .add-wi-btn{font-family:'Bangers',cursive;font-size:17px;letter-spacing:1px;padding:8px 18px;border-radius:10px;border:2px solid #cc5de8;box-shadow:0 0 8px rgba(204,93,232,0.3);cursor:pointer;background:rgba(2,11,24,0.85);color:white;transition:transform 0.1s,box-shadow 0.2s;white-space:nowrap}
     .add-wi-btn:hover{transform:translateY(-2px);box-shadow:0 0 18px rgba(204,93,232,0.6)}
     .wheel-hint{font-size:11px;color:rgba(168,228,255,0.3);margin-top:8px;letter-spacing:1px}
@@ -497,12 +500,13 @@
     </div>
     <div class="wheel-item-list" id="wheelItemList"></div>
     <div class="add-wheel-row">
-      <input class="wi-name-inp" type="text" id="newWiName" placeholder="Label…" maxlength="30">
+      <input class="wi-name-inp" type="text" id="newWiName" placeholder="Label (short, on wheel)…" maxlength="30">
+      <input class="wi-msg-inp" type="text" id="newWiMsg" placeholder="Message shown when landed on (optional)…" maxlength="140">
       <input class="wi-pts-inp" type="number" id="newWiPts" value="1" min="0" max="999" title="Points awarded (0 = no points)">
       <input class="wi-weight-inp" type="number" id="newWiWeight" value="1" min="1" max="100" title="Relative chance (higher = more likely)">
       <button class="add-wi-btn" onclick="addWheelItem()">+ ADD</button>
     </div>
-    <div class="wheel-hint">Pts = points awarded &nbsp;·&nbsp; Weight = relative chance (e.g. 2 = twice as likely)</div>
+    <div class="wheel-hint">Pts = points awarded (0 = a pure message, no points) &nbsp;·&nbsp; Weight = relative chance &nbsp;·&nbsp; Message = the fuller instruction/dare shown to the team when they land on this slice, e.g. "Do the chicken dance for 10 seconds!"</div>
   </div>
 
   <!-- TEAM SUMMARY -->
@@ -1212,16 +1216,22 @@ function renderWheelItems(){
   const el=document.getElementById('wheelItemList');
   if(wheelItems.length===0){el.innerHTML='<div style="font-size:13px;color:rgba(168,228,255,0.3);text-align:center;padding:10px 0">No items yet — add some below</div>';return;}
   const totalW=wheelItems.reduce((s,i)=>s+(i.weight||1),0);
-  el.innerHTML=wheelItems.map((item,idx)=>{const pct=Math.round((item.weight||1)/totalW*100);const col=WHEEL_COLORS[idx%WHEEL_COLORS.length];return`<div class="wheel-item-row"><div class="wi-color" style="background:${col}"></div><span class="wi-name">${item.label}</span><span class="wi-pts">${item.points>0?'+'+item.points+' pts':'No pts'}</span><span class="wi-weight">~${pct}%</span><button class="wi-del" onclick="deleteWheelItem('${item.id}')">✕</button></div>`;}).join('');
+  el.innerHTML=wheelItems.map((item,idx)=>{
+    const pct=Math.round((item.weight||1)/totalW*100);
+    const col=WHEEL_COLORS[idx%WHEEL_COLORS.length];
+    const msgHTML=item.message?`<div class="wi-msg">💬 "${item.message}"</div>`:'';
+    return`<div class="wheel-item-row"><div class="wi-color" style="background:${col}"></div><span class="wi-name">${item.label}</span><span class="wi-pts">${item.points>0?'+'+item.points+' pts':'No pts'}</span><span class="wi-weight">~${pct}%</span><button class="wi-del" onclick="deleteWheelItem('${item.id}')">✕</button>${msgHTML}</div>`;
+  }).join('');
 }
 async function addWheelItem(){
-  const labelEl=document.getElementById('newWiName');const ptsEl=document.getElementById('newWiPts');const wEl=document.getElementById('newWiWeight');
+  const labelEl=document.getElementById('newWiName');const msgEl=document.getElementById('newWiMsg');const ptsEl=document.getElementById('newWiPts');const wEl=document.getElementById('newWiWeight');
   const label=labelEl.value.trim();if(!label){labelEl.focus();return;}
+  const message=msgEl.value.trim();
   const points=parseInt(ptsEl.value)||0;const weight=Math.max(1,parseInt(wEl.value)||1);
-  const id='wi_'+Date.now();const item={label,points,weight};
+  const id='wi_'+Date.now();const item={label,message,points,weight};
   await fetch(FB+'/wheelItems/'+id+'.json',{method:'PUT',body:JSON.stringify(item)});
   wheelItems.push({id,...item});renderWheelItems();drawWheelPreview();
-  labelEl.value='';ptsEl.value='1';wEl.value='1';labelEl.focus();toast('✅ Wheel item added!');
+  labelEl.value='';msgEl.value='';ptsEl.value='1';wEl.value='1';labelEl.focus();toast('✅ Wheel item added!');
 }
 async function deleteWheelItem(id){await fetch(FB+'/wheelItems/'+id+'.json',{method:'DELETE'});wheelItems=wheelItems.filter(i=>i.id!==id);renderWheelItems();drawWheelPreview();}
 async function saveWheelSettings(){
