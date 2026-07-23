@@ -713,9 +713,9 @@
 <div class="challenge-banner" id="challengeBanner">
   <div class="challenge-badge"><span class="badge-dot"></span> CHALLENGE ACTIVE <span class="badge-dot"></span></div>
   <div class="challenge-name" id="challengeName">—</div>
-  <div class="challenge-pts" id="challengePts">+1 point for completing!</div>
+  <div class="challenge-pts" id="challengePts">+1 🪙 for completing!</div>
   <button class="complete-btn" id="completeBtn" onclick="completeChallenge()"><span>✅ WE COMPLETED IT!</span></button>
-  <div class="done-flash" id="doneFlash">🎉 DONE! POINTS EARNED!</div>
+  <div class="done-flash" id="doneFlash">🎉 DONE! MAKO COINS EARNED!</div>
 </div>
 
 <!-- SPIN THE WHEEL -->
@@ -1163,9 +1163,9 @@ async function pollChallenge(){
       if(ev.expiresAt){
         const secsLeft=Math.max(0,Math.round((ev.expiresAt-now)/1000));
         const m=Math.floor(secsLeft/60);const s=secsLeft%60;
-        document.getElementById('challengePts').textContent=`+${ev.points||1} pt${(ev.points||1)!==1?'s':''} · ⏱ ${m}:${String(s).padStart(2,'0')} left`;
+        document.getElementById('challengePts').textContent=`+${ev.points||1} 🪙 · ⏱ ${m}:${String(s).padStart(2,'0')} left`;
       } else {
-        document.getElementById('challengePts').textContent=`+${ev.points||1} point${(ev.points||1)!==1?'s':''} for completing!`;
+        document.getElementById('challengePts').textContent=`+${ev.points||1} Mako Coin${(ev.points||1)!==1?'s':''} for completing!`;
       }
     } else {
       banner.classList.remove('visible');lastEventId=null;
@@ -1179,9 +1179,17 @@ async function completeChallenge(){
   if(completedEventIds.includes(key))return;
   document.getElementById('completeBtn').disabled=true;
   document.getElementById('doneFlash').classList.add('show');
-  const res=await fetch(FB+"/teams/"+team+".json");let current=await res.json();current=(current||0)+lastEventId.points;
-  await fetch(FB+"/teams/"+team+".json",{method:"PUT",body:JSON.stringify(current)});
-  document.getElementById("score").innerText=current;
+  // Challenge points now award Mako Coins, NOT the team's lap score —
+  // sponsors pay per lap swum, so challenge/wheel bonuses shouldn't move
+  // that number. Same pattern as the wheel's coin awards.
+  const res=await fetch(FB+'/currency/'+team+'/mako.json');let currentMako=await res.json();
+  currentMako=Math.max(0,(currentMako||0)+lastEventId.points);
+  await fetch(FB+'/currency/'+team+'/mako.json',{method:'PUT',body:JSON.stringify(currentMako)});
+  _makoBalance=currentMako;_lastMako=currentMako;
+  document.getElementById('makoCount').textContent=currentMako;
+  document.getElementById('shopBalanceCount').textContent=currentMako;
+  bump('makoBadge');
+  renderShopAffordability();
   const logEntry={team,eventName:lastEventId.name,points:lastEventId.points,time:Date.now()};
   await fetch(FB+'/completions/'+Date.now()+'_'+team+'.json',{method:'PUT',body:JSON.stringify(logEntry)});
   completedEventIds.push(key);
