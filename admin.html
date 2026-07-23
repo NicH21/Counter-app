@@ -636,7 +636,7 @@ function renderNamesGrid(){
   const grid=document.getElementById('namesGrid');
   grid.innerHTML=TEAMS.map(k=>{const num=k.replace('team','');const val=teamNames[k]||`Team ${num}`;return`<div class="name-row"><input class="name-input" id="ni_${k}" type="text" value="${val}" placeholder="Team ${num}" maxlength="20"></div>`;}).join('');
 }
-async function saveTeamNames(){const u={};TEAMS.forEach(k=>{const v=document.getElementById('ni_'+k).value.trim();u[k]=v||`Team ${k.replace('team','')}`;});await fetch(FB+'/teamNames.json',{method:'PUT',body:JSON.stringify(u)});teamNames=u;renderScoreGrid();renderRosterTabs();renderFundGrid();renderStartingBalanceGrid();toast('✅ Names saved!');}
+async function saveTeamNames(){const u={};TEAMS.forEach(k=>{const v=document.getElementById('ni_'+k).value.trim();u[k]=v||`Team ${k.replace('team','')}`;});await fetch(FB+'/teamNames.json',{method:'PUT',body:JSON.stringify(u)});teamNames=u;renderScoreGrid();renderRosterTabs();renderFundGrid();renderStartingBalanceGrid();renderCurrencyGrid();toast('✅ Names saved!');}
 
 /* ── ROSTERS ── */
 async function loadRosters(){
@@ -1074,10 +1074,22 @@ async function clearLog(){if(!confirm('Clear completion log?'))return;await fetc
 
 /* ── CURRENCY (mako only) ── */
 let currency={};
+let currencyGridBuilt=false;
 async function loadCurrency(){
   const res=await fetch(FB+'/currency.json');const data=(await res.json())||{};
   currency={};TEAMS.forEach(k=>{currency[k]={mako:data[k]?.mako||0};});
-  renderCurrencyGrid();
+  // Only rebuild the whole grid's HTML once (or when team names change it via
+  // renderCurrencyGrid(true)). On every regular poll we just update the coin
+  // count text — rebuilding innerHTML here would wipe out whatever the admin
+  // is mid-typing in the "ADD" amount box and steal focus from it.
+  if(!currencyGridBuilt){
+    renderCurrencyGrid();
+  } else {
+    TEAMS.forEach(k=>{
+      const el=document.getElementById('cm_'+k);
+      if(el) el.textContent=currency[k]?.mako||0;
+    });
+  }
 }
 function renderCurrencyGrid(){
   const grid=document.getElementById('currencyGrid');
@@ -1099,6 +1111,7 @@ function renderCurrencyGrid(){
       </div>
     </div>`;
   }).join('');
+  currencyGridBuilt=true;
 }
 async function adjCurrency(team,delta){
   if(!currency[team])currency[team]={mako:0};
