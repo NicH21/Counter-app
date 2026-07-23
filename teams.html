@@ -1316,21 +1316,26 @@ async function onSpinComplete(){
   const winner=wheelItems[spinTargetIdx];
   const delta=winner.points||0;
   if(delta!==0){
-    const res=await fetch(FB+"/teams/"+team+".json");let current=await res.json();
-    current=Math.max(0,(current||0)+delta); // clamp at 0 — same floor as the admin score buttons
-    await fetch(FB+"/teams/"+team+".json",{method:"PUT",body:JSON.stringify(current)});
-    document.getElementById("score").innerText=current;
-    const logEntry={team,eventName:'🎡 '+winner.label,points:delta,time:Date.now()};
-    await fetch(FB+'/completions/'+Date.now()+'_'+team+'.json',{method:'PUT',body:JSON.stringify(logEntry)});
+    // Wheel wins/losses now affect this team's Mako Coin balance, NOT their
+    // lap score — sponsors are paying per lap swum, so the wheel shouldn't
+    // move that number up or down.
+    const res=await fetch(FB+'/currency/'+team+'/mako.json');let currentMako=await res.json();
+    currentMako=Math.max(0,(currentMako||0)+delta); // clamp at 0, same floor as admin +/- buttons
+    await fetch(FB+'/currency/'+team+'/mako.json',{method:'PUT',body:JSON.stringify(currentMako)});
+    _makoBalance=currentMako;_lastMako=currentMako;
+    document.getElementById('makoCount').textContent=currentMako;
+    document.getElementById('shopBalanceCount').textContent=currentMako;
+    bump('makoBadge');
+    renderShopAffordability();
   }
   const col=WHEEL_SEG_COLORS[spinTargetIdx%WHEEL_SEG_COLORS.length];
   const nameEl=document.getElementById('resultName');const ptsEl=document.getElementById('resultPts');const msgEl=document.getElementById('resultMessage');
   nameEl.textContent=winner.label;nameEl.style.color=col;nameEl.style.textShadow=`0 0 30px ${col}`;
   if(delta>0){
-    ptsEl.textContent=`+${delta} POINTS!`;
+    ptsEl.textContent=`+${delta} MAKO! 🪙`;
     ptsEl.style.color='#f0c040';
   } else if(delta<0){
-    ptsEl.textContent=`${delta} POINTS!`;
+    ptsEl.textContent=`${delta} MAKO! 🪙`;
     ptsEl.style.color='#ff6b6b';
   } else {
     ptsEl.textContent='Better luck next time!';
@@ -1343,6 +1348,9 @@ async function onSpinComplete(){
     msgEl.textContent='';
     msgEl.classList.remove('show');
   }
+  // Record this spin for the admin's Wheel Spin Log — every spin, win/lose/message-only
+  const wheelLogEntry={team,label:winner.label,delta,message:(winner.message||'').trim(),time:Date.now()};
+  fetch(FB+'/wheelLog/'+Date.now()+'_'+team+'.json',{method:'PUT',body:JSON.stringify(wheelLogEntry)});
   document.getElementById('resultOverlay').classList.add('show');
   if(!LOW_END&&delta>0) spawnConfetti(col);
   updateSpinBtn();
