@@ -267,6 +267,19 @@
     .shop-log-time { color:rgba(168,228,255,0.35); font-size:11px; white-space:nowrap; }
     .shop-log-empty { font-size:13px; color:rgba(168,228,255,0.3); text-align:center; padding:14px 0; }
 
+    /* Wheel spin log */
+    .wheel-log { max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 7px; }
+    .wheel-log-row { background:rgba(2,11,24,0.5); border-radius:9px; border:1px solid rgba(204,93,232,0.2); padding:9px 14px; display:flex; align-items:center; gap:10px; font-size:13px; flex-wrap:wrap; }
+    .wheel-log-team { font-weight:900; color:#cc5de8; white-space:nowrap; }
+    .wheel-log-label { flex:1; color:#a8e4ff; min-width:80px; }
+    .wheel-log-msg { flex-basis:100%; font-size:11px; color:rgba(168,228,255,0.45); font-style:italic; padding-left:2px; }
+    .wheel-log-coins { font-weight:700; white-space:nowrap; font-family:'Bangers',cursive; font-size:16px; }
+    .wheel-log-coins.pos { color:#6bcb77; }
+    .wheel-log-coins.neg { color:#ff6b6b; }
+    .wheel-log-coins.zero { color:rgba(168,228,255,0.35); font-family:'Nunito',sans-serif; font-size:12px; font-weight:700; }
+    .wheel-log-time { color:rgba(168,228,255,0.35); font-size:11px; white-space:nowrap; }
+    .wheel-log-empty { font-size:13px; color:rgba(168,228,255,0.3); text-align:center; padding:14px 0; }
+
     /* SLOTS */
     .slot-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
     @media(max-width:480px){.slot-grid{grid-template-columns:repeat(2,1fr)}}
@@ -502,11 +515,20 @@
     <div class="add-wheel-row">
       <input class="wi-name-inp" type="text" id="newWiName" placeholder="Label (short, on wheel)…" maxlength="30">
       <input class="wi-msg-inp" type="text" id="newWiMsg" placeholder="Message shown when landed on (optional)…" maxlength="140">
-      <input class="wi-pts-inp" type="number" id="newWiPts" value="1" min="-999" max="999" title="Points awarded (0 = no points, negative = deducts points)">
+      <input class="wi-pts-inp" type="number" id="newWiPts" value="1" min="-999" max="999" title="Mako Coins awarded (0 = no coins, negative = deducts coins)">
       <input class="wi-weight-inp" type="number" id="newWiWeight" value="1" min="1" max="100" title="Relative chance (higher = more likely)">
       <button class="add-wi-btn" onclick="addWheelItem()">+ ADD</button>
     </div>
-    <div class="wheel-hint">Pts = points awarded (0 = a pure message, no points) &nbsp;·&nbsp; Weight = relative chance &nbsp;·&nbsp; Message = the fuller instruction/dare shown to the team when they land on this slice, e.g. "Do the chicken dance for 10 seconds!"</div>
+    <div class="wheel-hint">🪙 Pts = <b>Mako Coins</b> awarded, not score/lap points (0 = a pure message, negative = deducts coins) &nbsp;·&nbsp; Weight = relative chance &nbsp;·&nbsp; Message = the fuller instruction/dare shown to the team when they land on this slice, e.g. "Do the chicken dance for 10 seconds!"</div>
+  </div>
+
+  <!-- WHEEL SPIN LOG -->
+  <div class="card">
+    <div class="card-title">
+      <span>🎡 Wheel Spin Log</span>
+      <button class="clear-log-btn" onclick="clearWheelLog()">Clear</button>
+    </div>
+    <div class="wheel-log" id="wheelLog"><div class="wheel-log-empty">No spins yet</div></div>
   </div>
 
   <!-- TEAM SUMMARY -->
@@ -1220,7 +1242,7 @@ function renderWheelItems(){
     const pct=Math.round((item.weight||1)/totalW*100);
     const col=WHEEL_COLORS[idx%WHEEL_COLORS.length];
     const msgHTML=item.message?`<div class="wi-msg">💬 "${item.message}"</div>`:'';
-    const ptsLabel=item.points>0?('+'+item.points+' pts'):(item.points<0?(item.points+' pts'):'No pts');
+    const ptsLabel=item.points>0?('+'+item.points+' 🪙'):(item.points<0?(item.points+' 🪙'):'No coins');
     const ptsStyle=item.points<0?' style="color:#ff6b6b"':'';
     return`<div class="wheel-item-row"><div class="wi-color" style="background:${col}"></div><span class="wi-name">${item.label}</span><span class="wi-pts"${ptsStyle}>${ptsLabel}</span><span class="wi-weight">~${pct}%</span><button class="wi-del" onclick="deleteWheelItem('${item.id}')">✕</button>${msgHTML}</div>`;
   }).join('');
@@ -1259,17 +1281,46 @@ function drawWheelPreview(){
   ctx.beginPath();ctx.moveTo(cx+R-2,cy-7);ctx.lineTo(cx+R+8,cy);ctx.lineTo(cx+R-2,cy+7);ctx.closePath();ctx.fillStyle='#fff';ctx.fill();
 }
 
+/* ── WHEEL SPIN LOG ──
+   Every spin (win, loss, or 0-coin message-only) gets logged here by
+   teams.html to /wheelLog/{timestamp_team}. Separate from the Completions
+   Log (score/lap events) and the Shop Purchase Log (coin spending) since
+   this is specifically coin-earning/losing wheel outcomes. */
+async function loadWheelLog(){
+  const res=await fetch(FB+'/wheelLog.json');const data=(await res.json())||{};
+  const entries=Object.values(data).sort((a,b)=>b.time-a.time);
+  const el=document.getElementById('wheelLog');
+  if(entries.length===0){el.innerHTML='<div class="wheel-log-empty">No spins yet</div>';return;}
+  el.innerHTML=entries.map(w=>{
+    const teamName=teamNames[w.team]||w.team;
+    const d=new Date(w.time);const timeStr=d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    const delta=w.delta||0;
+    const coinsClass=delta>0?'pos':(delta<0?'neg':'zero');
+    const coinsText=delta>0?`+${delta} 🪙`:(delta<0?`${delta} 🪙`:'No coins');
+    const msgHTML=w.message?`<div class="wheel-log-msg">💬 "${w.message}"</div>`:'';
+    return`<div class="wheel-log-row">
+      <span class="wheel-log-team">🎡 ${teamName}</span>
+      <span class="wheel-log-label">${w.label}</span>
+      <span class="wheel-log-coins ${coinsClass}">${coinsText}</span>
+      <span class="wheel-log-time">${timeStr}</span>
+      ${msgHTML}
+    </div>`;
+  }).join('');
+}
+async function clearWheelLog(){if(!confirm('Clear the wheel spin log?'))return;await fetch(FB+'/wheelLog.json',{method:'DELETE'});toast('Wheel log cleared');loadWheelLog();}
+
 /* ── INIT ── */
 async function init(){
   await loadTeamNames();
   await loadStartingBalances();
   loadScores();loadSlots();loadRosters();loadEvents();loadCompletionsLog();loadWheelData();loadCurrency();
-  loadShopData();loadShopLog();loadFundraising();
+  loadShopData();loadShopLog();loadFundraising();loadWheelLog();
   setInterval(loadScores,3000);setInterval(loadSlots,3000);setInterval(syncTimerUI,1000);
   setInterval(updateNextEventRow,1000);setInterval(loadCompletionsLog,3000);
   setInterval(tickActiveEventTimer,1000);setInterval(loadCurrency,5000);
   setInterval(loadShopLog,5000);setInterval(loadFundraising,4000);
   setInterval(renderTeamSummary,3000);
+  setInterval(loadWheelLog,4000);
   syncTimerUI();
 }
 init();
