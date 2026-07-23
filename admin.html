@@ -423,17 +423,17 @@
     <div class="event-list" id="eventList"></div>
     <div class="add-event-row">
       <input class="ev-name-inp" type="text" id="newEvName" placeholder="Challenge name…" maxlength="60">
-      <input class="ev-pts-inp" type="number" id="newEvPts" placeholder="Pts" value="1" min="1" max="999" title="Points awarded">
+      <input class="ev-pts-inp" type="number" id="newEvPts" placeholder="Coins" value="1" min="1" max="999" title="Mako Coins awarded">
       <input class="ev-dur-inp" type="number" id="newEvDur" placeholder="Min" value="5" min="1" max="999" title="Duration in minutes">
       <button class="add-ev-btn" onclick="addEvent()">+ ADD</button>
     </div>
-    <div style="font-size:11px;color:rgba(168,228,255,0.3);margin-top:8px;letter-spacing:1px">Pts = points awarded &nbsp;·&nbsp; Min = how long the challenge stays active</div>
+    <div style="font-size:11px;color:rgba(168,228,255,0.3);margin-top:8px;letter-spacing:1px">🪙 Pts = <b>Mako Coins</b> awarded (not score/lap points) &nbsp;·&nbsp; Min = how long the challenge stays active</div>
   </div>
 
   <!-- COMPLETIONS LOG -->
   <div class="card">
     <div class="card-title">
-      <span>✅ Completions Log</span>
+      <span>✅ Completions Log <span style="font-weight:400;opacity:0.5">(Mako Coins earned)</span></span>
       <button class="clear-log-btn" onclick="clearLog()">Clear</button>
     </div>
     <div class="completions-log" id="completionsLog"><div class="comp-empty">No completions yet</div></div>
@@ -993,7 +993,7 @@ async function loadEvents(){
 function renderEventList(){
   const el=document.getElementById('eventList');
   if(events.length===0){el.innerHTML='<div style="font-size:13px;color:rgba(168,228,255,0.3);text-align:center;padding:12px 0">No challenges added yet</div>';return;}
-  el.innerHTML=events.map(ev=>`<div class="event-item${ev.enabled?' enabled':' disabled-ev'}" id="evitem_${ev.id}"><span class="event-name-disp">${ev.name}</span><span class="event-pts">+${ev.points||1} pts</span><span class="event-dur">⏱${ev.durationMinutes||5}m</span><button class="ev-fire-btn" onclick="fireEvent('${ev.id}')" ${adminTimerEnded?'disabled title="Timer ended"':''} style="${adminTimerEnded?'opacity:0.35;cursor:not-allowed':''}">🔥 Fire</button><label class="toggle-switch" title="${ev.enabled?'Enabled':'Disabled'}"><input type="checkbox" ${ev.enabled?'checked':''} onchange="toggleEvent('${ev.id}',this.checked)"><span class="toggle-slider"></span></label><button class="ev-del-btn" onclick="deleteEvent('${ev.id}')">✕</button></div>`).join('');
+  el.innerHTML=events.map(ev=>`<div class="event-item${ev.enabled?' enabled':' disabled-ev'}" id="evitem_${ev.id}"><span class="event-name-disp">${ev.name}</span><span class="event-pts">+${ev.points||1} 🪙</span><span class="event-dur">⏱${ev.durationMinutes||5}m</span><button class="ev-fire-btn" onclick="fireEvent('${ev.id}')" ${adminTimerEnded?'disabled title="Timer ended"':''} style="${adminTimerEnded?'opacity:0.35;cursor:not-allowed':''}">🔥 Fire</button><label class="toggle-switch" title="${ev.enabled?'Enabled':'Disabled'}"><input type="checkbox" ${ev.enabled?'checked':''} onchange="toggleEvent('${ev.id}',this.checked)"><span class="toggle-slider"></span></label><button class="ev-del-btn" onclick="deleteEvent('${ev.id}')">✕</button></div>`).join('');
 }
 async function addEvent(){
   const nameEl=document.getElementById('newEvName');const ptsEl=document.getElementById('newEvPts');const durEl=document.getElementById('newEvDur');
@@ -1029,7 +1029,7 @@ async function clearActiveEvent(){
 }
 function updateActiveEventUI(ev){
   const nameEl=document.getElementById('activeEventName');const timerEl=document.getElementById('activeEventTimer');
-  if(ev&&ev.active&&ev.name){nameEl.textContent=`⚡ ${ev.name} (+${ev.points} pts)`;nameEl.className='active-event-name';timerEl.style.display='block';updateActiveEventTimerDisplay(ev.expiresAt);}
+  if(ev&&ev.active&&ev.name){nameEl.textContent=`⚡ ${ev.name} (+${ev.points} 🪙)`;nameEl.className='active-event-name';timerEl.style.display='block';updateActiveEventTimerDisplay(ev.expiresAt);}
   else{nameEl.textContent='No active challenge';nameEl.className='active-event-name none';timerEl.style.display='none';}
 }
 let _activeExpiresAt=0;
@@ -1069,7 +1069,7 @@ async function loadCompletionsLog(){
   const entries=Object.values(data).sort((a,b)=>b.time-a.time);
   const el=document.getElementById('completionsLog');
   if(entries.length===0){el.innerHTML='<div class="comp-empty">No completions yet</div>';return;}
-  el.innerHTML=entries.map(c=>{const teamName=teamNames[c.team]||c.team;const d=new Date(c.time);const timeStr=d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});const ptsTxt=c.points<0?`${c.points}pts`:`+${c.points}pts`;const ptsStyle=c.points<0?' style="color:#ff6b6b"':'';return`<div class="comp-row"><span class="comp-team">${teamName}</span><span class="comp-event">${c.eventName}</span><span class="comp-pts"${ptsStyle}>${ptsTxt}</span><span class="comp-time">${timeStr}</span></div>`;}).join('');
+  el.innerHTML=entries.map(c=>{const teamName=teamNames[c.team]||c.team;const d=new Date(c.time);const timeStr=d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});const ptsTxt=c.points<0?`${c.points} 🪙`:`+${c.points} 🪙`;const ptsStyle=c.points<0?' style="color:#ff6b6b"':'';return`<div class="comp-row"><span class="comp-team">${teamName}</span><span class="comp-event">${c.eventName}</span><span class="comp-pts"${ptsStyle}>${ptsTxt}</span><span class="comp-time">${timeStr}</span></div>`;}).join('');
 }
 async function clearLog(){if(!confirm('Clear completion log?'))return;await fetch(FB+'/completions.json',{method:'DELETE'});toast('Log cleared');loadCompletionsLog();}
 
