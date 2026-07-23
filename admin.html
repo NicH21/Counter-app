@@ -1274,7 +1274,19 @@ function drawWheelPreview(){
     const slice=(item.weight||1)/total*Math.PI*2;const col=WHEEL_COLORS[idx%WHEEL_COLORS.length];
     ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,R,angle,angle+slice);ctx.closePath();ctx.fillStyle=col;ctx.fill();
     ctx.strokeStyle='rgba(2,11,24,0.6)';ctx.lineWidth=1.5;ctx.stroke();
-    if(slice>0.25){ctx.save();ctx.translate(cx,cy);ctx.rotate(angle+slice/2);ctx.textAlign='right';ctx.fillStyle='rgba(255,255,255,0.95)';ctx.font=`bold ${Math.min(11,Math.max(8,R*0.18))}px Nunito,sans-serif`;const txt=item.label.length>10?item.label.slice(0,9)+'…':item.label;ctx.fillText(txt,R-6,4);ctx.restore();}
+    if(slice>0.25){
+      ctx.save();ctx.translate(cx,cy);ctx.rotate(angle+slice/2);ctx.textAlign='right';
+      ctx.fillStyle='rgba(255,255,255,0.95)';
+      const availWidth=R-14-8; // from inner hub to near the rim
+      let fontSize=Math.min(12,Math.max(6,R*0.18));
+      ctx.font=`bold ${fontSize}px Nunito,sans-serif`;
+      while(ctx.measureText(item.label).width>availWidth&&fontSize>6){
+        fontSize-=0.5;
+        ctx.font=`bold ${fontSize}px Nunito,sans-serif`;
+      }
+      ctx.fillText(item.label,R-6,4);
+      ctx.restore();
+    }
     angle+=slice;
   });
   ctx.beginPath();ctx.arc(cx,cy,14,0,Math.PI*2);ctx.fillStyle='rgba(2,11,24,0.9)';ctx.fill();ctx.strokeStyle='rgba(168,228,255,0.4)';ctx.lineWidth=2;ctx.stroke();
