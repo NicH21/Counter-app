@@ -1314,19 +1314,28 @@ function rafSpin(now){
 }
 async function onSpinComplete(){
   const winner=wheelItems[spinTargetIdx];
-  if((winner.points||0)>0){
+  const delta=winner.points||0;
+  if(delta!==0){
     const res=await fetch(FB+"/teams/"+team+".json");let current=await res.json();
-    current=(current||0)+(winner.points||0);
+    current=Math.max(0,(current||0)+delta); // clamp at 0 — same floor as the admin score buttons
     await fetch(FB+"/teams/"+team+".json",{method:"PUT",body:JSON.stringify(current)});
     document.getElementById("score").innerText=current;
-    const logEntry={team,eventName:'🎡 '+winner.label,points:winner.points,time:Date.now()};
+    const logEntry={team,eventName:'🎡 '+winner.label,points:delta,time:Date.now()};
     await fetch(FB+'/completions/'+Date.now()+'_'+team+'.json',{method:'PUT',body:JSON.stringify(logEntry)});
   }
   const col=WHEEL_SEG_COLORS[spinTargetIdx%WHEEL_SEG_COLORS.length];
   const nameEl=document.getElementById('resultName');const ptsEl=document.getElementById('resultPts');const msgEl=document.getElementById('resultMessage');
   nameEl.textContent=winner.label;nameEl.style.color=col;nameEl.style.textShadow=`0 0 30px ${col}`;
-  ptsEl.textContent=(winner.points||0)>0?`+${winner.points} POINTS!`:'Better luck next time!';
-  ptsEl.style.color=(winner.points||0)>0?'#f0c040':'rgba(168,228,255,0.5)';
+  if(delta>0){
+    ptsEl.textContent=`+${delta} POINTS!`;
+    ptsEl.style.color='#f0c040';
+  } else if(delta<0){
+    ptsEl.textContent=`${delta} POINTS!`;
+    ptsEl.style.color='#ff6b6b';
+  } else {
+    ptsEl.textContent='Better luck next time!';
+    ptsEl.style.color='rgba(168,228,255,0.5)';
+  }
   if(winner.message&&winner.message.trim()){
     msgEl.textContent=winner.message.trim();
     msgEl.classList.add('show');
@@ -1335,7 +1344,7 @@ async function onSpinComplete(){
     msgEl.classList.remove('show');
   }
   document.getElementById('resultOverlay').classList.add('show');
-  if(!LOW_END&&(winner.points||0)>0) spawnConfetti(col);
+  if(!LOW_END&&delta>0) spawnConfetti(col);
   updateSpinBtn();
 }
 function dismissResult(){document.getElementById('resultOverlay').classList.remove('show');stopConfetti();}
