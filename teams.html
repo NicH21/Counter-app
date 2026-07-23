@@ -1243,12 +1243,14 @@ function buildOffscreen(){
       ctx.textAlign='right';
       ctx.fillStyle='rgba(255,255,255,0.97)';
       ctx.shadowColor='rgba(0,0,0,0.6)';ctx.shadowBlur=3;
-      const fontSize=Math.min(14,Math.max(9,R*0.16));
+      const availWidth=R-24; // leave room for the center hub and rim edge
+      let fontSize=Math.min(15,Math.max(7,R*0.16));
       ctx.font=`900 ${fontSize}px Nunito,sans-serif`;
-      const maxLen=Math.floor(R*0.28);
-      let txt=item.label;
-      if(ctx.measureText(txt).width>maxLen) txt=txt.slice(0,Math.max(3,Math.floor(maxLen/fontSize*1.5)))+'…';
-      ctx.fillText(txt,R-8,fontSize*0.38);
+      while(ctx.measureText(item.label).width>availWidth&&fontSize>7){
+        fontSize-=0.5;
+        ctx.font=`900 ${fontSize}px Nunito,sans-serif`;
+      }
+      ctx.fillText(item.label,R-8,fontSize*0.38);
       ctx.restore();
     }
     angle+=slice;
