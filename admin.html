@@ -566,7 +566,7 @@ const COLORS = {team1:'#ff6b6b',team2:'#ffd93d',team3:'#6bcb77',team4:'#4d96ff',
 
 let scores={}, teamNames={}, rosters={}, activeRosterTab='team1';
 let events=[], eventFreqMinutes=15;
-let timerState={}, nextEventAt=null, eventScheduleInterval=null;
+let timerState={}, cachedNextEventAt=null;
 let adminTimerEnded=false;
 
 function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2400);}
@@ -596,29 +596,37 @@ async function syncTimerUI(){
 }
 function applyAdminTimerLock(ended){
   if(adminTimerEnded===ended)return;adminTimerEnded=ended;renderEventList();
-  if(ended){if(eventScheduleInterval){clearTimeout(eventScheduleInterval);eventScheduleInterval=null;}nextEventAt=null;updateNextEventRow();toast('⏰ Timer ended — events & wheel locked');}
+  if(ended){fetch(FB+'/eventSettings/nextEventAt.json',{method:'PUT',body:JSON.stringify(null)});cachedNextEventAt=null;updateNextEventRow();toast('⏰ Timer ended — events & wheel locked');}
 }
 async function startTimer(){
   const h=parseInt(document.getElementById('durationHr').value)||0;const m=parseInt(document.getElementById('durationMin').value)||0;const total=h*3600+m*60;
   if(total<=0){toast('Set a duration first!');return;}
   await fetch(FB+'/timer.json',{method:'PUT',body:JSON.stringify({state:'running',remaining:total,serverTime:Date.now(),total})});
-  scheduleNextEvent();toast('▶ Timer started');
+  // Kick off a fresh random-event schedule in Firebase — this is what any
+  // open page (admin, team pages, leaderboard) reads to decide when to
+  // auto-fire the next challenge, so it keeps going even if this admin tab
+  // gets closed or navigated away from.
+  const freshNext=Date.now()+eventFreqMinutes*60*1000;
+  await fetch(FB+'/eventSettings/nextEventAt.json',{method:'PUT',body:JSON.stringify(freshNext)});
+  cachedNextEventAt=freshNext;updateNextEventRow();
+  toast('▶ Timer started');
 }
 async function pauseTimer(){
   const t=await fetchTimer();let remaining=t.remaining||0;
   if(t.state==='running'&&t.serverTime)remaining=Math.max(0,remaining-Math.floor((Date.now()-t.serverTime)/1000));
   await fetch(FB+'/timer.json',{method:'PUT',body:JSON.stringify({state:'paused',remaining,serverTime:null,total:t.total})});
-  if(eventScheduleInterval)clearTimeout(eventScheduleInterval);toast('⏸ Timer paused');
+  toast('⏸ Timer paused');
 }
 async function resumeTimer(){
   const t=await fetchTimer();
   await fetch(FB+'/timer.json',{method:'PUT',body:JSON.stringify({state:'running',remaining:t.remaining||0,serverTime:Date.now(),total:t.total})});
-  scheduleNextEvent();toast('▶ Timer resumed');
+  toast('▶ Timer resumed');
 }
 async function resetTimer(){
   const h=parseInt(document.getElementById('durationHr').value)||0;const m=parseInt(document.getElementById('durationMin').value)||0;const total=h*3600+m*60;
   await fetch(FB+'/timer.json',{method:'PUT',body:JSON.stringify({state:'stopped',remaining:total,serverTime:null,total})});
-  if(eventScheduleInterval)clearTimeout(eventScheduleInterval);nextEventAt=null;updateNextEventRow();toast('↺ Timer reset');
+  await fetch(FB+'/eventSettings/nextEventAt.json',{method:'PUT',body:JSON.stringify(null)});
+  cachedNextEventAt=null;updateNextEventRow();toast('↺ Timer reset');
 }
 
 /* ── SCORES ── */
@@ -988,6 +996,7 @@ async function loadEvents(){
   const [evRes,setRes]=await Promise.all([fetch(FB+'/events.json'),fetch(FB+'/eventSettings.json')]);
   const evData=(await evRes.json())||{};const setData=(await setRes.json())||{};
   eventFreqMinutes=setData.freqMinutes||15;document.getElementById('freqMinutes').value=eventFreqMinutes;
+  cachedNextEventAt=setData.nextEventAt||null;
   events=Object.entries(evData).map(([id,ev])=>({id,...ev}));renderEventList();loadActiveEvent();
 }
 function renderEventList(){
@@ -1013,17 +1022,19 @@ async function fireEvent(id){
   const activeRes=await fetch(FB+'/activeEvent.json');const activeEv=(await activeRes.json())||{};const now=Date.now();
   if(activeEv&&activeEv.active&&activeEv.expiresAt&&now<activeEv.expiresAt){if(!confirm(`"${activeEv.name}" is still active. Replace it?`))return;}
   const ev=events.find(e=>e.id===id)||{id,name:'Challenge',points:1};await pushActiveEvent(ev);
+  // Manually firing also pushes the auto-schedule out, so an auto-fire
+  // doesn't immediately stomp the one just triggered by hand.
+  const freshNext=Date.now()+eventFreqMinutes*60*1000;
+  await fetch(FB+'/eventSettings/nextEventAt.json',{method:'PUT',body:JSON.stringify(freshNext)});
+  cachedNextEventAt=freshNext;updateNextEventRow();
 }
 async function pushActiveEvent(ev){
   const durationMs=(ev.durationMinutes||5)*60*1000;const firedAt=Date.now();const expiresAt=firedAt+durationMs;
   const payload={id:ev.id,name:ev.name,points:ev.points||1,firedAt,expiresAt,durationMinutes:ev.durationMinutes||5,active:true};
   await fetch(FB+'/activeEvent.json',{method:'PUT',body:JSON.stringify(payload)});
-  updateActiveEventUI(payload);scheduleEventExpiry(expiresAt);toast(`⚡ "${ev.name}" fired! (${ev.durationMinutes||5} min)`);
+  updateActiveEventUI(payload);toast(`⚡ "${ev.name}" fired! (${ev.durationMinutes||5} min)`);
 }
-let eventExpiryTimeout=null;
-function scheduleEventExpiry(expiresAt){if(eventExpiryTimeout)clearTimeout(eventExpiryTimeout);const ms=expiresAt-Date.now();if(ms<=0){clearActiveEvent();return;}eventExpiryTimeout=setTimeout(()=>{clearActiveEvent();toast('⏰ Challenge time is up!');},ms);}
 async function clearActiveEvent(){
-  if(eventExpiryTimeout){clearTimeout(eventExpiryTimeout);eventExpiryTimeout=null;}
   await fetch(FB+'/activeEvent.json',{method:'PUT',body:JSON.stringify({active:false,name:'',id:'',points:0,firedAt:0,expiresAt:0})});
   updateActiveEventUI(null);toast('✕ Challenge cleared');
 }
@@ -1040,27 +1051,83 @@ function tickActiveEventTimer(){
   const m=Math.floor(remaining/60);const s=remaining%60;
   timerEl.textContent=`⏱ ${m}:${String(s).padStart(2,'0')} left`;
   timerEl.className='active-event-timer'+(remaining<=30?' expiring':'');
+  // Expiry is detected purely from the timestamp here (and independently by
+  // every other open page) rather than a local setTimeout, so the "active
+  // challenge" display always self-corrects on the next tick/poll even if
+  // this tab was closed and reopened right as the challenge expired.
+  if(remaining<=0){updateActiveEventUI(null);}
 }
-async function loadActiveEvent(){const res=await fetch(FB+'/activeEvent.json');const ev=(await res.json())||{};updateActiveEventUI(ev);if(ev&&ev.active&&ev.expiresAt){_activeExpiresAt=ev.expiresAt;scheduleEventExpiry(ev.expiresAt);}}
-function scheduleNextEvent(){
-  if(eventScheduleInterval)clearTimeout(eventScheduleInterval);
-  const ms=eventFreqMinutes*60*1000;nextEventAt=Date.now()+ms;updateNextEventRow();
-  eventScheduleInterval=setTimeout(async()=>{
-    const t=await fetchTimer();let remaining=t.remaining||0;
-    if(t.state==='running'&&t.serverTime)remaining=Math.max(0,remaining-Math.floor((Date.now()-t.serverTime)/1000));
-    if(t.state==='running'&&remaining>0){
-      const activeRes=await fetch(FB+'/activeEvent.json');const activeEv=(await activeRes.json())||{};const now=Date.now();
-      const currentlyActive=activeEv&&activeEv.active&&activeEv.expiresAt&&now<activeEv.expiresAt;
-      if(!currentlyActive){const ev=pickRandomEvent();if(ev){await pushActiveEvent(ev);}}
-      else{toast('⏳ Event still active — next fire skipped');}
+/* Re-syncs the admin's "Currently Active" box from Firebase every few
+   seconds — catches challenges fired by the auto-scheduler (which may run
+   from a completely different open page/device, see checkAndFireScheduledEvent
+   below) as well as ones fired from this admin tab. */
+async function loadActiveEvent(){
+  const res=await fetch(FB+'/activeEvent.json');const ev=(await res.json())||{};
+  const now=Date.now();
+  const stillActive=ev&&ev.active&&ev.expiresAt&&now<ev.expiresAt;
+  updateActiveEventUI(stillActive?ev:null);
+}
+
+/* ── AUTO-FIRE SCHEDULE (Firebase-driven, not tab-local) ──
+   Random-event auto-firing used to run purely off a local setTimeout chain
+   in the admin's own browser tab — so leaving/closing the admin page (or
+   just navigating to another page in the same tab) silently killed it and
+   no more challenges would ever fire, even though the match timer itself
+   kept running in Firebase.
+
+   Now the "when's the next challenge due" schedule lives in Firebase
+   (/eventSettings/nextEventAt, an absolute timestamp) instead of a local
+   JS variable. This function polls that schedule and fires a challenge
+   when it's due — and because every open admin/team/leaderboard page runs
+   this same poll, the schedule keeps advancing as long as ANY page
+   connected to the game is open, not specifically the admin's. If the
+   admin closes their tab for a while and reopens it, this also naturally
+   "catches up": if nextEventAt has already passed, the very next poll
+   (from whichever page is open) fires the overdue challenge immediately
+   and reschedules from now. */
+async function checkAndFireScheduledEvent(){
+  try{
+    const [tRes,setRes,activeRes]=await Promise.all([
+      fetch(FB+'/timer.json'),fetch(FB+'/eventSettings.json'),fetch(FB+'/activeEvent.json')
+    ]);
+    const t=(await tRes.json())||{};
+    const sett=(await setRes.json())||{};
+    const activeEv=(await activeRes.json())||{};
+    cachedNextEventAt=sett.nextEventAt||null;
+    if(t.state!=='running'){updateNextEventRow();return;}
+    let remaining=t.remaining||0;
+    if(t.serverTime)remaining=Math.max(0,remaining-(Date.now()-t.serverTime)/1000);
+    if(remaining<=0){updateNextEventRow();return;}
+    const freqMinutes=sett.freqMinutes||eventFreqMinutes||15;
+    const now=Date.now();
+    if(!sett.nextEventAt){
+      // No schedule yet (fresh game, or migrating from before this existed) — start one.
+      const freshNext=now+freqMinutes*60000;
+      await fetch(FB+'/eventSettings/nextEventAt.json',{method:'PUT',body:JSON.stringify(freshNext)});
+      cachedNextEventAt=freshNext;updateNextEventRow();return;
     }
-    scheduleNextEvent();
-  },ms);
+    const currentlyActive=activeEv&&activeEv.active&&activeEv.expiresAt&&now<activeEv.expiresAt;
+    if(now>=sett.nextEventAt&&!currentlyActive){
+      // Push the schedule forward first to shrink the window where two
+      // simultaneously-open pages could both fire at once.
+      const newNext=now+freqMinutes*60000;
+      await fetch(FB+'/eventSettings/nextEventAt.json',{method:'PUT',body:JSON.stringify(newNext)});
+      cachedNextEventAt=newNext;
+      const evRes=await fetch(FB+'/events.json');const evData=(await evRes.json())||{};
+      const pool=Object.entries(evData).map(([id,e])=>({id,...e})).filter(e=>e.enabled);
+      if(pool.length>0){
+        const ev=pool[Math.floor(Math.random()*pool.length)];
+        await pushActiveEvent(ev);
+      }
+    }
+    updateNextEventRow();
+  }catch(e){}
 }
 function updateNextEventRow(){
   const el=document.getElementById('nextEventRow');
-  if(!nextEventAt){el.textContent='⏳ Next event in: — (timer not running)';return;}
-  el.textContent=`⏳ Next random event in: ${fmtTime(Math.max(0,Math.round((nextEventAt-Date.now())/1000)))}`;
+  if(!el)return;
+  if(!cachedNextEventAt){el.textContent='⏳ Next event in: — (timer not running)';return;}
+  el.textContent=`⏳ Next random event in: ${fmtTime(Math.max(0,Math.round((cachedNextEventAt-Date.now())/1000)))}`;
 }
 
 /* ── COMPLETIONS LOG ── */
@@ -1364,6 +1431,13 @@ async function init(){
   setInterval(loadShopLog,5000);setInterval(loadFundraising,4000);
   setInterval(renderTeamSummary,3000);
   setInterval(loadWheelLog,4000);
+  // Keeps the "Currently Active" box in sync even when a challenge was
+  // auto-fired by a completely different open page (see
+  // checkAndFireScheduledEvent), and drives the Firebase-backed auto-fire
+  // schedule itself so it keeps advancing even if this admin tab is closed.
+  setInterval(loadActiveEvent,2000);
+  setInterval(checkAndFireScheduledEvent,5000);
+  checkAndFireScheduledEvent();
   syncTimerUI();
 }
 init();
