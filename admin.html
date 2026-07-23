@@ -502,7 +502,7 @@
     <div class="add-wheel-row">
       <input class="wi-name-inp" type="text" id="newWiName" placeholder="Label (short, on wheel)…" maxlength="30">
       <input class="wi-msg-inp" type="text" id="newWiMsg" placeholder="Message shown when landed on (optional)…" maxlength="140">
-      <input class="wi-pts-inp" type="number" id="newWiPts" value="1" min="0" max="999" title="Points awarded (0 = no points)">
+      <input class="wi-pts-inp" type="number" id="newWiPts" value="1" min="-999" max="999" title="Points awarded (0 = no points, negative = deducts points)">
       <input class="wi-weight-inp" type="number" id="newWiWeight" value="1" min="1" max="100" title="Relative chance (higher = more likely)">
       <button class="add-wi-btn" onclick="addWheelItem()">+ ADD</button>
     </div>
@@ -1046,7 +1046,7 @@ async function loadCompletionsLog(){
   const entries=Object.values(data).sort((a,b)=>b.time-a.time);
   const el=document.getElementById('completionsLog');
   if(entries.length===0){el.innerHTML='<div class="comp-empty">No completions yet</div>';return;}
-  el.innerHTML=entries.map(c=>{const teamName=teamNames[c.team]||c.team;const d=new Date(c.time);const timeStr=d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});return`<div class="comp-row"><span class="comp-team">${teamName}</span><span class="comp-event">${c.eventName}</span><span class="comp-pts">+${c.points}pts</span><span class="comp-time">${timeStr}</span></div>`;}).join('');
+  el.innerHTML=entries.map(c=>{const teamName=teamNames[c.team]||c.team;const d=new Date(c.time);const timeStr=d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});const ptsTxt=c.points<0?`${c.points}pts`:`+${c.points}pts`;const ptsStyle=c.points<0?' style="color:#ff6b6b"':'';return`<div class="comp-row"><span class="comp-team">${teamName}</span><span class="comp-event">${c.eventName}</span><span class="comp-pts"${ptsStyle}>${ptsTxt}</span><span class="comp-time">${timeStr}</span></div>`;}).join('');
 }
 async function clearLog(){if(!confirm('Clear completion log?'))return;await fetch(FB+'/completions.json',{method:'DELETE'});toast('Log cleared');loadCompletionsLog();}
 
@@ -1220,7 +1220,9 @@ function renderWheelItems(){
     const pct=Math.round((item.weight||1)/totalW*100);
     const col=WHEEL_COLORS[idx%WHEEL_COLORS.length];
     const msgHTML=item.message?`<div class="wi-msg">💬 "${item.message}"</div>`:'';
-    return`<div class="wheel-item-row"><div class="wi-color" style="background:${col}"></div><span class="wi-name">${item.label}</span><span class="wi-pts">${item.points>0?'+'+item.points+' pts':'No pts'}</span><span class="wi-weight">~${pct}%</span><button class="wi-del" onclick="deleteWheelItem('${item.id}')">✕</button>${msgHTML}</div>`;
+    const ptsLabel=item.points>0?('+'+item.points+' pts'):(item.points<0?(item.points+' pts'):'No pts');
+    const ptsStyle=item.points<0?' style="color:#ff6b6b"':'';
+    return`<div class="wheel-item-row"><div class="wi-color" style="background:${col}"></div><span class="wi-name">${item.label}</span><span class="wi-pts"${ptsStyle}>${ptsLabel}</span><span class="wi-weight">~${pct}%</span><button class="wi-del" onclick="deleteWheelItem('${item.id}')">✕</button>${msgHTML}</div>`;
   }).join('');
 }
 async function addWheelItem(){
