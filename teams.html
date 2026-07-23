@@ -332,11 +332,27 @@
       display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
       opacity:0;pointer-events:none;
       transition:opacity 0.35s ease;
+      padding: 24px;
+      text-align: center;
     }
     .wheel-result-overlay.show{opacity:1;pointer-events:all}
     .result-badge{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:rgba(204,93,232,0.7);animation:badgeBlink 1s infinite}
     .result-name{font-family:'Bangers',cursive;font-size:clamp(36px,10vw,64px);letter-spacing:4px;text-align:center;line-height:1.1;padding:0 20px}
     .result-pts{font-family:'Bangers',cursive;font-size:clamp(28px,8vw,48px);color:#f0c040;text-shadow:0 0 24px rgba(240,192,64,0.6);letter-spacing:2px}
+    .result-message{
+      font-family:'Nunito',sans-serif;
+      font-size:clamp(16px,4.2vw,22px);
+      font-weight:700;
+      color:#a8e4ff;
+      max-width:420px;
+      line-height:1.4;
+      background:rgba(204,93,232,0.1);
+      border:1.5px solid rgba(204,93,232,0.4);
+      border-radius:16px;
+      padding:16px 22px;
+      display:none;
+    }
+    .result-message.show{display:block}
     .result-dismiss{font-family:'Bangers',cursive;font-size:22px;letter-spacing:2px;padding:14px 40px;border-radius:14px;border:2px solid #cc5de8;background:rgba(5,20,40,0.9);color:white;cursor:pointer;margin-top:8px;transition:transform 0.12s,box-shadow 0.2s;box-shadow:0 0 16px rgba(204,93,232,0.4)}
     .result-dismiss:hover{transform:scale(1.05);box-shadow:0 0 30px rgba(204,93,232,0.7)}
     #confettiCanvas{position:fixed;inset:0;pointer-events:none;z-index:201}
@@ -746,6 +762,7 @@
   <div class="result-badge">🎡 You landed on…</div>
   <div class="result-name" id="resultName">—</div>
   <div class="result-pts" id="resultPts"></div>
+  <div class="result-message" id="resultMessage"></div>
   <button class="result-dismiss" onclick="dismissResult()">NICE! ✓</button>
 </div>
 
@@ -1306,10 +1323,17 @@ async function onSpinComplete(){
     await fetch(FB+'/completions/'+Date.now()+'_'+team+'.json',{method:'PUT',body:JSON.stringify(logEntry)});
   }
   const col=WHEEL_SEG_COLORS[spinTargetIdx%WHEEL_SEG_COLORS.length];
-  const nameEl=document.getElementById('resultName');const ptsEl=document.getElementById('resultPts');
+  const nameEl=document.getElementById('resultName');const ptsEl=document.getElementById('resultPts');const msgEl=document.getElementById('resultMessage');
   nameEl.textContent=winner.label;nameEl.style.color=col;nameEl.style.textShadow=`0 0 30px ${col}`;
   ptsEl.textContent=(winner.points||0)>0?`+${winner.points} POINTS!`:'Better luck next time!';
   ptsEl.style.color=(winner.points||0)>0?'#f0c040':'rgba(168,228,255,0.5)';
+  if(winner.message&&winner.message.trim()){
+    msgEl.textContent=winner.message.trim();
+    msgEl.classList.add('show');
+  } else {
+    msgEl.textContent='';
+    msgEl.classList.remove('show');
+  }
   document.getElementById('resultOverlay').classList.add('show');
   if(!LOW_END&&(winner.points||0)>0) spawnConfetti(col);
   updateSpinBtn();
