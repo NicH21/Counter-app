@@ -1173,6 +1173,56 @@ async function pollChallenge(){
   }catch(e){}
 }
 
+/* ── AUTO-FIRE SCHEDULE (Firebase-driven, shared with admin.html) ──
+   Random-challenge auto-firing used to depend entirely on the admin's own
+   browser tab staying open (a local setTimeout chain there) — closing or
+   navigating away from the admin page silently stopped new challenges from
+   ever firing again, even though the match timer kept running.
+
+   The fix: "when's the next challenge due" now lives in Firebase
+   (/eventSettings/nextEventAt, an absolute timestamp), and this exact same
+   polling function also runs here on every team page. That means as long
+   as ANY team's device (or the admin panel, or the leaderboard) is open,
+   the schedule keeps advancing — it's no longer tied to one specific tab.
+   If everything was closed for a while, whichever page reopens/polls next
+   simply sees the schedule is overdue and fires the challenge immediately,
+   then reschedules from now. */
+async function checkAndFireScheduledEvent(){
+  try{
+    const [tRes,setRes,activeRes]=await Promise.all([
+      fetch(FB+'/timer.json'),fetch(FB+'/eventSettings.json'),fetch(FB+'/activeEvent.json')
+    ]);
+    const t=(await tRes.json())||{};
+    const sett=(await setRes.json())||{};
+    const activeEv=(await activeRes.json())||{};
+    if(t.state!=='running')return;
+    let remaining=t.remaining||0;
+    if(t.serverTime)remaining=Math.max(0,remaining-(Date.now()-t.serverTime)/1000);
+    if(remaining<=0)return;
+    const freqMinutes=sett.freqMinutes||15;
+    const now=Date.now();
+    if(!sett.nextEventAt){
+      const freshNext=now+freqMinutes*60000;
+      await fetch(FB+'/eventSettings/nextEventAt.json',{method:'PUT',body:JSON.stringify(freshNext)});
+      return;
+    }
+    const currentlyActive=activeEv&&activeEv.active&&activeEv.expiresAt&&now<activeEv.expiresAt;
+    if(now>=sett.nextEventAt&&!currentlyActive){
+      const newNext=now+freqMinutes*60000;
+      await fetch(FB+'/eventSettings/nextEventAt.json',{method:'PUT',body:JSON.stringify(newNext)});
+      const evRes=await fetch(FB+'/events.json');const evData=(await evRes.json())||{};
+      const pool=Object.entries(evData).map(([id,e])=>({id,...e})).filter(e=>e.enabled);
+      if(pool.length>0){
+        const ev=pool[Math.floor(Math.random()*pool.length)];
+        const durationMs=(ev.durationMinutes||5)*60*1000;
+        const firedAt=now;const expiresAt=firedAt+durationMs;
+        const payload={id:ev.id,name:ev.name,points:ev.points||1,firedAt,expiresAt,durationMinutes:ev.durationMinutes||5,active:true};
+        await fetch(FB+'/activeEvent.json',{method:'PUT',body:JSON.stringify(payload)});
+      }
+    }
+  }catch(e){}
+}
+
 async function completeChallenge(){
   if(!lastEventId||timerEnded)return;
   const key=lastEventId.id+'_'+lastEventId.firedAt;
@@ -1685,6 +1735,8 @@ renderPurchaseLog(); // restore from sessionStorage on page load
 
 setInterval(loadScore,1500);
 setInterval(pollChallenge,1500);
+setInterval(checkAndFireScheduledEvent,6000);
+checkAndFireScheduledEvent();
 setInterval(pollTimer,2000);
 setInterval(pollCurrency,3000);
 setInterval(loadFundraising,4000);
