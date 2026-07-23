@@ -547,6 +547,7 @@
     <div class="btn-row">
       <button class="ctrl-btn btn-reset" style="font-size:18px" onclick="resetAllScores()">🗑 RESET ALL SCORES</button>
       <button class="ctrl-btn btn-reset" style="font-size:18px;border-color:#cc5de8;box-shadow:0 0 16px rgba(204,93,232,0.3)" onclick="freeAllSlots()">🔓 FREE ALL SLOTS</button>
+      <button class="ctrl-btn btn-reset" style="font-size:18px;border-color:#4d96ff;box-shadow:0 0 16px rgba(77,150,255,0.3)" onclick="resetAllCurrency()">🪙 RESET ALL MAKO COINS</button>
     </div>
   </div>
 
@@ -1107,6 +1108,7 @@ function renderCurrencyGrid(){
           <button class="cur-btn plus mako" onclick="adjCurrency('${k}',1)">+</button>
           <input class="cur-add-inp" id="cmi_${k}" type="number" value="1" min="1" max="9999">
           <button class="cur-btn plus mako" style="width:auto;padding:0 8px;font-size:12px" onclick="adjCurrencyByInput('${k}')">ADD</button>
+          <button class="fund-reset-btn" onclick="resetCurrency('${k}')" title="Reset this team's Mako Coins to 0">↺ Reset</button>
         </div>
       </div>
     </div>`;
@@ -1127,6 +1129,22 @@ async function adjCurrencyByInput(team){
   document.getElementById(`cm_${team}`).textContent=currency[team].mako;
   await fetch(FB+'/currency/'+team+'/mako.json',{method:'PUT',body:JSON.stringify(currency[team].mako)});
   toast(`+${amount} Mako Coins → ${teamNames[team]||team}`);
+}
+async function resetCurrency(team){
+  const name=teamNames[team]||'Team '+team.replace('team','');
+  if(!confirm(`Reset ${name}'s Mako Coins to 0?`))return;
+  if(!currency[team])currency[team]={mako:0};
+  currency[team].mako=0;
+  document.getElementById(`cm_${team}`).textContent=0;
+  await fetch(FB+'/currency/'+team+'/mako.json',{method:'PUT',body:JSON.stringify(0)});
+  toast(`↺ ${name}'s Mako Coins reset to 0`);
+}
+async function resetAllCurrency(){
+  if(!confirm('Reset Mako Coins to 0 for ALL teams?'))return;
+  const u={};TEAMS.forEach(k=>{u[k]={mako:0};currency[k]={mako:0};});
+  await fetch(FB+'/currency.json',{method:'PUT',body:JSON.stringify(u)});
+  TEAMS.forEach(k=>{const el=document.getElementById('cm_'+k);if(el)el.textContent=0;});
+  toast('🗑 All teams\' Mako Coins reset to 0');
 }
 
 /* ── MAKO SHOP (ADMIN) ── */
