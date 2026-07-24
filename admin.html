@@ -66,7 +66,7 @@
     .member-input:focus{border-color:rgba(0,229,255,0.6)}
     .member-rate-wrap{display:flex;align-items:center;gap:4px;flex-shrink:0}
     .member-rate-label{font-size:10px;font-weight:700;letter-spacing:1px;color:rgba(240,192,64,0.55);white-space:nowrap}
-    .member-rate-inp{width:58px;padding:7px 6px;border-radius:7px;border:1px solid rgba(240,192,64,0.35);background:rgba(5,30,55,0.8);color:#f0c040;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;text-align:center;outline:none;transition:border-color 0.2s}
+    .member-rate-inp{width:58px;padding:7px 6px;border-radius:7px;border:1px solid rgba(240,192,64,0.35);background:rgba(5,30,55,0.8);color:#f0c040;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;text-align:center;outline:none}
     .member-rate-inp:focus{border-color:rgba(240,192,64,0.8)}
     .captain-btn{flex-shrink:0;font-size:11px;font-weight:700;letter-spacing:1px;padding:5px 9px;border-radius:7px;border:1.5px solid rgba(240,192,64,0.3);background:transparent;color:rgba(240,192,64,0.45);cursor:pointer;transition:all 0.18s;white-space:nowrap;font-family:'Nunito',sans-serif}
     .captain-btn:hover{border-color:rgba(240,192,64,0.7);color:#f0c040;background:rgba(240,192,64,0.1)}
@@ -199,10 +199,13 @@
     .shop-item-row.enabled { border-color: rgba(77,150,255,0.3); }
     .shop-item-row.type-powerup { border-color: rgba(107,203,119,0.3); }
     .shop-item-row.type-sabotage { border-color: rgba(255,107,107,0.3); }
+    .shop-item-row.type-defensive { border-color: rgba(204,93,232,0.35); }
     .si-emoji { font-size: 24px; flex-shrink: 0; }
     .si-info { flex: 1; min-width: 80px; }
     .si-name { font-size: 14px; font-weight: 900; color: #a8e4ff; }
     .si-desc { font-size: 11px; color: rgba(168,228,255,0.4); margin-top: 2px; letter-spacing: 0.5px; }
+    .si-meta-row { font-size: 10px; color: rgba(168,228,255,0.35); margin-top: 3px; letter-spacing: 0.5px; display:flex; gap:8px; flex-wrap:wrap; }
+    .si-meta-row span { white-space: nowrap; }
     .si-type-badge {
       font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
       padding: 2px 7px; border-radius: 5px; white-space: nowrap;
@@ -210,6 +213,7 @@
     .type-powerup .si-type-badge { background: rgba(107,203,119,0.15); color: #6bcb77; border: 1px solid rgba(107,203,119,0.35); }
     .type-sabotage .si-type-badge { background: rgba(255,107,107,0.15); color: #ff6b6b; border: 1px solid rgba(255,107,107,0.35); }
     .type-item .si-type-badge { background: rgba(77,150,255,0.15); color: #74c0fc; border: 1px solid rgba(77,150,255,0.35); }
+    .type-defensive .si-type-badge { background: rgba(204,93,232,0.15); color: #cc5de8; border: 1px solid rgba(204,93,232,0.35); }
     .si-price {
       display: flex; align-items: center; gap: 5px;
       font-family: 'Bangers', cursive; font-size: 20px; color: #74c0fc;
@@ -248,10 +252,16 @@
     .si-desc-inp:focus { border-color:rgba(0,229,255,0.5); }
     .si-price-inp { width:68px; background:rgba(5,30,55,0.8); border:1px solid rgba(77,150,255,0.3); border-radius:9px; padding:9px 10px; color:#74c0fc; font-family:'Nunito',sans-serif; font-size:14px; font-weight:700; text-align:center; outline:none; transition:border-color 0.2s; }
     .si-price-inp:focus { border-color:rgba(77,150,255,0.7); }
+    .si-dur-inp { width:64px; background:rgba(5,30,55,0.8); border:1px solid rgba(107,203,119,0.3); border-radius:9px; padding:9px 8px; color:#6bcb77; font-family:'Nunito',sans-serif; font-size:13px; font-weight:700; text-align:center; outline:none; transition:border-color 0.2s; }
+    .si-dur-inp:focus { border-color:rgba(107,203,119,0.7); }
     .si-type-select { background:rgba(5,30,55,0.8); border:1px solid rgba(255,255,255,0.15); border-radius:9px; padding:9px 10px; color:#a8e4ff; font-family:'Nunito',sans-serif; font-size:13px; font-weight:700; outline:none; cursor:pointer; }
+    .si-effect-select { background:rgba(5,30,55,0.8); border:1px solid rgba(204,93,232,0.3); border-radius:9px; padding:9px 10px; color:#cc5de8; font-family:'Nunito',sans-serif; font-size:13px; font-weight:700; outline:none; cursor:pointer; }
     .si-repurchase-select { background:rgba(5,30,55,0.8); border:1px solid rgba(77,150,255,0.2); border-radius:9px; padding:9px 10px; color:#74c0fc; font-family:'Nunito',sans-serif; font-size:13px; font-weight:700; outline:none; cursor:pointer; }
+    .si-target-label { display:flex; align-items:center; gap:6px; font-size:12px; color:rgba(168,228,255,0.55); font-weight:700; background:rgba(5,30,55,0.8); border:1px solid rgba(255,107,107,0.25); border-radius:9px; padding:9px 12px; white-space:nowrap; cursor:pointer; }
     .add-si-btn { font-family:'Bangers',cursive; font-size:17px; letter-spacing:1px; padding:9px 20px; border-radius:10px; border:2px solid #4d96ff; box-shadow:0 0 10px rgba(77,150,255,0.3); cursor:pointer; background:rgba(2,11,24,0.85); color:white; transition:transform 0.1s,box-shadow 0.2s; white-space:nowrap; }
     .add-si-btn:hover { transform:translateY(-2px); box-shadow:0 0 20px rgba(77,150,255,0.6); }
+    .starter-pack-btn { font-family:'Bangers',cursive; font-size:16px; letter-spacing:1px; padding:10px 20px; border-radius:10px; border:2px solid #cc5de8; box-shadow:0 0 10px rgba(204,93,232,0.3); cursor:pointer; background:rgba(2,11,24,0.85); color:white; transition:transform 0.1s,box-shadow 0.2s; white-space:nowrap; margin-bottom: 14px; width: 100%; }
+    .starter-pack-btn:hover { transform:translateY(-2px); box-shadow:0 0 22px rgba(204,93,232,0.6); }
     .shop-hint { font-size:11px; color:rgba(168,228,255,0.3); margin-top:8px; letter-spacing:1px; }
 
     /* Shop purchase log */
@@ -264,21 +274,26 @@
     .shop-log-type.powerup { background:rgba(107,203,119,0.15); color:#6bcb77; }
     .shop-log-type.sabotage { background:rgba(255,107,107,0.15); color:#ff6b6b; }
     .shop-log-type.item { background:rgba(77,150,255,0.15); color:#74c0fc; }
+    .shop-log-type.defensive { background:rgba(204,93,232,0.15); color:#cc5de8; }
+    .shop-log-result { font-size:10px; font-weight:700; letter-spacing:1px; padding:2px 6px; border-radius:5px; white-space:nowrap; text-transform:uppercase; background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.6); }
+    .shop-log-result.blocked { background:rgba(204,93,232,0.18); color:#cc5de8; }
+    .shop-log-result.reflected { background:rgba(77,150,255,0.18); color:#4d96ff; }
     .shop-log-time { color:rgba(168,228,255,0.35); font-size:11px; white-space:nowrap; }
     .shop-log-empty { font-size:13px; color:rgba(168,228,255,0.3); text-align:center; padding:14px 0; }
 
-    /* Wheel spin log */
-    .wheel-log { max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 7px; }
-    .wheel-log-row { background:rgba(2,11,24,0.5); border-radius:9px; border:1px solid rgba(204,93,232,0.2); padding:9px 14px; display:flex; align-items:center; gap:10px; font-size:13px; flex-wrap:wrap; }
-    .wheel-log-team { font-weight:900; color:#cc5de8; white-space:nowrap; }
-    .wheel-log-label { flex:1; color:#a8e4ff; min-width:80px; }
-    .wheel-log-msg { flex-basis:100%; font-size:11px; color:rgba(168,228,255,0.45); font-style:italic; padding-left:2px; }
-    .wheel-log-coins { font-weight:700; white-space:nowrap; font-family:'Bangers',cursive; font-size:16px; }
-    .wheel-log-coins.pos { color:#6bcb77; }
-    .wheel-log-coins.neg { color:#ff6b6b; }
-    .wheel-log-coins.zero { color:rgba(168,228,255,0.35); font-family:'Nunito',sans-serif; font-size:12px; font-weight:700; }
-    .wheel-log-time { color:rgba(168,228,255,0.35); font-size:11px; white-space:nowrap; }
-    .wheel-log-empty { font-size:13px; color:rgba(168,228,255,0.3); text-align:center; padding:14px 0; }
+    /* ACTIVE EFFECTS BOARD (admin) */
+    .effects-card { border-color: rgba(255,169,77,0.25); }
+    .effects-team-block { background: rgba(2,11,24,0.55); border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 8px; padding: 10px 14px; }
+    .effects-team-header { font-size: 13px; font-weight: 900; margin-bottom: 6px; display:flex; align-items:center; gap:8px; }
+    .effects-row { display:flex; align-items:center; gap:8px; padding:5px 0; font-size:12px; flex-wrap:wrap; }
+    .effects-row .eff-label { flex:1; color:#a8e4ff; }
+    .effects-row .eff-label.sabotage-label { color:#ff8787; }
+    .effects-row .eff-countdown { font-family:'Bangers',cursive; font-size:14px; color:#ffa94d; white-space:nowrap; }
+    .effects-row .eff-clear { width:22px;height:22px;border-radius:6px;border:1px solid rgba(255,107,107,0.35);background:rgba(2,11,24,0.8);color:#ff6b6b;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0 }
+    .effects-row .eff-clear:hover { background:rgba(255,64,64,0.15) }
+    .effects-empty-note { font-size:11px; color:rgba(168,228,255,0.25); padding:4px 0; }
+    .effects-defense-badges { display:flex; gap:6px; flex-wrap:wrap; margin-top:4px; }
+    .defense-badge { font-size:11px; font-weight:700; padding:3px 9px; border-radius:7px; background:rgba(204,93,232,0.12); border:1px solid rgba(204,93,232,0.3); color:#cc5de8; white-space:nowrap; }
 
     /* SLOTS */
     .slot-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
@@ -463,26 +478,39 @@
       </label>
       <span style="font-size:12px;color:rgba(168,228,255,0.4);letter-spacing:1px">Teams spend Mako Coins on power-ups &amp; sabotages</span>
     </div>
+    <button class="starter-pack-btn" onclick="loadStarterPack()">📦 LOAD STARTER PACK (power-ups, sabotages &amp; defensive items)</button>
     <div class="shop-item-list" id="shopItemList">
-      <div style="font-size:13px;color:rgba(168,228,255,0.3);text-align:center;padding:10px 0">No shop items yet — add some below</div>
+      <div style="font-size:13px;color:rgba(168,228,255,0.3);text-align:center;padding:10px 0">No shop items yet — add some below, or load the starter pack above</div>
     </div>
     <div class="add-shop-row">
       <input class="si-emoji-inp" type="text" id="newSiEmoji" value="⚡" maxlength="4" title="Emoji icon">
       <input class="si-name-inp" type="text" id="newSiName" placeholder="Item name…" maxlength="40">
       <input class="si-desc-inp" type="text" id="newSiDesc" placeholder="Short description (optional)…" maxlength="80">
       <input class="si-price-inp" type="number" id="newSiPrice" value="5" min="1" max="9999" title="Mako Coin cost">
-      <select class="si-type-select" id="newSiType">
+      <input class="si-dur-inp" type="number" id="newSiDuration" value="0" min="0" max="999" title="Active duration in minutes — 0 = instant, no timer">
+      <select class="si-type-select" id="newSiType" onchange="onNewSiTypeChange()">
         <option value="powerup">⚡ Power-up</option>
         <option value="sabotage">💀 Sabotage</option>
+        <option value="defensive">🛡️ Defensive</option>
         <option value="item">🛒 Item</option>
       </select>
+      <select class="si-effect-select" id="newSiEffect" style="display:none">
+        <option value="">— label only —</option>
+        <option value="shield">🛡️ Shield (blocks 1 sabotage)</option>
+        <option value="super_shield">🛡️🛡️ Super Shield (blocks all, timed)</option>
+        <option value="reflector">🔄 Reflector (bounces 1 sabotage back)</option>
+        <option value="cancel_card">❌ Cancel Card (cancels a power-up)</option>
+      </select>
+      <label class="si-target-label" id="newSiTargetLabel" style="display:none">
+        <input type="checkbox" id="newSiRequiresTarget" checked style="width:14px;height:14px"> Needs target team
+      </label>
       <select class="si-repurchase-select" id="newSiRepurchasable" title="Can teams buy this more than once?">
         <option value="true">🔁 Re-buyable</option>
         <option value="false">1️⃣ One-time only</option>
       </select>
       <button class="add-si-btn" onclick="addShopItem()">+ ADD</button>
     </div>
-    <div class="shop-hint">Emoji · Name · Description · Price · Type · Re-buyable?</div>
+    <div class="shop-hint">Emoji · Name · Description · Price · Duration (min, 0=instant) · Type · Effect (defensive only) · Re-buyable?</div>
   </div>
 
   <!-- SHOP PURCHASE LOG -->
@@ -492,6 +520,13 @@
       <button class="clear-log-btn" onclick="clearShopLog()">Clear</button>
     </div>
     <div class="shop-log" id="shopLog"><div class="shop-log-empty">No purchases yet</div></div>
+  </div>
+
+  <!-- ACTIVE EFFECTS BOARD -->
+  <div class="card effects-card">
+    <div class="card-title">🎯 Active Effects (power-ups, sabotages &amp; defenses)</div>
+    <p style="font-size:11px;color:rgba(168,228,255,0.35);margin-bottom:12px;letter-spacing:0.5px">Live view of what's active on each team. Use ✕ to manually clear anything in case of a dispute.</p>
+    <div id="effectsBoard">Loading...</div>
   </div>
 
   <!-- SPIN THE WHEEL -->
@@ -1216,6 +1251,65 @@ async function resetAllCurrency(){
 
 /* ── MAKO SHOP (ADMIN) ── */
 let shopItems=[];
+
+/* Starter pack: everything from the power-up / sabotage / defensive list.
+   durationMinutes: 0 = instant (label-only, no live countdown anywhere).
+   requiresTarget: true for every sabotage + the Cancel Card (needs to pick
+   who it hits). Prices are rough defaults based on Low/Medium/High — the
+   admin can edit any of them afterwards, same as any other shop item. */
+const STARTER_PACK = [
+  // POWER-UPS
+  {emoji:'🏊',name:'Speed Boost',description:'One swimmer may wear fins for 10 minutes.',price:5,type:'powerup',durationMinutes:10,requiresTarget:false,effectKey:''},
+  {emoji:'💪',name:'Full Power',description:'One swimmer may use fins and paddles for 10 minutes.',price:8,type:'powerup',durationMinutes:10,requiresTarget:false,effectKey:''},
+  {emoji:'🦈',name:'Shark Attack',description:'Your fastest swimmer may complete 10 extra minutes of swimming for the team.',price:8,type:'powerup',durationMinutes:10,requiresTarget:false,effectKey:''},
+  {emoji:'👥',name:'Double Trouble',description:'Two swimmers may swim at the same time for 10 minutes.',price:8,type:'powerup',durationMinutes:10,requiresTarget:false,effectKey:''},
+  {emoji:'📈',name:'Double Points',description:'Every length completed by your team during the next 10 minutes counts double.',price:8,type:'powerup',durationMinutes:10,requiresTarget:false,effectKey:''},
+  {emoji:'🚀',name:'Turbo Start',description:'A swimmer may use fins for 200m.',price:3,type:'powerup',durationMinutes:0,requiresTarget:false,effectKey:''},
+  {emoji:'🔄',name:'Fresh Legs',description:'Swap your current swimmer immediately without losing time.',price:5,type:'powerup',durationMinutes:0,requiresTarget:false,effectKey:''},
+  {emoji:'🎯',name:"Coach's Choice",description:'Your Team Manager chooses which swimmer completes the next 10 minutes, regardless of the original order.',price:5,type:'powerup',durationMinutes:10,requiresTarget:false,effectKey:''},
+  {emoji:'⭐',name:'Golden Minute',description:'All lengths swum during the next 5 minutes count triple.',price:8,type:'powerup',durationMinutes:5,requiresTarget:false,effectKey:''},
+  // SABOTAGES (all target an opposing team)
+  {emoji:'👕',name:'T-Shirt Challenge',description:'Opposing swimmer from another team must wear a cotton T-shirt for 10 minutes.',price:5,type:'sabotage',durationMinutes:10,requiresTarget:true,effectKey:''},
+  {emoji:'🥽',name:'Blind Faith',description:'Opposing swimmer swims 5 minutes without goggles.',price:5,type:'sabotage',durationMinutes:5,requiresTarget:true,effectKey:''},
+  {emoji:'🐶',name:'Doggy Paddle',description:'Opposing swimmer must swim 10 lengths using doggy paddle only.',price:5,type:'sabotage',durationMinutes:0,requiresTarget:true,effectKey:''},
+  {emoji:'🔄',name:'No Breakouts',description:'Opposing swimmer completes 20 laps using only tumble turns with no underwater breakouts.',price:5,type:'sabotage',durationMinutes:0,requiresTarget:true,effectKey:''},
+  {emoji:'👟',name:'Shoe Swim',description:'Opposing swimmer swims wearing running shoes for 10 minutes.',price:8,type:'sabotage',durationMinutes:10,requiresTarget:true,effectKey:''},
+  {emoji:'🦆',name:'Cross Legs',description:'Opposing swimmer completes 200m cross-legged dolphin kick (or modified cross-leg swimming challenge).',price:5,type:'sabotage',durationMinutes:0,requiresTarget:true,effectKey:''},
+  {emoji:'🛑',name:'Time Out',description:'Entire team must stop swimming for 5 minutes.',price:8,type:'sabotage',durationMinutes:5,requiresTarget:true,effectKey:''},
+  {emoji:'🐢',name:'Slow Lane',description:'Opposing swimmer may only use breaststroke for 10 minutes.',price:5,type:'sabotage',durationMinutes:10,requiresTarget:true,effectKey:''},
+  {emoji:'🖐️',name:'One Arm',description:'Swim 100m using one arm only (alternate arms every 25m).',price:3,type:'sabotage',durationMinutes:0,requiresTarget:true,effectKey:''},
+  {emoji:'🤿',name:'No Underwater',description:'No streamline or dolphin kicks off walls for 10 minutes.',price:5,type:'sabotage',durationMinutes:10,requiresTarget:true,effectKey:''},
+  {emoji:'🪨',name:'Heavy Water',description:'Swim with a kickboard held above the water for 100m.',price:3,type:'sabotage',durationMinutes:0,requiresTarget:true,effectKey:''},
+  {emoji:'🦀',name:'Crab Kick',description:'Complete 100m using breaststroke kick only.',price:3,type:'sabotage',durationMinutes:0,requiresTarget:true,effectKey:''},
+  {emoji:'🔁',name:'Reverse Order',description:"Opposing team must immediately swap to their next swimmer.",price:5,type:'sabotage',durationMinutes:0,requiresTarget:true,effectKey:''},
+  {emoji:'🚫',name:'No Fins',description:'Opposing team may not use any fins or paddles for the next 10 minutes.',price:5,type:'sabotage',durationMinutes:10,requiresTarget:true,effectKey:''},
+  {emoji:'😵',name:'Dizzy Start',description:'Swimmer must perform 10 star jumps before entering the pool.',price:3,type:'sabotage',durationMinutes:0,requiresTarget:true,effectKey:''},
+  // DEFENSIVE (auto-coded)
+  {emoji:'🛡️',name:'Shield',description:'Blocks the next sabotage aimed at you.',price:6,type:'defensive',durationMinutes:0,requiresTarget:false,effectKey:'shield'},
+  {emoji:'🛡️🛡️',name:'Super Shield',description:'Blocks ALL sabotages aimed at you for 10 minutes.',price:12,type:'defensive',durationMinutes:10,requiresTarget:false,effectKey:'super_shield'},
+  {emoji:'🔄',name:'Reflector',description:'The next sabotage aimed at you bounces back onto whoever bought it.',price:8,type:'defensive',durationMinutes:0,requiresTarget:false,effectKey:'reflector'},
+  {emoji:'❌',name:'Cancel Card',description:"Cancel a power-up currently active on another team.",price:8,type:'defensive',durationMinutes:0,requiresTarget:true,effectKey:'cancel_card'},
+];
+
+async function loadStarterPack(){
+  if(!confirm('Load the starter pack? This adds every power-up, sabotage & defensive item that isn\'t already in your shop (matched by name) — it will NOT duplicate or overwrite existing items.'))return;
+  const existingNames=new Set(shopItems.map(i=>(i.name||'').trim().toLowerCase()));
+  const updates={};
+  let added=0;
+  STARTER_PACK.forEach((tpl,i)=>{
+    if(existingNames.has(tpl.name.trim().toLowerCase()))return;
+    const id='si_'+Date.now()+'_'+i;
+    const item={...tpl,repurchasable:true,enabled:true,sortOrder:shopItems.length+added};
+    updates[id]=item;
+    shopItems.push({id,...item});
+    added++;
+  });
+  if(added===0){toast('Starter pack items are all already in your shop!');return;}
+  await fetch(FB+'/shopItems.json',{method:'PATCH',body:JSON.stringify(updates)});
+  renderShopItemList();
+  toast(`📦 Added ${added} starter item${added!==1?'s':''} to the shop!`);
+}
+
 async function loadShopData(){
   const [itemsRes,settingsRes]=await Promise.all([fetch(FB+'/shopItems.json'),fetch(FB+'/shopSettings.json')]);
   const itemsData=(await itemsRes.json())||{};const settingsData=(await settingsRes.json())||{};
@@ -1223,21 +1317,54 @@ async function loadShopData(){
   shopItems=Object.entries(itemsData).map(([id,v])=>({id,...v})).sort((a,b)=>(a.sortOrder||99)-(b.sortOrder||99)||(a.name||'').localeCompare(b.name||''));
   renderShopItemList();
 }
-function getShopTypeClass(type){if(type==='powerup')return'type-powerup';if(type==='sabotage')return'type-sabotage';return'type-item';}
-function getShopTypeBadge(type){if(type==='powerup')return'⚡ POWER-UP';if(type==='sabotage')return'💀 SABOTAGE';return'🛒 ITEM';}
+function getShopTypeClass(type){if(type==='powerup')return'type-powerup';if(type==='sabotage')return'type-sabotage';if(type==='defensive')return'type-defensive';return'type-item';}
+function getShopTypeBadge(type){if(type==='powerup')return'⚡ POWER-UP';if(type==='sabotage')return'💀 SABOTAGE';if(type==='defensive')return'🛡️ DEFENSIVE';return'🛒 ITEM';}
+function getEffectLabel(key){
+  if(key==='shield')return'🛡️ Shield: blocks 1 sabotage';
+  if(key==='super_shield')return'🛡️🛡️ Super Shield: blocks all, timed';
+  if(key==='reflector')return'🔄 Reflector: bounces 1 sabotage back';
+  if(key==='cancel_card')return'❌ Cancel Card: cancels a power-up';
+  return'';
+}
+
+function onNewSiTypeChange(){
+  const type=document.getElementById('newSiType').value;
+  const effectSel=document.getElementById('newSiEffect');
+  const targetLabel=document.getElementById('newSiTargetLabel');
+  const targetCheck=document.getElementById('newSiRequiresTarget');
+  effectSel.style.display=type==='defensive'?'inline-block':'none';
+  targetLabel.style.display=(type==='sabotage'||type==='defensive')?'flex':'none';
+  targetCheck.checked = type==='sabotage'; // default on for sabotage; defensive items normally don't need a target unless it's the Cancel Card (handled by effect change)
+  if(type==='defensive') onNewSiEffectChange();
+}
+function onNewSiEffectChange(){
+  const effect=document.getElementById('newSiEffect').value;
+  const targetCheck=document.getElementById('newSiRequiresTarget');
+  if(effect==='cancel_card') targetCheck.checked=true;
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  const effSel=document.getElementById('newSiEffect');
+  if(effSel) effSel.addEventListener('change',onNewSiEffectChange);
+});
 
 function renderShopItemList(){
   const el=document.getElementById('shopItemList');
-  if(shopItems.length===0){el.innerHTML='<div style="font-size:13px;color:rgba(168,228,255,0.3);text-align:center;padding:10px 0">No shop items yet — add some below</div>';return;}
+  if(shopItems.length===0){el.innerHTML='<div style="font-size:13px;color:rgba(168,228,255,0.3);text-align:center;padding:10px 0">No shop items yet — add some below, or load the starter pack above</div>';return;}
   el.innerHTML=shopItems.map(item=>{
     const typeClass=getShopTypeClass(item.type);
     // repurchasable defaults to true if not set
     const isRepurchasable=item.repurchasable!==false;
+    const metaBits=[];
+    if(item.durationMinutes>0) metaBits.push(`⏱ ${item.durationMinutes} min`);
+    else metaBits.push('⚡ instant');
+    if(item.requiresTarget) metaBits.push('🎯 needs target team');
+    if(item.effectKey) metaBits.push(getEffectLabel(item.effectKey));
     return `<div class="shop-item-row ${item.enabled!==false?'enabled':''} ${typeClass}" id="shoprow_${item.id}">
       <div class="si-emoji">${item.emoji||'🛒'}</div>
       <div class="si-info">
         <div class="si-name">${item.name}</div>
         ${item.description?`<div class="si-desc">${item.description}</div>`:''}
+        <div class="si-meta-row">${metaBits.map(b=>`<span>${b}</span>`).join('')}</div>
       </div>
       <div class="si-type-badge">${getShopTypeBadge(item.type)}</div>
       <div class="si-price">
@@ -1265,16 +1392,21 @@ function renderShopItemList(){
 async function addShopItem(){
   const emojiEl=document.getElementById('newSiEmoji');const nameEl=document.getElementById('newSiName');
   const descEl=document.getElementById('newSiDesc');const priceEl=document.getElementById('newSiPrice');
+  const durEl=document.getElementById('newSiDuration');
   const typeEl=document.getElementById('newSiType');const repurchEl=document.getElementById('newSiRepurchasable');
+  const effectEl=document.getElementById('newSiEffect');const targetCheckEl=document.getElementById('newSiRequiresTarget');
   const name=nameEl.value.trim();if(!name){nameEl.focus();return;}
   const emoji=emojiEl.value.trim()||'🛒';const description=descEl.value.trim();
   const price=Math.max(1,parseInt(priceEl.value)||5);const type=typeEl.value||'item';
+  const durationMinutes=Math.max(0,parseInt(durEl.value)||0);
   const repurchasable=repurchEl.value!=='false'; // true unless explicitly "false"
+  const effectKey=type==='defensive'?(effectEl.value||''):'';
+  const requiresTarget=(type==='sabotage'||type==='defensive')?!!targetCheckEl.checked:false;
   const id='si_'+Date.now();
-  const item={emoji,name,description,price,type,repurchasable,enabled:true,sortOrder:shopItems.length};
+  const item={emoji,name,description,price,type,durationMinutes,requiresTarget,effectKey,repurchasable,enabled:true,sortOrder:shopItems.length};
   await fetch(FB+'/shopItems/'+id+'.json',{method:'PUT',body:JSON.stringify(item)});
   shopItems.push({id,...item});renderShopItemList();
-  nameEl.value='';descEl.value='';emojiEl.value='⚡';priceEl.value='5';
+  nameEl.value='';descEl.value='';emojiEl.value='⚡';priceEl.value='5';durEl.value='0';
   nameEl.focus();toast('✅ Shop item added!');
 }
 async function deleteShopItem(id){
@@ -1309,9 +1441,20 @@ async function loadShopLog(){
   if(entries.length===0){el.innerHTML='<div class="shop-log-empty">No purchases yet</div>';return;}
   el.innerHTML=entries.map(p=>{
     const teamName=teamNames[p.team]||p.team;const d=new Date(p.time);const timeStr=d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});const typeClass=p.itemType||'item';
+    let targetHTML='';
+    if(p.targetTeam){
+      const targetName=teamNames[p.targetTeam]||p.targetTeam;
+      targetHTML=`<span style="font-size:11px;color:rgba(168,228,255,0.45)">→ ${targetName}</span>`;
+    }
+    let resultHTML='';
+    if(p.result==='blocked') resultHTML=`<span class="shop-log-result blocked">🛡️ BLOCKED</span>`;
+    else if(p.result==='reflected') resultHTML=`<span class="shop-log-result reflected">🔄 REFLECTED</span>`;
+    else if(p.result==='cancelled') resultHTML=`<span class="shop-log-result">❌ CANCELLED ${p.cancelledItemName||''}</span>`;
     return`<div class="shop-log-row">
       <span class="shop-log-team">${p.itemEmoji||'🛒'} ${teamName}</span>
       <span class="shop-log-item">${p.itemName}</span>
+      ${targetHTML}
+      ${resultHTML}
       <span class="shop-log-type ${typeClass}">${getShopTypeBadge(p.itemType||'item')}</span>
       <span class="shop-log-cost">-${p.cost} 🪙</span>
       <span class="shop-log-time">${timeStr}</span>
@@ -1319,6 +1462,67 @@ async function loadShopLog(){
   }).join('');
 }
 async function clearShopLog(){if(!confirm('Clear the shop purchase log?'))return;await fetch(FB+'/shopPurchases.json',{method:'DELETE'});toast('Shop log cleared');loadShopLog();}
+
+/* ── ACTIVE EFFECTS BOARD (admin) ──
+   Live view of /activePowerups/{team}, /activeSabotages/{team} and
+   /defenses/{team} for every team, each with a manual ✕ to clear in case
+   of a scoring dispute or a referee override. */
+async function loadEffectsBoard(){
+  try{
+    const [puRes,saRes,defRes]=await Promise.all([
+      fetch(FB+'/activePowerups.json'),fetch(FB+'/activeSabotages.json'),fetch(FB+'/defenses.json')
+    ]);
+    const puData=(await puRes.json())||{};
+    const saData=(await saRes.json())||{};
+    const defData=(await defRes.json())||{};
+    const now=Date.now();
+    const el=document.getElementById('effectsBoard');
+    el.innerHTML=TEAMS.map(k=>{
+      const name=teamNames[k]||'Team '+k.replace('team','');
+      const powerups=Object.entries(puData[k]||{}).filter(([id,p])=>!p.expiresAt||p.expiresAt>now);
+      const sabotages=Object.entries(saData[k]||{}).filter(([id,s])=>!s.expiresAt||s.expiresAt>now);
+      const def=defData[k]||{};
+      const badges=[];
+      if((def.shieldCount||0)>0) badges.push(`<span class="defense-badge">🛡️ Shield ×${def.shieldCount}</span>`);
+      if((def.reflectorCount||0)>0) badges.push(`<span class="defense-badge">🔄 Reflector ×${def.reflectorCount}</span>`);
+      if(def.superShieldExpiresAt&&def.superShieldExpiresAt>now) badges.push(`<span class="defense-badge" data-expires="${def.superShieldExpiresAt}" id="ssbadge_${k}">🛡️🛡️ Super Shield —</span>`);
+      if(powerups.length===0&&sabotages.length===0&&badges.length===0){
+        return `<div class="effects-team-block"><div class="effects-team-header" style="color:${COLORS[k]}">${name}</div><div class="effects-empty-note">Nothing active</div></div>`;
+      }
+      const puRows=powerups.map(([id,p])=>`<div class="effects-row" data-expires="${p.expiresAt||0}"><span class="eff-label">⚡ ${p.name}</span><span class="eff-countdown" id="eff_pu_${k}_${id}"></span><button class="eff-clear" onclick="clearEffect('activePowerups','${k}','${id}')">✕</button></div>`).join('');
+      const saRows=sabotages.map(([id,s])=>`<div class="effects-row" data-expires="${s.expiresAt||0}"><span class="eff-label sabotage-label">💀 ${s.name} <span style="opacity:0.5">(from ${teamNames[s.fromTeam]||s.fromTeam})</span></span><span class="eff-countdown" id="eff_sa_${k}_${id}"></span><button class="eff-clear" onclick="clearEffect('activeSabotages','${k}','${id}')">✕</button></div>`).join('');
+      return `<div class="effects-team-block">
+        <div class="effects-team-header" style="color:${COLORS[k]}">${name}</div>
+        ${puRows}${saRows}
+        ${badges.length?`<div class="effects-defense-badges">${badges.join('')}</div>`:''}
+      </div>`;
+    }).join('');
+    tickEffectsBoard();
+  }catch(e){}
+}
+function tickEffectsBoard(){
+  const now=Date.now();
+  document.querySelectorAll('.effects-row[data-expires]').forEach(row=>{
+    const exp=parseInt(row.getAttribute('data-expires'))||0;
+    const countdownEl=row.querySelector('.eff-countdown');
+    if(!countdownEl)return;
+    if(exp<=0){countdownEl.textContent='instant';return;}
+    const remaining=Math.max(0,Math.round((exp-now)/1000));
+    const m=Math.floor(remaining/60);const s=remaining%60;
+    countdownEl.textContent=remaining>0?`${m}:${String(s).padStart(2,'0')}`:'expired';
+  });
+  document.querySelectorAll('[id^="ssbadge_"]').forEach(badge=>{
+    const exp=parseInt(badge.getAttribute('data-expires'))||0;
+    const remaining=Math.max(0,Math.round((exp-now)/1000));
+    const m=Math.floor(remaining/60);const s=remaining%60;
+    badge.textContent=`🛡️🛡️ Super Shield — ${m}:${String(s).padStart(2,'0')}`;
+  });
+}
+async function clearEffect(pathRoot,team,id){
+  await fetch(FB+'/'+pathRoot+'/'+team+'/'+id+'.json',{method:'DELETE'});
+  toast('✕ Effect cleared');
+  loadEffectsBoard();
+}
 
 /* ── WHEEL ── */
 const WHEEL_COLORS=['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#ff922b','#cc5de8','#20c997','#f06595','#74c0fc','#a9e34b','#ffa94d','#e64980','#339af0','#51cf66','#ff6b6b'];
@@ -1424,13 +1628,15 @@ async function init(){
   await loadTeamNames();
   await loadStartingBalances();
   loadScores();loadSlots();loadRosters();loadEvents();loadCompletionsLog();loadWheelData();loadCurrency();
-  loadShopData();loadShopLog();loadFundraising();loadWheelLog();
+  loadShopData();loadShopLog();loadFundraising();loadWheelLog();loadEffectsBoard();
+  onNewSiTypeChange();
   setInterval(loadScores,3000);setInterval(loadSlots,3000);setInterval(syncTimerUI,1000);
   setInterval(updateNextEventRow,1000);setInterval(loadCompletionsLog,3000);
   setInterval(tickActiveEventTimer,1000);setInterval(loadCurrency,5000);
   setInterval(loadShopLog,5000);setInterval(loadFundraising,4000);
   setInterval(renderTeamSummary,3000);
   setInterval(loadWheelLog,4000);
+  setInterval(loadEffectsBoard,4000);setInterval(tickEffectsBoard,1000);
   // Keeps the "Currently Active" box in sync even when a challenge was
   // auto-fired by a completely different open page (see
   // checkAndFireScheduledEvent), and drives the Firebase-backed auto-fire
