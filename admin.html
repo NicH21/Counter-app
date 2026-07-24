@@ -220,6 +220,13 @@
       white-space: nowrap;
     }
     .si-price-img { width: 20px; height: 20px; border-radius: 50%; object-fit: contain; }
+    .si-price-edit-inp {
+      width: 54px; background: rgba(2,11,24,0.6); border: 1px solid rgba(77,150,255,0.35);
+      border-radius: 7px; padding: 4px 6px; color: #74c0fc; font-family: 'Bangers', cursive;
+      font-size: 18px; text-align: center; outline: none; transition: border-color 0.2s, background 0.2s;
+    }
+    .si-price-edit-inp:hover { border-color: rgba(77,150,255,0.6); }
+    .si-price-edit-inp:focus { border-color: rgba(77,150,255,0.9); background: rgba(2,11,24,0.85); }
 
     /* Repurchasable toggle label */
     .si-repurchase-wrap {
@@ -1367,9 +1374,11 @@ function renderShopItemList(){
         <div class="si-meta-row">${metaBits.map(b=>`<span>${b}</span>`).join('')}</div>
       </div>
       <div class="si-type-badge">${getShopTypeBadge(item.type)}</div>
-      <div class="si-price">
+      <div class="si-price" title="Edit and click away (or press Enter) to save">
         <img class="si-price-img" src="${MAKO_IMG}" alt="Mako">
-        ${item.price||0}
+        <input class="si-price-edit-inp" type="number" min="1" max="9999" value="${item.price||0}"
+          onchange="updateShopItemPrice('${item.id}',this.value)"
+          onkeydown="if(event.key==='Enter')this.blur()">
       </div>
       <!-- Repurchasable toggle -->
       <div class="si-repurchase-wrap" title="${isRepurchasable?'Re-buyable — teams can buy multiple times':'One-time only — greyed out after purchase'}">
@@ -1413,6 +1422,13 @@ async function deleteShopItem(id){
   if(!confirm('Remove this shop item?'))return;
   await fetch(FB+'/shopItems/'+id+'.json',{method:'DELETE'});
   shopItems=shopItems.filter(i=>i.id!==id);renderShopItemList();toast('🗑 Item removed');
+}
+async function updateShopItemPrice(id,value){
+  const item=shopItems.find(i=>i.id===id);if(!item)return;
+  const price=Math.max(1,parseInt(value)||1);
+  item.price=price;
+  await fetch(FB+'/shopItems/'+id+'/price.json',{method:'PUT',body:JSON.stringify(price)});
+  toast(`💰 ${item.name} price set to ${price} 🪙`);
 }
 async function toggleShopItem(id,enabled){
   const item=shopItems.find(i=>i.id===id);if(!item)return;
