@@ -44,6 +44,21 @@
     @keyframes coinBump{0%{transform:scale(1)}40%{transform:scale(1.3)}100%{transform:scale(1)}}
     .coin-icon-img{width:48px;height:48px;object-fit:contain;border-radius:50%;flex-shrink:0;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.6))}
 
+    /* ══ ACTIVE EFFECTS BARS ══ */
+    .effects-bars { width:100%; max-width:480px; display:flex; flex-direction:column; gap:10px; }
+    .effects-bar-section { display:none; }
+    .effects-bar-section.visible { display:block; }
+    .effects-bar-title { font-size:11px; letter-spacing:2px; text-transform:uppercase; color:rgba(168,228,255,0.5); margin-bottom:8px; text-align:center; }
+    .effects-chip-row { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
+    .effect-chip { display:flex; align-items:center; gap:6px; background:rgba(5,20,40,0.8); border:1.5px solid rgba(107,203,119,0.4); border-radius:12px; padding:8px 14px; font-size:13px; font-weight:700; color:#a8e4ff; }
+    .effect-chip.sabotage { border-color:rgba(255,107,107,0.5); background:rgba(255,107,107,0.08); }
+    .effect-chip .chip-emoji { font-size:16px; }
+    .effect-chip .chip-countdown { font-family:'Bangers',cursive; font-size:15px; color:#f0c040; }
+    .effect-chip.sabotage .chip-countdown { color:#ff8787; }
+    .effect-chip .chip-from { font-size:10px; color:rgba(168,228,255,0.4); font-weight:400; }
+    .defense-chip-row { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
+    .defense-chip { display:flex; align-items:center; gap:6px; background:rgba(204,93,232,0.1); border:1.5px solid rgba(204,93,232,0.4); border-radius:12px; padding:7px 12px; font-size:12px; font-weight:700; color:#cc5de8; }
+
     /* CHALLENGE BANNER */
     .challenge-banner { display:none; position:relative; width:100%; max-width:420px; background:linear-gradient(135deg,rgba(255,165,0,0.12),rgba(255,100,0,0.08)); border:2px solid rgba(255,165,0,0.6); border-radius:20px; padding:20px 22px; text-align:center; box-shadow:0 0 30px rgba(255,165,0,0.25); animation:bannerPulse 2s ease-in-out infinite; }
     .challenge-banner.visible{display:block}
@@ -244,7 +259,7 @@
     }
     .swimmer-row:hover { border-color: rgba(0,229,255,0.4); background: rgba(5,20,40,0.8); }
     .swimmer-row.is-active {
-      display: none; /* the active swimmer is shown big above, not in the small list */
+      display: none; /* the active swimmer is shown big above, not duplicated here */
     }
     .swimmer-row-name {
       flex: 1;
@@ -433,6 +448,8 @@
     .shop-item.powerup::before { background: linear-gradient(135deg, rgba(107,203,119,0.08), transparent); }
     .shop-item.sabotage { border-color: rgba(255,107,107,0.3); }
     .shop-item.sabotage::before { background: linear-gradient(135deg, rgba(255,107,107,0.08), transparent); }
+    .shop-item.defensive { border-color: rgba(204,93,232,0.35); }
+    .shop-item.defensive::before { background: linear-gradient(135deg, rgba(204,93,232,0.08), transparent); }
 
     .shop-item:hover:not(.cant-afford):not(.already-owned) {
       transform: translateY(-3px) scale(1.02);
@@ -440,6 +457,7 @@
     }
     .shop-item.powerup:hover:not(.cant-afford):not(.already-owned) { box-shadow: 0 0 24px rgba(107,203,119,0.4); border-color: rgba(107,203,119,0.7); }
     .shop-item.sabotage:hover:not(.cant-afford):not(.already-owned) { box-shadow: 0 0 24px rgba(255,107,107,0.4); border-color: rgba(255,107,107,0.7); }
+    .shop-item.defensive:hover:not(.cant-afford):not(.already-owned) { box-shadow: 0 0 24px rgba(204,93,232,0.4); border-color: rgba(204,93,232,0.7); }
     .shop-item.cant-afford { opacity: 0.45; cursor: not-allowed; transform: none !important; }
     .shop-item.already-owned { opacity: 0.4; cursor: not-allowed; transform: none !important; }
 
@@ -483,6 +501,7 @@
     }
     .shop-item.powerup .shop-item-type-badge { background: rgba(107,203,119,0.15); color: #6bcb77; border: 1px solid rgba(107,203,119,0.35); }
     .shop-item.sabotage .shop-item-type-badge { background: rgba(255,107,107,0.15); color: #ff6b6b; border: 1px solid rgba(255,107,107,0.35); }
+    .shop-item.defensive .shop-item-type-badge { background: rgba(204,93,232,0.15); color: #cc5de8; border: 1px solid rgba(204,93,232,0.35); }
     .shop-item-price {
       display: flex;
       align-items: center;
@@ -512,6 +531,8 @@
     .shop-item.powerup .shop-buy-btn:hover { background: rgba(107,203,119,0.15); box-shadow: 0 0 12px rgba(107,203,119,0.4); }
     .shop-item.sabotage .shop-buy-btn { border-color: rgba(255,107,107,0.5); }
     .shop-item.sabotage .shop-buy-btn:hover { background: rgba(255,107,107,0.15); box-shadow: 0 0 12px rgba(255,107,107,0.4); }
+    .shop-item.defensive .shop-buy-btn { border-color: rgba(204,93,232,0.5); }
+    .shop-item.defensive .shop-buy-btn:hover { background: rgba(204,93,232,0.15); box-shadow: 0 0 12px rgba(204,93,232,0.4); }
     .shop-buy-btn:hover { background: rgba(77,150,255,0.15); box-shadow: 0 0 12px rgba(77,150,255,0.3); }
     .shop-buy-btn:disabled { opacity: 0.4; cursor: not-allowed; }
     .shop-buy-btn span { position: relative; z-index: 2; }
@@ -586,12 +607,19 @@
       max-width: 360px;
       text-align: center;
       box-shadow: 0 0 40px rgba(77,150,255,0.2), 0 20px 60px rgba(0,0,0,0.5);
+      max-height: 85vh;
+      overflow-y: auto;
     }
     .shop-modal.powerup { border-color: rgba(107,203,119,0.45); box-shadow: 0 0 40px rgba(107,203,119,0.2), 0 20px 60px rgba(0,0,0,0.5); }
     .shop-modal.sabotage { border-color: rgba(255,107,107,0.45); box-shadow: 0 0 40px rgba(255,107,107,0.2), 0 20px 60px rgba(0,0,0,0.5); }
+    .shop-modal.defensive { border-color: rgba(204,93,232,0.45); box-shadow: 0 0 40px rgba(204,93,232,0.2), 0 20px 60px rgba(0,0,0,0.5); }
     .shop-modal-emoji { font-size: 52px; line-height: 1; margin-bottom: 10px; }
     .shop-modal-name { font-family: 'Bangers', cursive; font-size: 32px; letter-spacing: 3px; color: #a8e4ff; margin-bottom: 6px; }
     .shop-modal-desc { font-size: 13px; color: rgba(168,228,255,0.55); margin-bottom: 18px; line-height: 1.5; letter-spacing: 0.5px; }
+    .shop-modal-target-section, .shop-modal-cancel-section { margin-bottom: 16px; text-align:left; }
+    .shop-modal-target-label { font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(168,228,255,0.5); margin-bottom:6px; }
+    .shop-modal-target-select { width:100%; padding:10px 12px; border-radius:10px; border:1.5px solid rgba(77,150,255,0.3); background:rgba(2,11,24,0.8); color:#a8e4ff; font-family:'Nunito',sans-serif; font-size:14px; font-weight:700; outline:none; }
+    .shop-modal-note { font-size:12px; color:rgba(255,169,77,0.7); text-align:center; margin-bottom:14px; line-height:1.4; }
     .shop-modal-cost {
       display: inline-flex;
       align-items: center;
@@ -623,7 +651,9 @@
     }
     .shop-modal.powerup .shop-modal-confirm { border-color: #6bcb77; box-shadow: 0 0 14px rgba(107,203,119,0.3); }
     .shop-modal.sabotage .shop-modal-confirm { border-color: #ff6b6b; box-shadow: 0 0 14px rgba(255,107,107,0.3); }
+    .shop-modal.defensive .shop-modal-confirm { border-color: #cc5de8; box-shadow: 0 0 14px rgba(204,93,232,0.3); }
     .shop-modal-confirm:hover { transform: scale(1.04); box-shadow: 0 0 28px rgba(77,150,255,0.6); }
+    .shop-modal-confirm:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
     .shop-modal-cancel {
       font-family: 'Nunito', sans-serif;
       font-size: 13px;
@@ -653,12 +683,14 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s;
+      padding: 24px;
+      text-align: center;
     }
     .purchase-success.show { opacity: 1; pointer-events: all; }
     .purchase-success-emoji { font-size: 72px; animation: popIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275); }
     @keyframes popIn { 0%{transform:scale(0.3);opacity:0} 100%{transform:scale(1);opacity:1} }
     .purchase-success-title { font-family: 'Bangers', cursive; font-size: clamp(32px, 8vw, 52px); letter-spacing: 3px; color: #6bcb77; text-shadow: 0 0 30px rgba(107,203,119,0.6); }
-    .purchase-success-name { font-family: 'Bangers', cursive; font-size: clamp(20px, 5vw, 30px); letter-spacing: 2px; color: #a8e4ff; }
+    .purchase-success-name { font-family: 'Bangers', cursive; font-size: clamp(18px, 4.6vw, 28px); letter-spacing: 1.5px; color: #a8e4ff; max-width: 420px; line-height: 1.3; }
     .purchase-success-cost { display: flex; align-items: center; gap: 7px; font-family: 'Bangers', cursive; font-size: 22px; color: #74c0fc; opacity: 0.8; }
     .purchase-success-cost-img { width: 24px; height: 24px; border-radius: 50%; object-fit: contain; }
   </style>
@@ -676,6 +708,22 @@
 
 <div class="team-name" id="title">Loading...</div>
 <div class="score" id="score">0</div>
+
+<!-- ══ ACTIVE EFFECTS (power-ups on you, sabotages against you, your defenses) ══ -->
+<div class="effects-bars" id="effectsBars">
+  <div class="effects-bar-section" id="myPowerupsSection">
+    <div class="effects-bar-title">⚡ Your Active Power-Ups</div>
+    <div class="effects-chip-row" id="myPowerupsRow"></div>
+  </div>
+  <div class="effects-bar-section" id="mySabotagesSection">
+    <div class="effects-bar-title">💀 Sabotages Against You</div>
+    <div class="effects-chip-row" id="mySabotagesRow"></div>
+  </div>
+  <div class="effects-bar-section" id="myDefensesSection">
+    <div class="effects-bar-title">🛡️ Your Defenses</div>
+    <div class="defense-chip-row" id="myDefensesRow"></div>
+  </div>
+</div>
 
 <!-- ══ FUNDRAISING WIDGET (only shown for teams admin has enabled) ══ -->
 <div class="fund-banner" id="fundBanner">
@@ -772,6 +820,19 @@
     <div class="shop-modal-emoji" id="shopModalEmoji">🛒</div>
     <div class="shop-modal-name" id="shopModalName">Item Name</div>
     <div class="shop-modal-desc" id="shopModalDesc">Description here</div>
+
+    <div class="shop-modal-target-section" id="shopModalTargetSection" style="display:none">
+      <div class="shop-modal-target-label">🎯 Choose target team</div>
+      <select class="shop-modal-target-select" id="shopModalTargetSelect" onchange="onShopModalTargetChange()">
+        <option value="">Select a team…</option>
+      </select>
+    </div>
+    <div class="shop-modal-cancel-section" id="shopModalCancelSection" style="display:none">
+      <div class="shop-modal-target-label">Which of their power-ups to cancel?</div>
+      <select class="shop-modal-target-select" id="shopModalCancelSelect"></select>
+    </div>
+    <div class="shop-modal-note" id="shopModalNote" style="display:none"></div>
+
     <div class="shop-modal-cost">
       <img class="shop-modal-cost-img" src="./assets/mako-coin.png" alt="Mako">
       <span id="shopModalCost">0</span> MAKO
@@ -786,7 +847,7 @@
 <!-- PURCHASE SUCCESS -->
 <div class="purchase-success" id="purchaseSuccess">
   <div class="purchase-success-emoji" id="purchaseSuccessEmoji">🎉</div>
-  <div class="purchase-success-title">PURCHASED!</div>
+  <div class="purchase-success-title" id="purchaseSuccessTitle">PURCHASED!</div>
   <div class="purchase-success-name" id="purchaseSuccessName"></div>
   <div class="purchase-success-cost">
     <img class="purchase-success-cost-img" src="./assets/mako-coin.png" alt="Mako">
@@ -799,6 +860,7 @@
 const MAKO_IMG='./assets/mako-coin.png';
 const COLORS_TEAM={team1:'#ff6b6b',team2:'#ffd93d',team3:'#6bcb77',team4:'#4d96ff',team5:'#ff922b',team6:'#cc5de8',team7:'#20c997',team8:'#f06595',team9:'#74c0fc',team10:'#ff8787',team11:'#a9e34b',team12:'#ffa94d'};
 const WHEEL_SEG_COLORS=['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#ff922b','#cc5de8','#20c997','#f06595','#74c0fc','#a9e34b','#ffa94d','#e64980','#339af0','#51cf66'];
+const ALL_TEAMS=['team1','team2','team3','team4','team5','team6','team7','team8','team9','team10','team11','team12'];
 const FB="https://counterapp-5297b-default-rtdb.firebaseio.com";
 let team=localStorage.getItem("myTeam");
 if(!team){window.location.href="index.html";}
@@ -860,6 +922,25 @@ let _makoBalance=0;
 // ── FIX: keyed by team so Team A's purchases don't mark items as owned for Team B ──
 let sessionPurchasedIds=new Set(JSON.parse(sessionStorage.getItem('sessionPurchasedIds_'+team)||'[]'));
 let sessionPurchaseLog=JSON.parse(sessionStorage.getItem('sessionPurchaseLog_'+team)||'[]');
+
+/* ─────────────── ACTIVE EFFECTS STATE (power-ups on me, sabotages against me, my defenses) ───────────────
+   /activePowerups/{team}/{id}   — power-ups THIS team bought that are still running (durationMinutes>0 only;
+                                    instant power-ups are just logged, not tracked here)
+   /activeSabotages/{team}/{id}  — sabotages currently afflicting THIS team, bought by an opposing team
+   /defenses/{team}              — { shieldCount, reflectorCount, superShieldExpiresAt }
+   Sabotage resolution against defenses (Super Shield blocks all / Reflector bounces back / Shield blocks
+   one and is consumed) happens client-side at the moment of purchase, in resolveSabotagePurchase(). */
+let allTeamNames = {};
+let myActivePowerups = {};
+let mySabotages = {};
+let myDefenses = {};
+
+async function loadAllTeamNames(){
+  try{
+    const res = await fetch(FB+'/teamNames.json');
+    allTeamNames = (await res.json())||{};
+  }catch(e){}
+}
 
 /* ─────────────── HELPERS ─────────────── */
 function parseRoster(raw){
@@ -1535,6 +1616,162 @@ function bump(id){
 }
 
 /* ══════════════════════════════════════
+   ACTIVE EFFECTS ENGINE
+   (power-ups running on this team, sabotages afflicting this team,
+   and this team's defensive inventory — Shield / Super Shield / Reflector)
+══════════════════════════════════════ */
+async function loadMyEffects(){
+  try{
+    const [puRes,saRes,defRes]=await Promise.all([
+      fetch(FB+'/activePowerups/'+team+'.json'),
+      fetch(FB+'/activeSabotages/'+team+'.json'),
+      fetch(FB+'/defenses/'+team+'.json')
+    ]);
+    const puData=(await puRes.json())||{};
+    const saData=(await saRes.json())||{};
+    const defData=(await defRes.json())||{};
+    const now=Date.now();
+    myActivePowerups=Object.fromEntries(Object.entries(puData).filter(([id,p])=>!p.expiresAt||p.expiresAt>now));
+    mySabotages=Object.fromEntries(Object.entries(saData).filter(([id,s])=>!s.expiresAt||s.expiresAt>now));
+    myDefenses=defData;
+    renderMyEffects();
+  }catch(e){}
+}
+
+function renderMyEffects(){
+  const now=Date.now();
+  const puSection=document.getElementById('myPowerupsSection');
+  const puRow=document.getElementById('myPowerupsRow');
+  const puEntries=Object.entries(myActivePowerups);
+  if(puEntries.length>0){
+    puSection.classList.add('visible');
+    puRow.innerHTML=puEntries.map(([id,p])=>`<div class="effect-chip" data-expires="${p.expiresAt||0}"><span class="chip-emoji">${p.emoji||'⚡'}</span><span>${p.name}</span><span class="chip-countdown" id="pu_cd_${id}"></span></div>`).join('');
+  } else {
+    puSection.classList.remove('visible');puRow.innerHTML='';
+  }
+
+  const saSection=document.getElementById('mySabotagesSection');
+  const saRow=document.getElementById('mySabotagesRow');
+  const saEntries=Object.entries(mySabotages);
+  if(saEntries.length>0){
+    saSection.classList.add('visible');
+    saRow.innerHTML=saEntries.map(([id,s])=>`<div class="effect-chip sabotage" data-expires="${s.expiresAt||0}"><span class="chip-emoji">${s.emoji||'💀'}</span><span>${s.name}</span><span class="chip-from">from ${allTeamNames[s.fromTeam]||s.fromTeam}</span><span class="chip-countdown" id="sa_cd_${id}"></span></div>`).join('');
+  } else {
+    saSection.classList.remove('visible');saRow.innerHTML='';
+  }
+
+  const defSection=document.getElementById('myDefensesSection');
+  const defRow=document.getElementById('myDefensesRow');
+  const badges=[];
+  if((myDefenses.shieldCount||0)>0) badges.push(`<div class="defense-chip">🛡️ Shield ×${myDefenses.shieldCount}</div>`);
+  if((myDefenses.reflectorCount||0)>0) badges.push(`<div class="defense-chip">🔄 Reflector ×${myDefenses.reflectorCount}</div>`);
+  if(myDefenses.superShieldExpiresAt&&myDefenses.superShieldExpiresAt>now) badges.push(`<div class="defense-chip" data-expires="${myDefenses.superShieldExpiresAt}" id="ss_cd">🛡️🛡️ Super Shield —</div>`);
+  if(badges.length>0){
+    defSection.classList.add('visible');
+    defRow.innerHTML=badges.join('');
+  } else {
+    defSection.classList.remove('visible');defRow.innerHTML='';
+  }
+  tickMyEffects();
+}
+
+function tickMyEffects(){
+  const now=Date.now();
+  let anyExpired=false;
+  document.querySelectorAll('#myPowerupsRow .effect-chip[data-expires], #mySabotagesRow .effect-chip[data-expires]').forEach(chip=>{
+    const exp=parseInt(chip.getAttribute('data-expires'))||0;
+    const cdEl=chip.querySelector('.chip-countdown');
+    if(!cdEl)return;
+    if(exp<=0){cdEl.textContent='';return;}
+    const remaining=Math.max(0,Math.round((exp-now)/1000));
+    if(remaining<=0){anyExpired=true;return;}
+    const m=Math.floor(remaining/60);const s=remaining%60;
+    cdEl.textContent=`${m}:${String(s).padStart(2,'0')}`;
+  });
+  const ssChip=document.getElementById('ss_cd');
+  if(ssChip){
+    const exp=parseInt(ssChip.getAttribute('data-expires'))||0;
+    const remaining=Math.max(0,Math.round((exp-now)/1000));
+    if(remaining<=0){anyExpired=true;}
+    else{
+      const m=Math.floor(remaining/60);const s=remaining%60;
+      ssChip.textContent=`🛡️🛡️ Super Shield — ${m}:${String(s).padStart(2,'0')}`;
+    }
+  }
+  if(anyExpired) loadMyEffects(); // re-fetch to drop expired entries cleanly
+}
+
+async function addActivePowerup(teamKey,item){
+  const id='pu_'+Date.now();
+  const now=Date.now();
+  const payload={
+    itemId:item.id,name:item.name,emoji:item.emoji||'⚡',description:item.description||'',
+    purchasedAt:now,expiresAt:now+((item.durationMinutes||0)*60000)
+  };
+  await fetch(FB+'/activePowerups/'+teamKey+'/'+id+'.json',{method:'PUT',body:JSON.stringify(payload)});
+}
+
+async function addActiveSabotage(targetTeamKey,item,fromTeamKey,reflected){
+  const id='sab_'+Date.now();
+  const now=Date.now();
+  const payload={
+    itemId:item.id,name:item.name,emoji:item.emoji||'💀',description:item.description||'',
+    fromTeam:fromTeamKey,purchasedAt:now,
+    expiresAt:(item.durationMinutes||0)>0?now+(item.durationMinutes*60000):0,
+    reflected:!!reflected
+  };
+  await fetch(FB+'/activeSabotages/'+targetTeamKey+'/'+id+'.json',{method:'PUT',body:JSON.stringify(payload)});
+}
+
+async function incrementDefense(teamKey,field,delta){
+  const res=await fetch(FB+'/defenses/'+teamKey+'/'+field+'.json');
+  const cur=(await res.json())||0;
+  const next=Math.max(0,(cur||0)+delta);
+  await fetch(FB+'/defenses/'+teamKey+'/'+field+'.json',{method:'PUT',body:JSON.stringify(next)});
+}
+
+async function extendSuperShield(teamKey,durationMinutes){
+  const res=await fetch(FB+'/defenses/'+teamKey+'/superShieldExpiresAt.json');
+  const cur=(await res.json())||0;
+  const now=Date.now();
+  const base=Math.max(cur||0,now);
+  const next=base+(durationMinutes*60000);
+  await fetch(FB+'/defenses/'+teamKey+'/superShieldExpiresAt.json',{method:'PUT',body:JSON.stringify(next)});
+}
+
+async function performCancelCard(targetTeamKey,powerupId){
+  const res=await fetch(FB+'/activePowerups/'+targetTeamKey+'/'+powerupId+'.json');
+  const data=(await res.json())||{};
+  await fetch(FB+'/activePowerups/'+targetTeamKey+'/'+powerupId+'.json',{method:'DELETE'});
+  return {name:data.name||'a power-up'};
+}
+
+/* Resolves a sabotage purchase against the target team's current defenses.
+   Priority: Super Shield (blocks everything, doesn't get consumed) >
+   Reflector (bounces it back onto the buyer, consumed) > Shield (blocks
+   it, consumed) > no defense (applies normally to the target). */
+async function resolveSabotagePurchase(item,targetTeam){
+  const now=Date.now();
+  const defRes=await fetch(FB+'/defenses/'+targetTeam+'.json');
+  const def=(await defRes.json())||{};
+
+  if(def.superShieldExpiresAt&&def.superShieldExpiresAt>now){
+    return {result:'blocked',blockedBy:'super_shield',targetTeam};
+  }
+  if((def.reflectorCount||0)>0){
+    await fetch(FB+'/defenses/'+targetTeam+'/reflectorCount.json',{method:'PUT',body:JSON.stringify(Math.max(0,(def.reflectorCount||0)-1))});
+    await addActiveSabotage(team,item,targetTeam,true);
+    return {result:'reflected',targetTeam};
+  }
+  if((def.shieldCount||0)>0){
+    await fetch(FB+'/defenses/'+targetTeam+'/shieldCount.json',{method:'PUT',body:JSON.stringify(Math.max(0,(def.shieldCount||0)-1))});
+    return {result:'blocked',blockedBy:'shield',targetTeam};
+  }
+  await addActiveSabotage(targetTeam,item,team,false);
+  return {result:'applied',targetTeam};
+}
+
+/* ══════════════════════════════════════
    MAKO SHOP ENGINE
 ══════════════════════════════════════ */
 async function loadShop(){
@@ -1570,11 +1807,13 @@ function isAlreadyOwned(item){
 function getItemTypeClass(item){
   if(item.type==='powerup') return 'powerup';
   if(item.type==='sabotage') return 'sabotage';
+  if(item.type==='defensive') return 'defensive';
   return '';
 }
 function getItemTypeBadgeText(item){
   if(item.type==='powerup') return '⚡ POWER-UP';
   if(item.type==='sabotage') return '💀 SABOTAGE';
+  if(item.type==='defensive') return '🛡️ DEFENSIVE';
   return '🛒 ITEM';
 }
 
@@ -1638,8 +1877,68 @@ function openShopModal(itemId){
   document.getElementById('shopModalName').textContent=item.name;
   document.getElementById('shopModalDesc').textContent=item.description||'';
   document.getElementById('shopModalCost').textContent=item.price||0;
+
+  const targetSection=document.getElementById('shopModalTargetSection');
+  const targetSelect=document.getElementById('shopModalTargetSelect');
+  const cancelSection=document.getElementById('shopModalCancelSection');
+  const cancelSelect=document.getElementById('shopModalCancelSelect');
+  const noteEl=document.getElementById('shopModalNote');
+  const confirmBtn=document.getElementById('shopModalConfirm');
+  cancelSection.style.display='none';
+  cancelSelect.innerHTML='';
+  noteEl.style.display='none';
+
+  if(item.requiresTarget){
+    targetSection.style.display='block';
+    targetSelect.innerHTML='<option value="">Select a team…</option>'+ALL_TEAMS.filter(t=>t!==team).map(t=>`<option value="${t}">${allTeamNames[t]||('Team '+t.replace('team',''))}</option>`).join('');
+    targetSelect.value='';
+    confirmBtn.disabled=true;
+  } else {
+    targetSection.style.display='none';
+    confirmBtn.disabled=false;
+  }
   document.getElementById('shopModal').classList.add('open');
 }
+
+async function onShopModalTargetChange(){
+  const item=pendingPurchase;if(!item)return;
+  const targetSelect=document.getElementById('shopModalTargetSelect');
+  const confirmBtn=document.getElementById('shopModalConfirm');
+  const targetTeamVal=targetSelect.value;
+  const cancelSection=document.getElementById('shopModalCancelSection');
+  const cancelSelect=document.getElementById('shopModalCancelSelect');
+  const noteEl=document.getElementById('shopModalNote');
+
+  if(!targetTeamVal){confirmBtn.disabled=true;cancelSection.style.display='none';noteEl.style.display='none';return;}
+
+  if(item.effectKey==='cancel_card'){
+    try{
+      const res=await fetch(FB+'/activePowerups/'+targetTeamVal+'.json');
+      const data=(await res.json())||{};
+      const now=Date.now();
+      const entries=Object.entries(data).filter(([id,p])=>!p.expiresAt||p.expiresAt>now);
+      if(entries.length===0){
+        cancelSection.style.display='none';
+        noteEl.textContent=`${allTeamNames[targetTeamVal]||targetTeamVal} has no active power-ups to cancel right now.`;
+        noteEl.style.display='block';
+        confirmBtn.disabled=true;
+      } else {
+        cancelSelect.innerHTML='<option value="">Select a power-up…</option>'+entries.map(([id,p])=>`<option value="${id}">${p.emoji||'⚡'} ${p.name}</option>`).join('');
+        cancelSelect.onchange=onShopModalCancelPowerupChange;
+        cancelSection.style.display='block';
+        noteEl.style.display='none';
+        confirmBtn.disabled=true; // wait for a power-up pick too
+      }
+    }catch(e){confirmBtn.disabled=true;}
+  } else {
+    confirmBtn.disabled=false;
+  }
+}
+function onShopModalCancelPowerupChange(){
+  const val=document.getElementById('shopModalCancelSelect').value;
+  document.getElementById('shopModalConfirm').disabled=!val;
+}
+
 function closeShopModal(){
   document.getElementById('shopModal').classList.remove('open');
   pendingPurchase=null;
@@ -1648,6 +1947,14 @@ function closeShopModal(){
 async function confirmPurchase(){
   if(!pendingPurchase)return;
   const item=pendingPurchase;
+  const targetSelect=document.getElementById('shopModalTargetSelect');
+  const cancelSelect=document.getElementById('shopModalCancelSelect');
+  const targetTeam=item.requiresTarget?targetSelect.value:'';
+  const cancelPowerupId=item.effectKey==='cancel_card'?cancelSelect.value:'';
+
+  if(item.requiresTarget&&!targetTeam){showToast('Pick a target team first!');return;}
+  if(item.effectKey==='cancel_card'&&!cancelPowerupId){showToast('Pick a power-up to cancel first!');return;}
+
   closeShopModal();
 
   // Re-check balance
@@ -1659,36 +1966,61 @@ async function confirmPurchase(){
   // Deduct
   const newMako=currentMako-(item.price||0);
   await fetch(FB+'/currency/'+team+'/mako.json',{method:'PUT',body:JSON.stringify(newMako)});
-
-  // Log to Firebase
-  const logEntry={
-    team,itemId:item.id,itemName:item.name,itemType:item.type||'item',
-    itemEmoji:item.emoji||'🛒',cost:item.price||0,time:Date.now()
-  };
-  await fetch(FB+'/shopPurchases/'+Date.now()+'_'+team+'.json',{method:'PUT',body:JSON.stringify(logEntry)});
-
-  // Update local state
   _makoBalance=newMako;_lastMako=newMako;
   document.getElementById('makoCount').textContent=newMako;
   document.getElementById('shopBalanceCount').textContent=newMako;
   bump('makoBadge');
 
+  let logExtra={};
+  let resultInfo=null;
+
+  if(item.type==='sabotage'){
+    resultInfo=await resolveSabotagePurchase(item,targetTeam);
+    logExtra={targetTeam,result:resultInfo.result};
+  } else if(item.type==='defensive'){
+    if(item.effectKey==='shield'){
+      await incrementDefense(team,'shieldCount',1);
+    } else if(item.effectKey==='super_shield'){
+      await extendSuperShield(team,item.durationMinutes||10);
+    } else if(item.effectKey==='reflector'){
+      await incrementDefense(team,'reflectorCount',1);
+    } else if(item.effectKey==='cancel_card'){
+      const cancelRes=await performCancelCard(targetTeam,cancelPowerupId);
+      logExtra={targetTeam,result:'cancelled',cancelledItemName:cancelRes.name};
+      resultInfo={result:'cancelled',name:cancelRes.name,targetTeam};
+    }
+  } else {
+    // plain power-up or generic item — only timed ones get an active-effect entry;
+    // instant ones are just logged, matching a simple "label" purchase.
+    if((item.durationMinutes||0)>0){
+      await addActivePowerup(team,item);
+    }
+  }
+
+  // Log to Firebase purchase log
+  const logEntry={
+    team,itemId:item.id,itemName:item.name,itemType:item.type||'item',
+    itemEmoji:item.emoji||'🛒',cost:item.price||0,time:Date.now(),...logExtra
+  };
+  await fetch(FB+'/shopPurchases/'+Date.now()+'_'+team+'.json',{method:'PUT',body:JSON.stringify(logEntry)});
+
   // Track session purchase — keyed by team so it doesn't affect other teams
   if(item.repurchasable===false){
     sessionPurchasedIds.add(item.id);
-    // ── FIX: save under team-namespaced key ──
     sessionStorage.setItem('sessionPurchasedIds_'+team,JSON.stringify([...sessionPurchasedIds]));
   }
 
   // Add to session log — keyed by team
   sessionPurchaseLog.unshift({emoji:item.emoji||'🛒',name:item.name,cost:item.price||0,time:Date.now()});
-  // ── FIX: save under team-namespaced key ──
   sessionStorage.setItem('sessionPurchaseLog_'+team,JSON.stringify(sessionPurchaseLog));
   renderPurchaseLog();
   renderShopAffordability();
 
-  showPurchaseSuccess(item);
+  showPurchaseSuccess(item,resultInfo);
   pendingPurchase=null;
+
+  // Refresh my own effect bars right away (defenses / power-ups may have changed)
+  loadMyEffects();
 }
 
 function renderPurchaseLog(){
@@ -1711,14 +2043,39 @@ function renderPurchaseLog(){
   }).join('');
 }
 
-function showPurchaseSuccess(item){
-  document.getElementById('purchaseSuccessEmoji').textContent=item.emoji||'🎉';
-  document.getElementById('purchaseSuccessName').textContent=item.name;
-  document.getElementById('purchaseSuccessCost').textContent='-'+(item.price||0)+' Mako';
+function showPurchaseSuccess(item,resultInfo){
   const overlay=document.getElementById('purchaseSuccess');
+  const titleEl=document.getElementById('purchaseSuccessTitle');
+  const emojiEl=document.getElementById('purchaseSuccessEmoji');
+  const nameEl=document.getElementById('purchaseSuccessName');
+  const costEl=document.getElementById('purchaseSuccessCost');
+
+  if(resultInfo&&resultInfo.result==='blocked'){
+    emojiEl.textContent='🛡️';
+    titleEl.textContent=resultInfo.blockedBy==='super_shield'?'SUPER SHIELDED!':'BLOCKED!';
+    nameEl.textContent=`${allTeamNames[resultInfo.targetTeam]||resultInfo.targetTeam} blocked your ${item.name}!`;
+  } else if(resultInfo&&resultInfo.result==='reflected'){
+    emojiEl.textContent='🔄';
+    titleEl.textContent='REFLECTED!';
+    nameEl.textContent=`${allTeamNames[resultInfo.targetTeam]||resultInfo.targetTeam}'s Reflector bounced ${item.name} back at YOU!`;
+  } else if(resultInfo&&resultInfo.result==='cancelled'){
+    emojiEl.textContent='❌';
+    titleEl.textContent='CANCELLED!';
+    nameEl.textContent=`You cancelled ${allTeamNames[resultInfo.targetTeam]||resultInfo.targetTeam}'s ${resultInfo.name}!`;
+  } else if(resultInfo&&resultInfo.result==='applied'){
+    emojiEl.textContent=item.emoji||'💀';
+    titleEl.textContent='SABOTAGE SENT!';
+    nameEl.textContent=`${item.name} → ${allTeamNames[resultInfo.targetTeam]||resultInfo.targetTeam}`;
+  } else {
+    emojiEl.textContent=item.emoji||'🎉';
+    titleEl.textContent='PURCHASED!';
+    nameEl.textContent=item.name;
+  }
+  costEl.textContent='-'+(item.price||0)+' Mako';
+
   overlay.classList.add('show');
   if(!LOW_END) spawnConfetti('#4d96ff');
-  setTimeout(()=>{overlay.classList.remove('show');stopConfetti();},2200);
+  setTimeout(()=>{overlay.classList.remove('show');stopConfetti();},2600);
 }
 
 function showToast(msg){
@@ -1731,6 +2088,7 @@ document.getElementById('shopModal').addEventListener('click',function(e){if(e.t
 
 /* ─────────────── INIT ─────────────── */
 loadInfo();loadScore();loadWheel();resizeWheel();pollTimer();pollCurrency();loadShop();loadFundraising();
+loadAllTeamNames();loadMyEffects();
 renderPurchaseLog(); // restore from sessionStorage on page load
 
 setInterval(loadScore,1500);
@@ -1753,6 +2111,9 @@ setInterval(async()=>{
   }catch(e){}
 },5000);
 setInterval(loadShop,8000);
+setInterval(loadAllTeamNames,20000);
+setInterval(loadMyEffects,5000);
+setInterval(tickMyEffects,1000);
 pollChallenge();
 </script>
 </body>
