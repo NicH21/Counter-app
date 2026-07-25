@@ -228,6 +228,16 @@
     .si-price-edit-inp:hover { border-color: rgba(77,150,255,0.6); }
     .si-price-edit-inp:focus { border-color: rgba(77,150,255,0.9); background: rgba(2,11,24,0.85); }
 
+    /* Inline "actually does something" controls per item row */
+    .si-mech-wrap { display:flex; flex-direction:column; align-items:center; gap:3px; flex-shrink:0; }
+    .si-mech-label { font-size:9px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:rgba(168,228,255,0.4); white-space:nowrap; }
+    .si-mult-inp { width:44px; background:rgba(2,11,24,0.6); border:1px solid rgba(107,203,119,0.4); border-radius:7px; padding:4px 4px; color:#6bcb77; font-family:'Bangers',cursive; font-size:16px; text-align:center; outline:none; }
+    .si-mult-inp:focus { border-color:rgba(107,203,119,0.8); }
+    .si-fins-toggle-wrap .toggle-slider { background: rgba(255,169,77,0.25); }
+    .si-fins-toggle-wrap input:checked + .toggle-slider { background: #ffa94d; }
+    .si-sabeffect-select { background:rgba(2,11,24,0.7); border:1px solid rgba(255,107,107,0.4); border-radius:7px; padding:5px 7px; color:#ff8787; font-family:'Nunito',sans-serif; font-size:11px; font-weight:700; outline:none; cursor:pointer; max-width:130px; }
+    .si-sabeffect-select:focus { border-color:rgba(255,107,107,0.8); }
+
     /* Repurchasable toggle label */
     .si-repurchase-wrap {
       display: flex;
@@ -493,7 +503,7 @@
       <input class="si-emoji-inp" type="text" id="newSiEmoji" value="⚡" maxlength="4" title="Emoji icon">
       <input class="si-name-inp" type="text" id="newSiName" placeholder="Item name…" maxlength="40">
       <input class="si-desc-inp" type="text" id="newSiDesc" placeholder="Short description (optional)…" maxlength="80">
-      <input class="si-price-inp" type="number" id="newSiPrice" value="5" min="1" max="9999" title="Mako Coin cost">
+      <input class="si-price-inp" type="number" id="newSiPrice" value="5" min="1" title="Mako Coin cost">
       <input class="si-dur-inp" type="number" id="newSiDuration" value="0" min="0" max="999" title="Active duration in minutes — 0 = instant, no timer">
       <select class="si-type-select" id="newSiType" onchange="onNewSiTypeChange()">
         <option value="powerup">⚡ Power-up</option>
@@ -508,6 +518,15 @@
         <option value="reflector">🔄 Reflector (bounces 1 sabotage back)</option>
         <option value="cancel_card">❌ Cancel Card (cancels a power-up)</option>
       </select>
+      <input class="si-mult-inp" id="newSiMultiplier" type="number" value="1" min="1" max="10" title="Score multiplier while active (power-ups only) — e.g. 2 for Double Points, 3 for Golden Minute" style="display:none">
+      <label class="si-target-label" id="newSiFinsLabel" style="display:none" title="Tag this power-up as fins-based, so a 'No Fins'-style sabotage can block teams from buying it">
+        <input type="checkbox" id="newSiUsesFins" style="width:14px;height:14px"> Uses fins
+      </label>
+      <select class="si-effect-select" id="newSiSabotageEffect" style="display:none">
+        <option value="">— label only —</option>
+        <option value="lock_laps">🛑 Locks their laps (like Time Out)</option>
+        <option value="block_fins">🚫 Blocks fin power-ups (like No Fins)</option>
+      </select>
       <label class="si-target-label" id="newSiTargetLabel" style="display:none">
         <input type="checkbox" id="newSiRequiresTarget" checked style="width:14px;height:14px"> Needs target team
       </label>
@@ -517,7 +536,7 @@
       </select>
       <button class="add-si-btn" onclick="addShopItem()">+ ADD</button>
     </div>
-    <div class="shop-hint">Emoji · Name · Description · Price · Duration (min, 0=instant) · Type · Effect (defensive only) · Re-buyable?</div>
+    <div class="shop-hint">Emoji · Name · Description · Price · Duration (min, 0=instant) · Type · Effect/Multiplier/Fins tag · Re-buyable?</div>
   </div>
 
   <!-- SHOP PURCHASE LOG -->
@@ -1266,31 +1285,31 @@ let shopItems=[];
    admin can edit any of them afterwards, same as any other shop item. */
 const STARTER_PACK = [
   // POWER-UPS
-  {emoji:'🏊',name:'Speed Boost',description:'One swimmer may wear fins for 10 minutes.',price:5,type:'powerup',durationMinutes:10,requiresTarget:false,effectKey:''},
-  {emoji:'💪',name:'Full Power',description:'One swimmer may use fins and paddles for 10 minutes.',price:8,type:'powerup',durationMinutes:10,requiresTarget:false,effectKey:''},
-  {emoji:'🦈',name:'Shark Attack',description:'Your fastest swimmer may complete 10 extra minutes of swimming for the team.',price:8,type:'powerup',durationMinutes:10,requiresTarget:false,effectKey:''},
-  {emoji:'👥',name:'Double Trouble',description:'Two swimmers may swim at the same time for 10 minutes.',price:8,type:'powerup',durationMinutes:10,requiresTarget:false,effectKey:''},
-  {emoji:'📈',name:'Double Points',description:'Every length completed by your team during the next 10 minutes counts double.',price:8,type:'powerup',durationMinutes:10,requiresTarget:false,effectKey:''},
-  {emoji:'🚀',name:'Turbo Start',description:'A swimmer may use fins for 200m.',price:3,type:'powerup',durationMinutes:0,requiresTarget:false,effectKey:''},
-  {emoji:'🔄',name:'Fresh Legs',description:'Swap your current swimmer immediately without losing time.',price:5,type:'powerup',durationMinutes:0,requiresTarget:false,effectKey:''},
-  {emoji:'🎯',name:"Coach's Choice",description:'Your Team Manager chooses which swimmer completes the next 10 minutes, regardless of the original order.',price:5,type:'powerup',durationMinutes:10,requiresTarget:false,effectKey:''},
-  {emoji:'⭐',name:'Golden Minute',description:'All lengths swum during the next 5 minutes count triple.',price:8,type:'powerup',durationMinutes:5,requiresTarget:false,effectKey:''},
+  {emoji:'🏊',name:'Speed Boost',description:'One swimmer may wear fins for 10 minutes.',price:5,type:'powerup',durationMinutes:10,requiresTarget:false,effectKey:'',multiplier:1,usesFins:true},
+  {emoji:'💪',name:'Full Power',description:'One swimmer may use fins and paddles for 10 minutes.',price:8,type:'powerup',durationMinutes:10,requiresTarget:false,effectKey:'',multiplier:1,usesFins:true},
+  {emoji:'🦈',name:'Shark Attack',description:'Your fastest swimmer may complete 10 extra minutes of swimming for the team.',price:8,type:'powerup',durationMinutes:10,requiresTarget:false,effectKey:'',multiplier:1,usesFins:false},
+  {emoji:'👥',name:'Double Trouble',description:'Two swimmers may swim at the same time for 10 minutes.',price:8,type:'powerup',durationMinutes:10,requiresTarget:false,effectKey:'',multiplier:1,usesFins:false},
+  {emoji:'📈',name:'Double Points',description:'Every length completed by your team during the next 10 minutes counts double.',price:8,type:'powerup',durationMinutes:10,requiresTarget:false,effectKey:'',multiplier:2,usesFins:false},
+  {emoji:'🚀',name:'Turbo Start',description:'A swimmer may use fins for 200m.',price:3,type:'powerup',durationMinutes:0,requiresTarget:false,effectKey:'',multiplier:1,usesFins:true},
+  {emoji:'🔄',name:'Fresh Legs',description:'Swap your current swimmer immediately without losing time.',price:5,type:'powerup',durationMinutes:0,requiresTarget:false,effectKey:'',multiplier:1,usesFins:false},
+  {emoji:'🎯',name:"Coach's Choice",description:'Your Team Manager chooses which swimmer completes the next 10 minutes, regardless of the original order.',price:5,type:'powerup',durationMinutes:10,requiresTarget:false,effectKey:'',multiplier:1,usesFins:false},
+  {emoji:'⭐',name:'Golden Minute',description:'All lengths swum during the next 5 minutes count triple.',price:8,type:'powerup',durationMinutes:5,requiresTarget:false,effectKey:'',multiplier:3,usesFins:false},
   // SABOTAGES (all target an opposing team)
-  {emoji:'👕',name:'T-Shirt Challenge',description:'Opposing swimmer from another team must wear a cotton T-shirt for 10 minutes.',price:5,type:'sabotage',durationMinutes:10,requiresTarget:true,effectKey:''},
-  {emoji:'🥽',name:'Blind Faith',description:'Opposing swimmer swims 5 minutes without goggles.',price:5,type:'sabotage',durationMinutes:5,requiresTarget:true,effectKey:''},
-  {emoji:'🐶',name:'Doggy Paddle',description:'Opposing swimmer must swim 10 lengths using doggy paddle only.',price:5,type:'sabotage',durationMinutes:0,requiresTarget:true,effectKey:''},
-  {emoji:'🔄',name:'No Breakouts',description:'Opposing swimmer completes 20 laps using only tumble turns with no underwater breakouts.',price:5,type:'sabotage',durationMinutes:0,requiresTarget:true,effectKey:''},
-  {emoji:'👟',name:'Shoe Swim',description:'Opposing swimmer swims wearing running shoes for 10 minutes.',price:8,type:'sabotage',durationMinutes:10,requiresTarget:true,effectKey:''},
-  {emoji:'🦆',name:'Cross Legs',description:'Opposing swimmer completes 200m cross-legged dolphin kick (or modified cross-leg swimming challenge).',price:5,type:'sabotage',durationMinutes:0,requiresTarget:true,effectKey:''},
-  {emoji:'🛑',name:'Time Out',description:'Entire team must stop swimming for 5 minutes.',price:8,type:'sabotage',durationMinutes:5,requiresTarget:true,effectKey:''},
-  {emoji:'🐢',name:'Slow Lane',description:'Opposing swimmer may only use breaststroke for 10 minutes.',price:5,type:'sabotage',durationMinutes:10,requiresTarget:true,effectKey:''},
-  {emoji:'🖐️',name:'One Arm',description:'Swim 100m using one arm only (alternate arms every 25m).',price:3,type:'sabotage',durationMinutes:0,requiresTarget:true,effectKey:''},
-  {emoji:'🤿',name:'No Underwater',description:'No streamline or dolphin kicks off walls for 10 minutes.',price:5,type:'sabotage',durationMinutes:10,requiresTarget:true,effectKey:''},
-  {emoji:'🪨',name:'Heavy Water',description:'Swim with a kickboard held above the water for 100m.',price:3,type:'sabotage',durationMinutes:0,requiresTarget:true,effectKey:''},
-  {emoji:'🦀',name:'Crab Kick',description:'Complete 100m using breaststroke kick only.',price:3,type:'sabotage',durationMinutes:0,requiresTarget:true,effectKey:''},
+  {emoji:'👕',name:'T-Shirt Challenge',description:'Opposing swimmer from another team must wear a cotton T-shirt for 10 minutes.',price:5,type:'sabotage',durationMinutes:10,requiresTarget:true,effectKey:'',sabotageEffect:''},
+  {emoji:'🥽',name:'Blind Faith',description:'Opposing swimmer swims 5 minutes without goggles.',price:5,type:'sabotage',durationMinutes:5,requiresTarget:true,effectKey:'',sabotageEffect:''},
+  {emoji:'🐶',name:'Doggy Paddle',description:'Opposing swimmer must swim 10 lengths using doggy paddle only.',price:5,type:'sabotage',durationMinutes:0,requiresTarget:true,effectKey:'',sabotageEffect:''},
+  {emoji:'🔄',name:'No Breakouts',description:'Opposing swimmer completes 20 laps using only tumble turns with no underwater breakouts.',price:5,type:'sabotage',durationMinutes:0,requiresTarget:true,effectKey:'',sabotageEffect:''},
+  {emoji:'👟',name:'Shoe Swim',description:'Opposing swimmer swims wearing running shoes for 10 minutes.',price:8,type:'sabotage',durationMinutes:10,requiresTarget:true,effectKey:'',sabotageEffect:''},
+  {emoji:'🦆',name:'Cross Legs',description:'Opposing swimmer completes 200m cross-legged dolphin kick (or modified cross-leg swimming challenge).',price:5,type:'sabotage',durationMinutes:0,requiresTarget:true,effectKey:'',sabotageEffect:''},
+  {emoji:'🛑',name:'Time Out',description:'Entire team must stop swimming for 5 minutes.',price:8,type:'sabotage',durationMinutes:5,requiresTarget:true,effectKey:'',sabotageEffect:'lock_laps'},
+  {emoji:'🐢',name:'Slow Lane',description:'Opposing swimmer may only use breaststroke for 10 minutes.',price:5,type:'sabotage',durationMinutes:10,requiresTarget:true,effectKey:'',sabotageEffect:''},
+  {emoji:'🖐️',name:'One Arm',description:'Swim 100m using one arm only (alternate arms every 25m).',price:3,type:'sabotage',durationMinutes:0,requiresTarget:true,effectKey:'',sabotageEffect:''},
+  {emoji:'🤿',name:'No Underwater',description:'No streamline or dolphin kicks off walls for 10 minutes.',price:5,type:'sabotage',durationMinutes:10,requiresTarget:true,effectKey:'',sabotageEffect:''},
+  {emoji:'🪨',name:'Heavy Water',description:'Swim with a kickboard held above the water for 100m.',price:3,type:'sabotage',durationMinutes:0,requiresTarget:true,effectKey:'',sabotageEffect:''},
+  {emoji:'🦀',name:'Crab Kick',description:'Complete 100m using breaststroke kick only.',price:3,type:'sabotage',durationMinutes:0,requiresTarget:true,effectKey:'',sabotageEffect:''},
   {emoji:'🔁',name:'Reverse Order',description:"Opposing team must immediately swap to their next swimmer.",price:5,type:'sabotage',durationMinutes:0,requiresTarget:true,effectKey:''},
-  {emoji:'🚫',name:'No Fins',description:'Opposing team may not use any fins or paddles for the next 10 minutes.',price:5,type:'sabotage',durationMinutes:10,requiresTarget:true,effectKey:''},
-  {emoji:'😵',name:'Dizzy Start',description:'Swimmer must perform 10 star jumps before entering the pool.',price:3,type:'sabotage',durationMinutes:0,requiresTarget:true,effectKey:''},
+  {emoji:'🚫',name:'No Fins',description:'Opposing team may not use any fins or paddles for the next 10 minutes.',price:5,type:'sabotage',durationMinutes:10,requiresTarget:true,effectKey:'',sabotageEffect:'block_fins'},
+  {emoji:'😵',name:'Dizzy Start',description:'Swimmer must perform 10 star jumps before entering the pool.',price:3,type:'sabotage',durationMinutes:0,requiresTarget:true,effectKey:'',sabotageEffect:''},
   // DEFENSIVE (auto-coded)
   {emoji:'🛡️',name:'Shield',description:'Blocks the next sabotage aimed at you.',price:6,type:'defensive',durationMinutes:0,requiresTarget:false,effectKey:'shield'},
   {emoji:'🛡️🛡️',name:'Super Shield',description:'Blocks ALL sabotages aimed at you for 10 minutes.',price:12,type:'defensive',durationMinutes:10,requiresTarget:false,effectKey:'super_shield'},
@@ -1333,15 +1352,26 @@ function getEffectLabel(key){
   if(key==='cancel_card')return'❌ Cancel Card: cancels a power-up';
   return'';
 }
+function getSabotageEffectLabel(key){
+  if(key==='lock_laps')return'🛑 Actually locks their lap buttons';
+  if(key==='block_fins')return'🚫 Actually blocks fin power-ups';
+  return'';
+}
 
 function onNewSiTypeChange(){
   const type=document.getElementById('newSiType').value;
   const effectSel=document.getElementById('newSiEffect');
   const targetLabel=document.getElementById('newSiTargetLabel');
   const targetCheck=document.getElementById('newSiRequiresTarget');
+  const multInp=document.getElementById('newSiMultiplier');
+  const finsLabel=document.getElementById('newSiFinsLabel');
+  const sabEffectSel=document.getElementById('newSiSabotageEffect');
   effectSel.style.display=type==='defensive'?'inline-block':'none';
   targetLabel.style.display=(type==='sabotage'||type==='defensive')?'flex':'none';
   targetCheck.checked = type==='sabotage'; // default on for sabotage; defensive items normally don't need a target unless it's the Cancel Card (handled by effect change)
+  multInp.style.display = type==='powerup' ? 'inline-block' : 'none';
+  finsLabel.style.display = type==='powerup' ? 'flex' : 'none';
+  sabEffectSel.style.display = type==='sabotage' ? 'inline-block' : 'none';
   if(type==='defensive') onNewSiEffectChange();
 }
 function onNewSiEffectChange(){
@@ -1366,6 +1396,41 @@ function renderShopItemList(){
     else metaBits.push('⚡ instant');
     if(item.requiresTarget) metaBits.push('🎯 needs target team');
     if(item.effectKey) metaBits.push(getEffectLabel(item.effectKey));
+    if(item.type==='powerup'&&(item.multiplier||1)>1) metaBits.push(`✖${item.multiplier} score while active`);
+    if(item.type==='powerup'&&item.usesFins) metaBits.push('🦈 tagged as fins-based');
+    if(item.type==='sabotage'&&item.sabotageEffect) metaBits.push(getSabotageEffectLabel(item.sabotageEffect));
+
+    // Inline "actually does something" controls — lets you wire up real
+    // mechanics on items you already added (e.g. via the starter pack)
+    // without needing to delete and re-add them.
+    let mechControlHTML='';
+    if(item.type==='powerup'){
+      mechControlHTML=`
+        <div class="si-mech-wrap" title="Score multiplier applied to laps logged while this power-up is active (1 = no effect)">
+          <span class="si-mech-label">✖ score</span>
+          <input class="si-mult-inp" type="number" min="1" max="10" value="${item.multiplier||1}"
+            onchange="updateShopItemField('${item.id}','multiplier',this.value,true)"
+            onkeydown="if(event.key==='Enter')this.blur()">
+        </div>
+        <div class="si-mech-wrap si-fins-toggle-wrap" title="Tag as fins-based so a 'block fins' sabotage can actually stop teams buying it">
+          <span class="si-mech-label">🦈 fins?</span>
+          <label class="toggle-switch">
+            <input type="checkbox" ${item.usesFins?'checked':''} onchange="updateShopItemField('${item.id}','usesFins',this.checked,false)">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>`;
+    } else if(item.type==='sabotage'){
+      mechControlHTML=`
+        <div class="si-mech-wrap" title="What this sabotage actually enforces in code, beyond just showing a label">
+          <span class="si-mech-label">real effect</span>
+          <select class="si-sabeffect-select" onchange="updateShopItemField('${item.id}','sabotageEffect',this.value,false)">
+            <option value="" ${!item.sabotageEffect?'selected':''}>— label only —</option>
+            <option value="lock_laps" ${item.sabotageEffect==='lock_laps'?'selected':''}>🛑 Locks laps</option>
+            <option value="block_fins" ${item.sabotageEffect==='block_fins'?'selected':''}>🚫 Blocks fins</option>
+          </select>
+        </div>`;
+    }
+
     return `<div class="shop-item-row ${item.enabled!==false?'enabled':''} ${typeClass}" id="shoprow_${item.id}">
       <div class="si-emoji">${item.emoji||'🛒'}</div>
       <div class="si-info">
@@ -1376,10 +1441,11 @@ function renderShopItemList(){
       <div class="si-type-badge">${getShopTypeBadge(item.type)}</div>
       <div class="si-price" title="Edit and click away (or press Enter) to save">
         <img class="si-price-img" src="${MAKO_IMG}" alt="Mako">
-        <input class="si-price-edit-inp" type="number" min="1" max="9999" value="${item.price||0}"
+        <input class="si-price-edit-inp" type="number" min="1" value="${item.price||0}"
           onchange="updateShopItemPrice('${item.id}',this.value)"
           onkeydown="if(event.key==='Enter')this.blur()">
       </div>
+      ${mechControlHTML}
       <!-- Repurchasable toggle -->
       <div class="si-repurchase-wrap" title="${isRepurchasable?'Re-buyable — teams can buy multiple times':'One-time only — greyed out after purchase'}">
         <span class="si-repurchase-label">${isRepurchasable?'🔁 Re-buy':'1️⃣ Once'}</span>
@@ -1404,6 +1470,8 @@ async function addShopItem(){
   const durEl=document.getElementById('newSiDuration');
   const typeEl=document.getElementById('newSiType');const repurchEl=document.getElementById('newSiRepurchasable');
   const effectEl=document.getElementById('newSiEffect');const targetCheckEl=document.getElementById('newSiRequiresTarget');
+  const multEl=document.getElementById('newSiMultiplier');const finsEl=document.getElementById('newSiUsesFins');
+  const sabEffectEl=document.getElementById('newSiSabotageEffect');
   const name=nameEl.value.trim();if(!name){nameEl.focus();return;}
   const emoji=emojiEl.value.trim()||'🛒';const description=descEl.value.trim();
   const price=Math.max(1,parseInt(priceEl.value)||5);const type=typeEl.value||'item';
@@ -1411,11 +1479,14 @@ async function addShopItem(){
   const repurchasable=repurchEl.value!=='false'; // true unless explicitly "false"
   const effectKey=type==='defensive'?(effectEl.value||''):'';
   const requiresTarget=(type==='sabotage'||type==='defensive')?!!targetCheckEl.checked:false;
+  const multiplier=type==='powerup'?Math.max(1,Math.min(10,parseInt(multEl.value)||1)):1;
+  const usesFins=type==='powerup'?!!finsEl.checked:false;
+  const sabotageEffect=type==='sabotage'?(sabEffectEl.value||''):'';
   const id='si_'+Date.now();
-  const item={emoji,name,description,price,type,durationMinutes,requiresTarget,effectKey,repurchasable,enabled:true,sortOrder:shopItems.length};
+  const item={emoji,name,description,price,type,durationMinutes,requiresTarget,effectKey,multiplier,usesFins,sabotageEffect,repurchasable,enabled:true,sortOrder:shopItems.length};
   await fetch(FB+'/shopItems/'+id+'.json',{method:'PUT',body:JSON.stringify(item)});
   shopItems.push({id,...item});renderShopItemList();
-  nameEl.value='';descEl.value='';emojiEl.value='⚡';priceEl.value='5';durEl.value='0';
+  nameEl.value='';descEl.value='';emojiEl.value='⚡';priceEl.value='5';durEl.value='0';multEl.value='1';finsEl.checked=false;sabEffectEl.value='';
   nameEl.focus();toast('✅ Shop item added!');
 }
 async function deleteShopItem(id){
@@ -1429,6 +1500,19 @@ async function updateShopItemPrice(id,value){
   item.price=price;
   await fetch(FB+'/shopItems/'+id+'/price.json',{method:'PUT',body:JSON.stringify(price)});
   toast(`💰 ${item.name} price set to ${price} 🪙`);
+}
+async function updateShopItemField(id,field,rawValue,isNumeric){
+  const item=shopItems.find(i=>i.id===id);if(!item)return;
+  let value;
+  if(field==='multiplier'){ value=Math.max(1,Math.min(10,parseInt(rawValue)||1)); }
+  else if(field==='usesFins'){ value=!!rawValue; }
+  else { value=rawValue; } // sabotageEffect string
+  item[field]=value;
+  await fetch(FB+'/shopItems/'+id+'/'+field+'.json',{method:'PUT',body:JSON.stringify(value)});
+  renderShopItemList();
+  if(field==='multiplier') toast(`✖ ${item.name} now multiplies score by ${value} while active`);
+  else if(field==='usesFins') toast(value?`🦈 ${item.name} tagged as fins-based`:`${item.name} no longer tagged as fins-based`);
+  else if(field==='sabotageEffect') toast(value?`⚙️ ${item.name} will now ${getSabotageEffectLabel(value).replace('🛑 ','').replace('🚫 ','').toLowerCase()}`:`${item.name} is now label-only again`);
 }
 async function toggleShopItem(id,enabled){
   const item=shopItems.find(i=>i.id===id);if(!item)return;
