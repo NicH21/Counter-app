@@ -935,6 +935,32 @@ let myActivePowerups = {};
 let mySabotages = {};
 let myDefenses = {};
 
+/* Real mechanics derived from active effects:
+   - Score multiplier: while a power-up with multiplier>1 is active (e.g. Double
+     Points x2, Golden Minute x3), laps logged add MORE to the team's competitive
+     score — but the physical lap count (used for fundraising, since sponsors pay
+     per real lap swum) stays exactly what was actually swum.
+   - Locked laps: a sabotage with sabotageEffect==='lock_laps' (e.g. Time Out)
+     actually disables this team's lap buttons for its duration.
+   - Blocked fins: a sabotage with sabotageEffect==='block_fins' (e.g. No Fins)
+     actually disables buying/using any power-up tagged usesFins:true. */
+function getActiveScoreMultiplier(){
+  const now=Date.now();
+  let mult=1;
+  Object.values(myActivePowerups).forEach(p=>{
+    if((p.multiplier||1)>mult && (!p.expiresAt || p.expiresAt>now)) mult=p.multiplier;
+  });
+  return mult;
+}
+function isLapsLocked(){
+  const now=Date.now();
+  return Object.values(mySabotages).some(s=>s.sabotageEffect==='lock_laps' && (!s.expiresAt || s.expiresAt>now));
+}
+function isFinsBlocked(){
+  const now=Date.now();
+  return Object.values(mySabotages).some(s=>s.sabotageEffect==='block_fins' && (!s.expiresAt || s.expiresAt>now));
+}
+
 async function loadAllTeamNames(){
   try{
     const res = await fetch(FB+'/teamNames.json');
@@ -991,6 +1017,11 @@ function updateLapCooldownUI(){
   const swimBtn = document.getElementById('swimmerBigBtn');
   if(remaining <= 0){
     if(lapCooldownInterval){ clearInterval(lapCooldownInterval); lapCooldownInterval = null; }
+    if(isLapsLocked()){
+      if(pointBtn){ pointBtn.disabled=true; pointBtn.style.opacity='0.4'; pointBtn.style.cursor='not-allowed'; pointBtn.querySelector('span').textContent='🛑 TIME OUT'; }
+      if(swimBtn){ swimBtn.disabled=true; swimBtn.querySelector('span').textContent='🛑 TIME OUT'; }
+      return;
+    }
     if(pointBtn && !timerEnded){ pointBtn.disabled=false; pointBtn.style.opacity=''; pointBtn.style.cursor=''; pointBtn.querySelector('span').textContent='+2 LAPS'; }
     if(swimBtn && !timerEnded){ swimBtn.disabled=false; swimBtn.querySelector('span').textContent='+2 LAPS'; }
     return;
@@ -1001,12 +1032,14 @@ function updateLapCooldownUI(){
 }
 
 async function update(){
-  if(timerEnded||isLapOnCooldown())return;
+  if(timerEnded||isLapOnCooldown()||isLapsLocked())return;
+  const mult=getActiveScoreMultiplier();
+  const scoreDelta=2*mult;
   let res=await fetch(FB+"/teams/"+team+".json");let value=await res.json();
-  value=(value||0)+2;
+  value=(value||0)+scoreDelta;
   await fetch(FB+"/teams/"+team+".json",{method:"PUT",body:JSON.stringify(value)});
   document.getElementById("score").innerText=value;
-  await bumpTeamLaps(2); // flat fallback fundraising counter (no-roster teams only)
+  await bumpTeamLaps(2); // flat fallback fundraising counter (no-roster teams only) — physical laps, never multiplied
   startLapCooldown();
 }
 async function loadScore(){
@@ -1152,9 +1185,11 @@ function renderSwimmers(){
 }
 
 async function addLapToActiveSwimmer(){
-  if(timerEnded || isLapOnCooldown() || activeSwimmerIdx===null || !roster[activeSwimmerIdx]) return;
+  if(timerEnded || isLapOnCooldown() || isLapsLocked() || activeSwimmerIdx===null || !roster[activeSwimmerIdx]) return;
   const idx = activeSwimmerIdx;
-  const amount = 2;
+  const amount = 2; // physical laps actually swum — always this, never multiplied (fundraising is per real lap)
+  const mult = getActiveScoreMultiplier();
+  const scoreDelta = amount * mult;
 
   // Update this swimmer's personal lap count
   const newLaps = (swimmerLaps[idx]||0) + amount;
@@ -1163,16 +1198,16 @@ async function addLapToActiveSwimmer(){
   updateActiveSwimmerRaisedDisplay(idx, newLaps); // reflects the full +2 laps worth of money, right away
   await fetch(FB+'/swimmerLaps/'+team+'/'+idx+'.json',{method:'PUT',body:JSON.stringify(newLaps)});
 
-  // Add to the team's grand total, same as the original whole-team button did
+  // Add to the team's grand total (competitive score), same as the original whole-team button did
   const res=await fetch(FB+"/teams/"+team+".json");let value=await res.json();
-  value=(value||0)+amount;
+  value=(value||0)+scoreDelta;
   await fetch(FB+"/teams/"+team+".json",{method:"PUT",body:JSON.stringify(value)});
   document.getElementById("score").innerText=value;
 
   // Refresh this swimmer's individual fundraising total (per-swimmer R/lap)
   renderFundBannerFromRoster();
 
-  lastSwimmerAction = {idx, amount};
+  lastSwimmerAction = {idx, amount, scoreDelta};
   document.getElementById('swimmerUndoBtn').style.display='inline-block';
   renderSwimmerRowLaps(idx);
   startLapCooldown();
@@ -1180,7 +1215,7 @@ async function addLapToActiveSwimmer(){
 
 async function undoLapForActiveSwimmer(){
   if(!lastSwimmerAction || lastSwimmerAction.idx!==activeSwimmerIdx) return;
-  const {idx, amount} = lastSwimmerAction;
+  const {idx, amount, scoreDelta} = lastSwimmerAction;
 
   const newLaps = Math.max(0,(swimmerLaps[idx]||0) - amount);
   swimmerLaps[idx] = newLaps;
@@ -1189,7 +1224,7 @@ async function undoLapForActiveSwimmer(){
   await fetch(FB+'/swimmerLaps/'+team+'/'+idx+'.json',{method:'PUT',body:JSON.stringify(newLaps)});
 
   const res=await fetch(FB+"/teams/"+team+".json");let value=await res.json();
-  value=Math.max(0,(value||0) - amount);
+  value=Math.max(0,(value||0) - (scoreDelta!==undefined?scoreDelta:amount));
   await fetch(FB+"/teams/"+team+".json",{method:"PUT",body:JSON.stringify(value)});
   document.getElementById("score").innerText=value;
 
@@ -1225,6 +1260,7 @@ function applySwimmerTimerLock(){
   const bigBtn=document.getElementById('swimmerBigBtn');
   if(!bigBtn) return;
   if(isLapOnCooldown()){ updateLapCooldownUI(); return; } // don't clobber an active cooldown countdown
+  if(isLapsLocked()){ bigBtn.disabled=true; bigBtn.querySelector('span').textContent='🛑 TIME OUT'; return; }
   bigBtn.disabled = timerEnded;
   bigBtn.querySelector('span').textContent = timerEnded ? '⏰ TIME\'S UP' : '+2 LAPS';
 }
@@ -1582,8 +1618,13 @@ async function pollTimer(){
 function applyTimerLock(ended){
   const lapBtn=document.getElementById('pointBtn');
   if(ended||!isLapOnCooldown()){
-    lapBtn.disabled=ended;lapBtn.style.opacity=ended?'0.4':'';lapBtn.style.cursor=ended?'not-allowed':'';
-    lapBtn.querySelector('span').textContent=ended?'⏰ TIME\'S UP':'+2 LAPS';
+    if(!ended&&isLapsLocked()){
+      lapBtn.disabled=true;lapBtn.style.opacity='0.4';lapBtn.style.cursor='not-allowed';
+      lapBtn.querySelector('span').textContent='🛑 TIME OUT';
+    } else {
+      lapBtn.disabled=ended;lapBtn.style.opacity=ended?'0.4':'';lapBtn.style.cursor=ended?'not-allowed':'';
+      lapBtn.querySelector('span').textContent=ended?'⏰ TIME\'S UP':'+2 LAPS';
+    }
   }
   applySwimmerTimerLock();
   const spinBtn=document.getElementById('spinBtn');
@@ -1673,6 +1714,26 @@ function renderMyEffects(){
     defSection.classList.remove('visible');defRow.innerHTML='';
   }
   tickMyEffects();
+  // Real mechanics: refresh the lap buttons (Time Out-style lock) and the
+  // shop's fin-power-up availability (No Fins-style block) right away,
+  // rather than waiting for the next timer/lap-cooldown tick.
+  applySwimmerTimerLock();
+  applyLapLockToFlatButton();
+  renderShopAffordability();
+}
+
+function applyLapLockToFlatButton(){
+  const lapBtn=document.getElementById('pointBtn');
+  if(!lapBtn||lapBtn.style.display==='none')return;
+  if(isLapOnCooldown())return; // don't clobber an active cooldown countdown
+  if(timerEnded)return; // timer-ended state already wins
+  if(isLapsLocked()){
+    lapBtn.disabled=true;lapBtn.style.opacity='0.4';lapBtn.style.cursor='not-allowed';
+    lapBtn.querySelector('span').textContent='🛑 TIME OUT';
+  } else {
+    lapBtn.disabled=false;lapBtn.style.opacity='';lapBtn.style.cursor='';
+    lapBtn.querySelector('span').textContent='+2 LAPS';
+  }
 }
 
 function tickMyEffects(){
@@ -1706,7 +1767,8 @@ async function addActivePowerup(teamKey,item){
   const now=Date.now();
   const payload={
     itemId:item.id,name:item.name,emoji:item.emoji||'⚡',description:item.description||'',
-    purchasedAt:now,expiresAt:now+((item.durationMinutes||0)*60000)
+    purchasedAt:now,expiresAt:now+((item.durationMinutes||0)*60000),
+    multiplier:item.multiplier||1,usesFins:!!item.usesFins
   };
   await fetch(FB+'/activePowerups/'+teamKey+'/'+id+'.json',{method:'PUT',body:JSON.stringify(payload)});
 }
@@ -1714,11 +1776,17 @@ async function addActivePowerup(teamKey,item){
 async function addActiveSabotage(targetTeamKey,item,fromTeamKey,reflected){
   const id='sab_'+Date.now();
   const now=Date.now();
+  // Timed sabotages (e.g. Time Out, No Fins) stay visible for their real
+  // duration. Instant ones (e.g. Doggy Paddle, One Arm) have no natural
+  // "window" — but the target team still needs to actually SEE they were
+  // hit, so give instant ones a short 2-minute notification flash instead
+  // of either vanishing immediately or (the old bug) never expiring.
+  const INSTANT_NOTIFY_MS = 2*60*1000;
+  const expiresAt = (item.durationMinutes||0)>0 ? now+(item.durationMinutes*60000) : now+INSTANT_NOTIFY_MS;
   const payload={
     itemId:item.id,name:item.name,emoji:item.emoji||'💀',description:item.description||'',
-    fromTeam:fromTeamKey,purchasedAt:now,
-    expiresAt:(item.durationMinutes||0)>0?now+(item.durationMinutes*60000):0,
-    reflected:!!reflected
+    fromTeam:fromTeamKey,purchasedAt:now,expiresAt,
+    reflected:!!reflected,sabotageEffect:item.sabotageEffect||''
   };
   await fetch(FB+'/activeSabotages/'+targetTeamKey+'/'+id+'.json',{method:'PUT',body:JSON.stringify(payload)});
 }
@@ -1823,15 +1891,18 @@ function renderShop(){
     grid.innerHTML='<div class="shop-empty" style="grid-column:1/-1">No items in the shop yet!</div>';
     return;
   }
+  const finsBlocked=isFinsBlocked();
   grid.innerHTML=shopItems.map(item=>{
     const typeClass=getItemTypeClass(item);
     const cantAfford=_makoBalance<(item.price||0);
     const owned=isAlreadyOwned(item);
-    const disabled=cantAfford||owned||timerEnded;
+    const blockedByFins=finsBlocked&&item.usesFins;
+    const disabled=cantAfford||owned||timerEnded||blockedByFins;
     let btnLabel='BUY!';
-    if(owned) btnLabel='OWNED';
+    if(blockedByFins) btnLabel='🚫 NO FINS';
+    else if(owned) btnLabel='OWNED';
     else if(cantAfford) btnLabel='NOT ENOUGH';
-    return `<div class="shop-item ${typeClass}${cantAfford&&!owned?' cant-afford':''}${owned?' already-owned':''}" id="si_${item.id}">
+    return `<div class="shop-item ${typeClass}${cantAfford&&!owned?' cant-afford':''}${owned?' already-owned':''}${blockedByFins?' cant-afford':''}" id="si_${item.id}">
       ${owned?'<div class="owned-ribbon">OWNED</div>':''}
       <div class="shop-item-emoji">${item.emoji||'🛒'}</div>
       <div class="shop-item-name">${item.name}</div>
@@ -1849,17 +1920,20 @@ function renderShop(){
 }
 
 function renderShopAffordability(){
+  const finsBlocked=isFinsBlocked();
   shopItems.forEach(item=>{
     const el=document.getElementById('si_'+item.id);if(!el)return;
     const cantAfford=_makoBalance<(item.price||0);
     const owned=isAlreadyOwned(item);
-    el.classList.toggle('cant-afford',cantAfford&&!owned);
+    const blockedByFins=finsBlocked&&item.usesFins;
+    el.classList.toggle('cant-afford',(cantAfford&&!owned)||blockedByFins);
     el.classList.toggle('already-owned',owned);
     const btn=el.querySelector('.shop-buy-btn');
     if(btn){
-      btn.disabled=cantAfford||owned||timerEnded;
+      btn.disabled=cantAfford||owned||timerEnded||blockedByFins;
       let lbl='BUY!';
-      if(owned) lbl='OWNED';
+      if(blockedByFins) lbl='🚫 NO FINS';
+      else if(owned) lbl='OWNED';
       else if(cantAfford) lbl='NOT ENOUGH';
       btn.querySelector('span').textContent=lbl;
     }
@@ -1870,6 +1944,7 @@ function openShopModal(itemId){
   const item=shopItems.find(i=>i.id===itemId);
   if(!item)return;
   if(_makoBalance<(item.price||0)||isAlreadyOwned(item))return;
+  if(isFinsBlocked()&&item.usesFins){showToast('🚫 No Fins is active on you — this power-up is blocked!');return;}
   pendingPurchase=item;
   const inner=document.getElementById('shopModalInner');
   inner.className='shop-modal '+getItemTypeClass(item);
