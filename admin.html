@@ -425,7 +425,7 @@
   <!-- FUNDRAISING (PAY-PER-LAP) -->
   <div class="card fund-card">
     <div class="card-title">💵 Fundraising (Rand per Lap)</div>
-    <div class="fund-hint">For teams with a roster: set each swimmer's own R/lap sponsor rate up in "Team Rosters" — this card just totals them up automatically. For teams with no roster (using the whole-team button), use the flat team rate below instead. Either way it's tracked off real laps swum, not bonus points from challenges or the wheel. Each team's total below also includes the starting balance set in the 🏦 Starting Money Balance card above. Use "Reset" on a team to zero out its lap-based earnings (starting balance stays).</div>
+    <div class="fund-hint">For teams with a roster: set each swimmer's own R/lap sponsor rate up in "Team Rosters" — this card just totals them up automatically. For teams with no roster (using the flat whole-team button), use the flat team rate below instead. Either way it's tracked off real laps swum, not bonus points from challenges or the wheel. Each team's total below also includes the starting balance set in the 🏦 Starting Money Balance card above. Use "Reset" on a team to zero out its lap-based earnings (starting balance stays).</div>
     <div class="fund-grid" id="fundGrid">Loading...</div>
     <div class="fund-grand-total" id="fundGrandTotal">Total raised across all fundraising teams: <b>R0.00</b></div>
     <div class="fund-save-row">
@@ -495,6 +495,21 @@
       </label>
       <span style="font-size:12px;color:rgba(168,228,255,0.4);letter-spacing:1px">Teams spend Mako Coins on power-ups &amp; sabotages</span>
     </div>
+    <div class="shop-toggle-row" id="shopRotationRow">
+      <span class="shop-enabled-label">Rotate items:</span>
+      <label class="toggle-switch">
+        <input type="checkbox" id="shopRotationToggle" onchange="saveShopRotationSettings()">
+        <span class="toggle-slider"></span>
+      </label>
+      <label style="font-size:14px;color:rgba(168,228,255,0.7);margin-left:8px">Every</label>
+      <input class="freq-input" style="width:70px" type="number" id="shopRotationMinutes" value="10" min="1" max="999">
+      <span style="font-size:14px;color:rgba(168,228,255,0.5)">min</span>
+      <label style="font-size:14px;color:rgba(168,228,255,0.7);margin-left:8px">Show</label>
+      <input class="freq-input" style="width:60px" type="number" id="shopRotationCount" value="6" min="1" max="99">
+      <span style="font-size:14px;color:rgba(168,228,255,0.5)">items at a time</span>
+      <button class="freq-save-btn" onclick="saveShopRotationSettings()">💾 Save</button>
+    </div>
+    <div class="next-event-row" id="shopRotationStatusRow" style="margin-bottom:16px">🔄 Rotation off — all enabled items shown at once</div>
     <button class="starter-pack-btn" onclick="loadStarterPack()">📦 LOAD STARTER PACK (power-ups, sabotages &amp; defensive items)</button>
     <div class="shop-item-list" id="shopItemList">
       <div style="font-size:13px;color:rgba(168,228,255,0.3);text-align:center;padding:10px 0">No shop items yet — add some below, or load the starter pack above</div>
@@ -1529,8 +1544,92 @@ async function toggleRepurchasable(id,repurchasable){
 }
 async function saveShopSettings(){
   const enabled=document.getElementById('shopEnabledToggle').checked;
-  await fetch(FB+'/shopSettings.json',{method:'PUT',body:JSON.stringify({enabled})});
+  await fetch(FB+'/shopSettings.json',{method:'PATCH',body:JSON.stringify({enabled})});
   toast(enabled?'🛒 Shop enabled!':'🛒 Shop disabled');
+}
+
+/* ── SHOP ROTATION (Firebase-driven, not tab-local) ──
+   Lets the admin show only a random subset of shop items at a time on the
+   team pages, refreshing on a timer. Mirrors the exact same "shared
+   schedule lives in Firebase" pattern already used for Random Events
+   (/eventSettings/nextEventAt) so rotation keeps advancing as long as ANY
+   open page (admin, or any team page) is polling — not tied to the admin
+   tab staying open.
+   /shopSettings: rotationEnabled, rotationMinutes, rotationCount
+   /shopRotation: { itemIds: [...], nextRotationAt } */
+let shopRotationSettings={enabled:false,rotationMinutes:10,rotationCount:6};
+let cachedShopNextRotationAt=null;
+
+async function loadShopRotationSettings(){
+  const res=await fetch(FB+'/shopSettings.json');const data=(await res.json())||{};
+  shopRotationSettings={enabled:!!data.rotationEnabled,rotationMinutes:data.rotationMinutes||10,rotationCount:data.rotationCount||6};
+  document.getElementById('shopRotationToggle').checked=shopRotationSettings.enabled;
+  document.getElementById('shopRotationMinutes').value=shopRotationSettings.rotationMinutes;
+  document.getElementById('shopRotationCount').value=shopRotationSettings.rotationCount;
+  const rotRes=await fetch(FB+'/shopRotation/nextRotationAt.json');
+  cachedShopNextRotationAt=(await rotRes.json())||null;
+  updateShopRotationStatusRow();
+}
+function shuffleArray(arr){
+  const a=arr.slice();
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+async function rotateShopItemsNow(count){
+  const pool=shopItems.filter(i=>i.enabled!==false).map(i=>i.id);
+  const chosen=shuffleArray(pool).slice(0,Math.max(1,count||1));
+  await fetch(FB+'/shopRotation/itemIds.json',{method:'PUT',body:JSON.stringify(chosen)});
+}
+async function saveShopRotationSettings(){
+  const enabled=document.getElementById('shopRotationToggle').checked;
+  const rotationMinutes=Math.max(1,parseInt(document.getElementById('shopRotationMinutes').value)||10);
+  const rotationCount=Math.max(1,parseInt(document.getElementById('shopRotationCount').value)||6);
+  shopRotationSettings={enabled,rotationMinutes,rotationCount};
+  await fetch(FB+'/shopSettings.json',{method:'PATCH',body:JSON.stringify({rotationEnabled:enabled,rotationMinutes,rotationCount})});
+  if(enabled){
+    const freshNext=Date.now()+rotationMinutes*60000;
+    await fetch(FB+'/shopRotation/nextRotationAt.json',{method:'PUT',body:JSON.stringify(freshNext)});
+    cachedShopNextRotationAt=freshNext;
+    await rotateShopItemsNow(rotationCount);
+  } else {
+    await fetch(FB+'/shopRotation.json',{method:'DELETE'});
+    cachedShopNextRotationAt=null;
+  }
+  updateShopRotationStatusRow();
+  toast(enabled?'🔄 Shop rotation enabled!':'🔄 Shop rotation disabled — all items shown');
+}
+function updateShopRotationStatusRow(){
+  const el=document.getElementById('shopRotationStatusRow');if(!el)return;
+  if(!shopRotationSettings.enabled){el.textContent='🔄 Rotation off — all enabled items shown at once';return;}
+  if(!cachedShopNextRotationAt){el.textContent='🔄 Rotation on — starting soon';return;}
+  el.textContent=`🔄 Next shop rotation in: ${fmtTime(Math.max(0,Math.round((cachedShopNextRotationAt-Date.now())/1000)))} · showing ${shopRotationSettings.rotationCount} item${shopRotationSettings.rotationCount!==1?'s':''} at a time`;
+}
+async function checkAndRotateShop(){
+  try{
+    const setRes=await fetch(FB+'/shopSettings.json');const sett=(await setRes.json())||{};
+    shopRotationSettings={enabled:!!sett.rotationEnabled,rotationMinutes:sett.rotationMinutes||10,rotationCount:sett.rotationCount||6};
+    if(!sett.rotationEnabled){cachedShopNextRotationAt=null;updateShopRotationStatusRow();return;}
+    const rotationMinutes=sett.rotationMinutes||10;
+    const rotationCount=sett.rotationCount||6;
+    const nextRes=await fetch(FB+'/shopRotation/nextRotationAt.json');
+    let nextAt=(await nextRes.json())||null;
+    cachedShopNextRotationAt=nextAt;
+    const now=Date.now();
+    if(!nextAt){
+      const freshNext=now+rotationMinutes*60000;
+      await fetch(FB+'/shopRotation/nextRotationAt.json',{method:'PUT',body:JSON.stringify(freshNext)});
+      cachedShopNextRotationAt=freshNext;
+      await rotateShopItemsNow(rotationCount);
+      updateShopRotationStatusRow();return;
+    }
+    if(now>=nextAt){
+      const newNext=now+rotationMinutes*60000;
+      await fetch(FB+'/shopRotation/nextRotationAt.json',{method:'PUT',body:JSON.stringify(newNext)});
+      cachedShopNextRotationAt=newNext;
+      await rotateShopItemsNow(rotationCount);
+    }
+    updateShopRotationStatusRow();
+  }catch(e){}
 }
 
 /* ── SHOP PURCHASE LOG ── */
@@ -1728,7 +1827,9 @@ async function init(){
   await loadTeamNames();
   await loadStartingBalances();
   loadScores();loadSlots();loadRosters();loadEvents();loadCompletionsLog();loadWheelData();loadCurrency();
-  loadShopData();loadShopLog();loadFundraising();loadWheelLog();loadEffectsBoard();
+  await loadShopData();
+  loadShopLog();loadFundraising();loadWheelLog();loadEffectsBoard();
+  await loadShopRotationSettings();
   onNewSiTypeChange();
   setInterval(loadScores,3000);setInterval(loadSlots,3000);setInterval(syncTimerUI,1000);
   setInterval(updateNextEventRow,1000);setInterval(loadCompletionsLog,3000);
@@ -1744,6 +1845,9 @@ async function init(){
   setInterval(loadActiveEvent,2000);
   setInterval(checkAndFireScheduledEvent,5000);
   checkAndFireScheduledEvent();
+  setInterval(updateShopRotationStatusRow,1000);
+  setInterval(checkAndRotateShop,5000);
+  checkAndRotateShop();
   syncTimerUI();
 }
 init();
