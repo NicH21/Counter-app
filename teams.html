@@ -414,6 +414,13 @@
       border-radius: 50%;
       object-fit: contain;
     }
+    .shop-rotation-note {
+      font-size: 11px;
+      color: rgba(168,228,255,0.4);
+      text-align: center;
+      margin-bottom: 10px;
+      letter-spacing: 0.5px;
+    }
 
     .shop-grid {
       display: grid;
@@ -786,6 +793,7 @@
       <span id="shopBalanceCount">0</span>
     </div>
   </div>
+  <div class="shop-rotation-note" id="shopRotationNote"></div>
   <div class="shop-grid" id="shopGrid">
     <div class="shop-empty" style="grid-column:1/-1">Loading shop…</div>
   </div>
@@ -922,6 +930,16 @@ let _makoBalance=0;
 // ── FIX: keyed by team so Team A's purchases don't mark items as owned for Team B ──
 let sessionPurchasedIds=new Set(JSON.parse(sessionStorage.getItem('sessionPurchasedIds_'+team)||'[]'));
 let sessionPurchaseLog=JSON.parse(sessionStorage.getItem('sessionPurchaseLog_'+team)||'[]');
+
+/* ─────────────── SHOP ROTATION STATE ───────────────
+   Mirrors admin.html's Firebase-driven scheduling: /shopSettings holds
+   rotationEnabled/rotationMinutes/rotationCount, /shopRotation holds the
+   currently-picked itemIds + nextRotationAt. Any open team page (or the
+   admin panel) advances the schedule when it's due, so rotation keeps
+   going even if the admin's tab is closed. */
+let shopRotationEnabled=false;
+let shopRotationItemIds=null; // null = show all (rotation disabled)
+let shopNextRotationAt=null;
 
 /* ─────────────── ACTIVE EFFECTS STATE (power-ups on me, sabotages against me, my defenses) ───────────────
    /activePowerups/{team}/{id}   — power-ups THIS team bought that are still running (durationMinutes>0 only;
@@ -1338,6 +1356,55 @@ async function checkAndFireScheduledEvent(){
       }
     }
   }catch(e){}
+}
+
+/* ── SHOP ROTATION AUTO-SCHEDULE (Firebase-driven, shared with admin.html) ──
+   Same shared-schedule pattern as random events: /shopSettings holds
+   rotationEnabled/rotationMinutes/rotationCount, and /shopRotation holds
+   the currently-active itemIds + nextRotationAt. Every open team page (and
+   the admin panel) polls this, so rotation keeps advancing even if the
+   admin's tab is closed — whichever page is open next just picks it up. */
+async function checkAndRotateShop(){
+  try{
+    const setRes=await fetch(FB+'/shopSettings.json');const sett=(await setRes.json())||{};
+    if(!sett.rotationEnabled)return;
+    const rotationMinutes=sett.rotationMinutes||10;
+    const rotationCount=sett.rotationCount||6;
+    const nextRes=await fetch(FB+'/shopRotation/nextRotationAt.json');
+    let nextAt=(await nextRes.json())||null;
+    const now=Date.now();
+    if(!nextAt){
+      const freshNext=now+rotationMinutes*60000;
+      await fetch(FB+'/shopRotation/nextRotationAt.json',{method:'PUT',body:JSON.stringify(freshNext)});
+      await rotateShopItemsNowShared(rotationCount);
+      return;
+    }
+    if(now>=nextAt){
+      const newNext=now+rotationMinutes*60000;
+      await fetch(FB+'/shopRotation/nextRotationAt.json',{method:'PUT',body:JSON.stringify(newNext)});
+      await rotateShopItemsNowShared(rotationCount);
+    }
+  }catch(e){}
+}
+async function rotateShopItemsNowShared(count){
+  try{
+    const itemsRes=await fetch(FB+'/shopItems.json');
+    const itemsData=(await itemsRes.json())||{};
+    const pool=Object.entries(itemsData).filter(([id,v])=>v.enabled!==false).map(([id])=>id);
+    const a=pool.slice();
+    for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+    const chosen=a.slice(0,Math.max(1,count||1));
+    await fetch(FB+'/shopRotation/itemIds.json',{method:'PUT',body:JSON.stringify(chosen)});
+  }catch(e){}
+}
+function tickShopRotationNote(){
+  const el=document.getElementById('shopRotationNote');
+  if(!el)return;
+  if(!shopRotationEnabled){el.textContent='';return;}
+  if(!shopNextRotationAt){el.textContent='🔄 Items rotate periodically';return;}
+  const remaining=Math.max(0,Math.round((shopNextRotationAt-Date.now())/1000));
+  const m=Math.floor(remaining/60);const s=remaining%60;
+  el.textContent=`🔄 New items in ${m}:${String(s).padStart(2,'0')}`;
 }
 
 async function completeChallenge(){
@@ -1844,18 +1911,29 @@ async function resolveSabotagePurchase(item,targetTeam){
 ══════════════════════════════════════ */
 async function loadShop(){
   try{
-    const [itemsRes,settingsRes]=await Promise.all([
+    const [itemsRes,settingsRes,rotationRes]=await Promise.all([
       fetch(FB+'/shopItems.json'),
-      fetch(FB+'/shopSettings.json')
+      fetch(FB+'/shopSettings.json'),
+      fetch(FB+'/shopRotation.json')
     ]);
     const itemsData=(await itemsRes.json())||{};
     const settingsData=(await settingsRes.json())||{};
+    const rotationData=(await rotationRes.json())||{};
     const enabled=settingsData.enabled!==false;
 
-    shopItems=Object.entries(itemsData)
+    shopRotationEnabled=!!settingsData.rotationEnabled;
+    shopRotationItemIds=(shopRotationEnabled&&Array.isArray(rotationData.itemIds))?rotationData.itemIds:null;
+    shopNextRotationAt=rotationData.nextRotationAt||null;
+    tickShopRotationNote();
+
+    let allItems=Object.entries(itemsData)
       .map(([id,v])=>({id,...v}))
       .filter(i=>i.enabled!==false)
       .sort((a,b)=>(a.sortOrder||99)-(b.sortOrder||99)||a.name.localeCompare(b.name));
+
+    shopItems = (shopRotationEnabled && shopRotationItemIds)
+      ? allItems.filter(i=>shopRotationItemIds.includes(i.id))
+      : allItems;
 
     const section=document.getElementById('shopSection');
     if(enabled&&shopItems.length>0){
@@ -2170,6 +2248,9 @@ setInterval(loadScore,1500);
 setInterval(pollChallenge,1500);
 setInterval(checkAndFireScheduledEvent,6000);
 checkAndFireScheduledEvent();
+setInterval(checkAndRotateShop,6000);
+checkAndRotateShop();
+setInterval(tickShopRotationNote,1000);
 setInterval(pollTimer,2000);
 setInterval(pollCurrency,3000);
 setInterval(loadFundraising,4000);
