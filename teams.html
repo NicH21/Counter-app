@@ -1074,9 +1074,11 @@ let myDefenses = {};
 
 /* Real mechanics derived from active effects:
    - Score multiplier: while a power-up with multiplier>1 is active (e.g. Double
-     Points x2, Golden Minute x3), laps logged add MORE to the team's competitive
-     score — but the physical lap count (used for fundraising, since sponsors pay
-     per real lap swum) stays exactly what was actually swum.
+     Points x2, Golden Minute x3), BOTH the swimmer's own lap count and the
+     team's competitive score are multiplied per tap. Since fundraising is
+     calculated off each swimmer's lap count, this means fundraising totals
+     also rise faster while a boost is active — that's intentional per the
+     event organiser's request, not a bug.
    - Locked laps: a sabotage with sabotageEffect==='lock_laps' (e.g. Time Out)
      actually disables this team's lap buttons for its duration.
    - Blocked fins: a sabotage with sabotageEffect==='block_fins' (e.g. No Fins)
@@ -1171,13 +1173,13 @@ function updateLapCooldownUI(){
 async function update(){
   if(timerEnded||isLapOnCooldown()||isLapsLocked())return;
   const mult=getActiveScoreMultiplier();
-  const scoreDelta=2*mult;
+  const amount=2*mult; // both the score AND the lap count now scale with an active boost
   let res=await fetch(FB+"/teams/"+team+".json");let value=await res.json();
-  value=(value||0)+scoreDelta;
+  value=(value||0)+amount;
   await fetch(FB+"/teams/"+team+".json",{method:"PUT",body:JSON.stringify(value)});
   document.getElementById("score").innerText=value;
-  await bumpTeamLaps(2); // flat fallback fundraising counter (no-roster teams only) — physical laps, never multiplied
-  if(mult>1) showToast(`⚡ ×${mult} BOOST — score +${scoreDelta}!`);
+  await bumpTeamLaps(amount); // flat fallback fundraising counter — scales with the boost too
+  if(mult>1) showToast(`⚡ ×${mult} BOOST — +${amount} laps & score!`);
   startLapCooldown();
 }
 async function loadScore(){
@@ -1325,15 +1327,15 @@ function renderSwimmers(){
 async function addLapToActiveSwimmer(){
   if(timerEnded || isLapOnCooldown() || isLapsLocked() || activeSwimmerIdx===null || !roster[activeSwimmerIdx]) return;
   const idx = activeSwimmerIdx;
-  const amount = 2; // physical laps actually swum — always this, never multiplied (fundraising is per real lap)
   const mult = getActiveScoreMultiplier();
-  const scoreDelta = amount * mult;
+  const amount = 2 * mult; // both this swimmer's own lap count AND the team score scale with an active boost
+  const scoreDelta = amount;
 
   // Update this swimmer's personal lap count
   const newLaps = (swimmerLaps[idx]||0) + amount;
   swimmerLaps[idx] = newLaps;
   document.getElementById('activeSwimmerLaps').textContent = newLaps;
-  updateActiveSwimmerRaisedDisplay(idx, newLaps); // reflects the full +2 laps worth of money, right away
+  updateActiveSwimmerRaisedDisplay(idx, newLaps); // reflects the full boosted laps worth of money, right away
   await fetch(FB+'/swimmerLaps/'+team+'/'+idx+'.json',{method:'PUT',body:JSON.stringify(newLaps)});
 
   // Add to the team's grand total (competitive score), same as the original whole-team button did
@@ -1345,7 +1347,7 @@ async function addLapToActiveSwimmer(){
   // Refresh this swimmer's individual fundraising total (per-swimmer R/lap)
   renderFundBannerFromRoster();
 
-  if(mult>1) showToast(`⚡ ×${mult} BOOST — score +${scoreDelta}!`);
+  if(mult>1) showToast(`⚡ ×${mult} BOOST — +${amount} laps & score!`);
 
   lastSwimmerAction = {idx, amount, scoreDelta};
   document.getElementById('swimmerUndoBtn').style.display='inline-block';
