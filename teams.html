@@ -290,6 +290,23 @@
     .swimmer-big-btn:hover:not(:disabled) { transform: scale(1.03); }
     .swimmer-big-btn:active:not(:disabled) { transform: scale(0.96); }
     .swimmer-big-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .boost-badge {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-family: 'Bangers', cursive;
+      font-size: 14px;
+      letter-spacing: 1.5px;
+      color: #6bcb77;
+      background: rgba(107,203,119,0.12);
+      border: 1.5px solid rgba(107,203,119,0.5);
+      border-radius: 10px;
+      padding: 6px 12px;
+      margin-bottom: 10px;
+      animation: badgeBlink 1s infinite;
+    }
+    .boost-badge.visible { display: flex; }
     .swimmer-undo-btn {
       margin-top: 10px;
       font-family: 'Nunito', sans-serif;
@@ -809,6 +826,7 @@
 </div>
 
 <!-- Fallback team-wide button — only shown when there is NO roster set up -->
+<div class="boost-badge" id="flatBoostBadge">⚡ SCORE BOOST ACTIVE</div>
 <button class="point-btn" id="pointBtn" onclick="update()" style="display:none"><span>+2 LAPS</span></button>
 
 <!-- ══ SWIMMER LAPS ══ -->
@@ -823,6 +841,7 @@
     <div class="active-swimmer-laps" id="activeSwimmerLaps">0</div>
     <div class="active-swimmer-laps-label">laps</div>
     <div class="active-swimmer-raised" id="activeSwimmerRaised"></div>
+    <div class="boost-badge" id="swimmerBoostBadge">⚡ SCORE BOOST ACTIVE</div>
     <button class="swimmer-big-btn" id="swimmerBigBtn" onclick="addLapToActiveSwimmer()"><span>+2 LAPS</span></button>
     <button class="swimmer-undo-btn" id="swimmerUndoBtn" onclick="undoLapForActiveSwimmer()">↺ Undo last +2</button>
   </div>
@@ -1158,6 +1177,7 @@ async function update(){
   await fetch(FB+"/teams/"+team+".json",{method:"PUT",body:JSON.stringify(value)});
   document.getElementById("score").innerText=value;
   await bumpTeamLaps(2); // flat fallback fundraising counter (no-roster teams only) — physical laps, never multiplied
+  if(mult>1) showToast(`⚡ ×${mult} BOOST — score +${scoreDelta}!`);
   startLapCooldown();
 }
 async function loadScore(){
@@ -1324,6 +1344,8 @@ async function addLapToActiveSwimmer(){
 
   // Refresh this swimmer's individual fundraising total (per-swimmer R/lap)
   renderFundBannerFromRoster();
+
+  if(mult>1) showToast(`⚡ ×${mult} BOOST — score +${scoreDelta}!`);
 
   lastSwimmerAction = {idx, amount, scoreDelta};
   document.getElementById('swimmerUndoBtn').style.display='inline-block';
@@ -1922,6 +1944,23 @@ function renderMyEffects(){
   applySwimmerTimerLock();
   applyLapLockToFlatButton();
   renderShopAffordability();
+  updateBoostBadge();
+}
+
+/* Makes an active score multiplier undeniable — a visible "×2 SCORE BOOST
+   ACTIVE" badge above whichever lap button this team is using, so it's
+   obvious at a glance whether a Double Points / Golden Minute-style
+   power-up is actually in effect right now. */
+function updateBoostBadge(){
+  const mult=getActiveScoreMultiplier();
+  const flatBadge=document.getElementById('flatBoostBadge');
+  const swimBadge=document.getElementById('swimmerBoostBadge');
+  const text = mult>1 ? `⚡ ×${mult} SCORE BOOST ACTIVE` : '';
+  [flatBadge,swimBadge].forEach(b=>{
+    if(!b)return;
+    if(mult>1){ b.textContent=text; b.classList.add('visible'); }
+    else{ b.classList.remove('visible'); }
+  });
 }
 
 function applyLapLockToFlatButton(){
@@ -2234,7 +2273,7 @@ function closeShopModal(){
 
 async function confirmPurchase(){
   if(!pendingPurchase)return;
-  const item=pendingPurchase;
+  let item=pendingPurchase;
   const targetSelect=document.getElementById('shopModalTargetSelect');
   const cancelSelect=document.getElementById('shopModalCancelSelect');
   const targetTeam=item.requiresTarget?targetSelect.value:'';
@@ -2250,6 +2289,18 @@ async function confirmPurchase(){
   const freshData=(await freshRes.json())||{};
   const currentMako=freshData.mako||0;
   if(currentMako<(item.price||0)){showToast('Not enough Mako Coins!');return;}
+
+  // Pull the item's LIVE data straight from Firebase right before applying its
+  // effect. The `shopItems` array in memory only refreshes every ~8s, so if an
+  // admin just tweaked something (e.g. the multiplier on Double Points / Golden
+  // Minute) moments before this purchase, the cached copy in `item` could still
+  // be the old value. This guarantees the multiplier/duration/effect actually
+  // applied always matches what's currently saved in the admin panel.
+  try{
+    const liveRes=await fetch(FB+'/shopItems/'+item.id+'.json');
+    const liveData=(await liveRes.json())||{};
+    item={...item,...liveData,id:item.id};
+  }catch(e){}
 
   // Deduct
   const newMako=currentMako-(item.price||0);
