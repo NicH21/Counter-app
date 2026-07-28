@@ -66,9 +66,98 @@
     .event-strip-pts{font-size:13px;color:rgba(240,192,64,0.7);margin-top:3px}
     .back-btn{font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;padding:12px 30px;border-radius:10px;border:1px solid rgba(0,229,255,0.3);cursor:pointer;background:rgba(5,20,40,0.7);color:#a8e4ff;letter-spacing:1px;transition:background 0.2s,border-color 0.2s}
     .back-btn:hover{background:rgba(0,229,255,0.1);border-color:rgba(0,229,255,0.6)}
+
+    /* ══ NEW: SHOP ROTATION DISPLAY (read-only, no buy button) ══ */
+    .shop-rotation-status{font-size:11px;color:rgba(168,228,255,0.35);text-align:center;padding:8px 20px 0;letter-spacing:0.5px}
+    .shop-display-list{display:flex;flex-direction:column;gap:8px;padding:14px 20px}
+    .shop-display-item{display:flex;align-items:center;gap:10px;background:rgba(2,11,24,0.5);border-radius:10px;border:1px solid rgba(255,255,255,0.07);padding:10px 12px;text-align:left}
+    .shop-display-item.type-powerup{border-color:rgba(107,203,119,0.3)}
+    .shop-display-item.type-sabotage{border-color:rgba(255,107,107,0.3)}
+    .shop-display-item.type-defensive{border-color:rgba(204,93,232,0.3)}
+    .sdi-emoji{font-size:22px;flex-shrink:0}
+    .sdi-info{flex:1;min-width:0}
+    .sdi-name{font-size:14px;font-weight:900;color:#a8e4ff}
+    .sdi-desc{font-size:11px;color:rgba(168,228,255,0.4);margin-top:2px}
+    .sdi-badge{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2px 6px;border-radius:5px;white-space:nowrap;flex-shrink:0}
+    .type-powerup .sdi-badge{background:rgba(107,203,119,0.15);color:#6bcb77}
+    .type-sabotage .sdi-badge{background:rgba(255,107,107,0.15);color:#ff6b6b}
+    .type-defensive .sdi-badge{background:rgba(204,93,232,0.15);color:#cc5de8}
+    .type-item .sdi-badge{background:rgba(77,150,255,0.15);color:#74c0fc}
+    .sdi-price{display:flex;align-items:center;gap:5px;font-family:'Bangers',cursive;font-size:18px;color:#f0c040;white-space:nowrap;flex-shrink:0}
+    .sdi-price-img{width:18px;height:18px;border-radius:50%;object-fit:contain}
+    .shop-display-empty{font-size:13px;color:rgba(168,228,255,0.3);text-align:center;padding:14px 0}
+
+    /* ══ NEW: TOP-OF-SCREEN POPUP NOTIFICATIONS FOR SHOP PURCHASES ══ */
+    .notif-popup-stack {
+      position: fixed;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 300;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 92%;
+      max-width: 420px;
+      align-items: center;
+      pointer-events: none;
+    }
+    .notif-popup {
+      width: 100%;
+      background: linear-gradient(135deg, rgba(5,20,40,0.97), rgba(2,11,24,0.97));
+      border: 2px solid rgba(107,203,119,0.6);
+      border-radius: 16px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5), 0 0 26px rgba(107,203,119,0.4);
+      transform: translateY(-140%);
+      opacity: 0;
+      transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s;
+      pointer-events: all;
+      animation: notifGlow 1.4s ease-in-out infinite;
+    }
+    .notif-popup.show { transform: translateY(0); opacity: 1; }
+    .notif-popup.sabotage {
+      border-color: rgba(255,107,107,0.7);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5), 0 0 26px rgba(255,107,107,0.45);
+      animation-name: notifGlowSab;
+    }
+    @keyframes notifGlow {
+      0%,100% { box-shadow: 0 8px 30px rgba(0,0,0,0.5), 0 0 26px rgba(107,203,119,0.35); }
+      50% { box-shadow: 0 8px 30px rgba(0,0,0,0.5), 0 0 40px rgba(107,203,119,0.65); }
+    }
+    @keyframes notifGlowSab {
+      0%,100% { box-shadow: 0 8px 30px rgba(0,0,0,0.5), 0 0 26px rgba(255,107,107,0.4); }
+      50% { box-shadow: 0 8px 30px rgba(0,0,0,0.5), 0 0 42px rgba(255,107,107,0.7); }
+    }
+    .notif-popup .notif-emoji { font-size: 34px; flex-shrink: 0; line-height: 1; }
+    .notif-popup .notif-body { flex: 1; text-align: left; min-width: 0; }
+    .notif-popup .notif-label {
+      font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+      color: rgba(168,228,255,0.6); margin-bottom: 2px; font-weight: 700;
+    }
+    .notif-popup.sabotage .notif-label { color: rgba(255,150,150,0.8); }
+    .notif-popup .notif-name {
+      font-family:'Bangers',cursive; font-size: 20px; letter-spacing: 1.5px;
+      color: #a8e4ff; line-height:1.15; word-break: break-word;
+    }
+    .notif-popup.sabotage .notif-name { color: #ff8787; }
+    .notif-popup .notif-sub { font-size: 11px; color: rgba(168,228,255,0.5); margin-top: 3px; }
+    .notif-popup .notif-close {
+      flex-shrink:0; width:26px;height:26px;border-radius:8px;
+      border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.06);
+      color:rgba(255,255,255,0.65); cursor:pointer; font-size:13px;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .notif-popup .notif-close:hover { background: rgba(255,255,255,0.12); }
   </style>
 </head>
 <body>
+<!-- TOP-OF-SCREEN POPUP NOTIFICATIONS (shop purchases: power-ups & sabotages) -->
+<div class="notif-popup-stack" id="notifPopupStack"></div>
+
 <div class="content">
   <h1>🏆 LEADERBOARD</h1>
   <div class="live-badge"><span class="live-dot"></span>Live Scores</div>
@@ -95,6 +184,14 @@
     <h2>All Teams — tap a row to see members</h2>
     <div id="allTeamsRows"></div>
   </div>
+
+  <!-- ══ NEW: MAKO SHOP — CURRENT ROTATION (read-only, no buy button) ══ -->
+  <div class="all-teams" id="shopDisplayCard" style="display:none">
+    <h2>🛒 Mako Shop — Currently Available</h2>
+    <div class="shop-rotation-status" id="shopRotationStatus"></div>
+    <div class="shop-display-list" id="shopDisplayList"></div>
+  </div>
+
   <button class="back-btn" onclick="window.location.href='./index.html'">← Back</button>
 </div>
 
@@ -112,6 +209,7 @@
 const TEAMS=['team1','team2','team3','team4','team5','team6','team7','team8','team9','team10','team11','team12'];
 const COLORS={team1:'#ff6b6b',team2:'#ffd93d',team3:'#6bcb77',team4:'#4d96ff',team5:'#ff922b',team6:'#cc5de8',team7:'#20c997',team8:'#f06595',team9:'#74c0fc',team10:'#ff8787',team11:'#a9e34b',team12:'#ffa94d'};
 const FB="https://counterapp-5297b-default-rtdb.firebaseio.com";
+const MAKO_IMG='./assets/mako-coin.png';
 let prevTop=['','',''];
 let cachedRosters={};
 let cachedNames={};
@@ -210,6 +308,133 @@ async function pollActiveEvent(){
   }catch(e){}
 }
 setInterval(pollActiveEvent,1000);pollActiveEvent();
+
+/* ══════════════════════════════════════
+   NEW: MAKO SHOP — CURRENT ROTATION DISPLAY
+   Read-only view of whatever the shop currently has available (respects
+   the admin's enabled/rotation settings exactly like the team pages do),
+   but with no buy button — this is just a shared/public view. Refreshes
+   on the same 1-second cadence as the other live boards on this page.
+══════════════════════════════════════ */
+async function loadShopDisplay(){
+  try{
+    const [itemsRes,settingsRes,rotationRes]=await Promise.all([
+      fetch(FB+'/shopItems.json'),fetch(FB+'/shopSettings.json'),fetch(FB+'/shopRotation.json')
+    ]);
+    const itemsData=(await itemsRes.json())||{};
+    const settingsData=(await settingsRes.json())||{};
+    const rotationData=(await rotationRes.json())||{};
+    const enabled=settingsData.enabled!==false;
+    const card=document.getElementById('shopDisplayCard');
+    const list=document.getElementById('shopDisplayList');
+    const statusEl=document.getElementById('shopRotationStatus');
+
+    if(!enabled){card.style.display='none';return;}
+    card.style.display='block';
+
+    const rotationEnabled=!!settingsData.rotationEnabled;
+    const rotationItemIds=(rotationEnabled&&Array.isArray(rotationData.itemIds))?rotationData.itemIds:null;
+
+    let allItems=Object.entries(itemsData)
+      .map(([id,v])=>({id,...v}))
+      .filter(i=>i.enabled!==false)
+      .sort((a,b)=>(a.sortOrder||99)-(b.sortOrder||99)||(a.name||'').localeCompare(b.name||''));
+
+    const shownItems=(rotationEnabled&&rotationItemIds)?allItems.filter(i=>rotationItemIds.includes(i.id)):allItems;
+
+    if(shownItems.length===0){
+      list.innerHTML='<div class="shop-display-empty">No items available right now</div>';
+    } else {
+      list.innerHTML=shownItems.map(item=>{
+        const typeClass='type-'+(item.type||'item');
+        const badge=item.type==='powerup'?'⚡ POWER-UP':item.type==='sabotage'?'💀 SABOTAGE':item.type==='defensive'?'🛡️ DEFENSIVE':'🛒 ITEM';
+        return `<div class="shop-display-item ${typeClass}">
+          <div class="sdi-emoji">${item.emoji||'🛒'}</div>
+          <div class="sdi-info">
+            <div class="sdi-name">${item.name}</div>
+            ${item.description?`<div class="sdi-desc">${item.description}</div>`:''}
+          </div>
+          <div class="sdi-badge">${badge}</div>
+          <div class="sdi-price"><img class="sdi-price-img" src="${MAKO_IMG}" alt="Mako">${item.price||0}</div>
+        </div>`;
+      }).join('');
+    }
+
+    if(rotationEnabled&&rotationData.nextRotationAt){
+      const remaining=Math.max(0,Math.round((rotationData.nextRotationAt-Date.now())/1000));
+      const m=Math.floor(remaining/60);const s=remaining%60;
+      statusEl.textContent=`🔄 Next rotation in ${m}:${String(s).padStart(2,'0')} · showing ${shownItems.length} item${shownItems.length!==1?'s':''}`;
+    } else if(rotationEnabled){
+      statusEl.textContent='🔄 Rotation on — starting soon';
+    } else {
+      statusEl.textContent='';
+    }
+  }catch(e){}
+}
+loadShopDisplay();setInterval(loadShopDisplay,1000);
+
+/* ══════════════════════════════════════
+   NEW: TOP-OF-SCREEN POPUP NOTIFICATIONS FOR SHOP PURCHASES
+   Watches /shopPurchases for new power-up or sabotage buys and pops a
+   banner at the top of the screen saying who bought it, and — for
+   sabotages — who they targeted. Purchases that existed before this page
+   was opened are marked "seen" silently on first load so it doesn't spam
+   the whole purchase history the moment the board is opened; only NEW
+   purchases from then on trigger a popup. Refreshes on the same 1-second
+   cadence as the rest of this page's live data.
+══════════════════════════════════════ */
+let seenPurchaseKeys=new Set(JSON.parse(sessionStorage.getItem('seenShopPurchases_leaderboard')||'[]'));
+let shopPurchasesFirstLoad=true;
+
+function spawnPurchaseNotif(p){
+  const stack=document.getElementById('notifPopupStack');
+  if(!stack)return;
+  const isSab=p.itemType==='sabotage';
+  const buyerName=cachedNames[p.team]||p.team;
+  let nameHTML,subHTML;
+  if(isSab&&p.targetTeam){
+    const targetName=cachedNames[p.targetTeam]||p.targetTeam;
+    nameHTML=`${buyerName} ➜ ${targetName}`;
+    subHTML=p.itemName||'';
+  } else {
+    nameHTML=buyerName;
+    subHTML=p.itemName||'';
+  }
+  const el=document.createElement('div');
+  el.className='notif-popup'+(isSab?' sabotage':'');
+  el.innerHTML=`<div class="notif-emoji">${p.itemEmoji||(isSab?'💀':'⚡')}</div>
+    <div class="notif-body">
+      <div class="notif-label">${isSab?'💀 Sabotage Bought':'⚡ Power-Up Bought'}</div>
+      <div class="notif-name">${nameHTML}</div>
+      <div class="notif-sub">${subHTML}</div>
+    </div>
+    <button class="notif-close" onclick="this.parentElement.remove()">✕</button>`;
+  stack.appendChild(el);
+  requestAnimationFrame(()=>el.classList.add('show'));
+  const life=isSab?7000:5500;
+  setTimeout(()=>{
+    el.classList.remove('show');
+    setTimeout(()=>el.remove(),400);
+  },life);
+}
+
+async function pollShopPurchases(){
+  try{
+    const res=await fetch(FB+'/shopPurchases.json');
+    const data=(await res.json())||{};
+    const entries=Object.entries(data).map(([key,p])=>({key,...p})).sort((a,b)=>(a.time||0)-(b.time||0));
+    entries.forEach(p=>{
+      if(seenPurchaseKeys.has(p.key))return;
+      seenPurchaseKeys.add(p.key);
+      if(!shopPurchasesFirstLoad&&(p.itemType==='powerup'||p.itemType==='sabotage')){
+        spawnPurchaseNotif(p);
+      }
+    });
+    shopPurchasesFirstLoad=false;
+    sessionStorage.setItem('seenShopPurchases_leaderboard',JSON.stringify([...seenPurchaseKeys]));
+  }catch(e){}
+}
+pollShopPurchases();setInterval(pollShopPurchases,1000);
 </script>
 </body>
 </html>
