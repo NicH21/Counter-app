@@ -44,6 +44,72 @@
     @keyframes coinBump{0%{transform:scale(1)}40%{transform:scale(1.3)}100%{transform:scale(1)}}
     .coin-icon-img{width:48px;height:48px;object-fit:contain;border-radius:50%;flex-shrink:0;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.6))}
 
+    /* ══ NEW-EFFECT POPUP NOTIFICATIONS ══ */
+    .notif-popup-stack {
+      position: fixed;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 300;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 92%;
+      max-width: 420px;
+      align-items: center;
+      pointer-events: none;
+    }
+    .notif-popup {
+      width: 100%;
+      background: linear-gradient(135deg, rgba(5,20,40,0.97), rgba(2,11,24,0.97));
+      border: 2px solid rgba(107,203,119,0.6);
+      border-radius: 16px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5), 0 0 26px rgba(107,203,119,0.4);
+      transform: translateY(-140%);
+      opacity: 0;
+      transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s;
+      pointer-events: all;
+      animation: notifGlow 1.4s ease-in-out infinite;
+    }
+    .notif-popup.show { transform: translateY(0); opacity: 1; }
+    .notif-popup.sabotage {
+      border-color: rgba(255,107,107,0.7);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5), 0 0 26px rgba(255,107,107,0.45);
+      animation-name: notifGlowSab;
+    }
+    @keyframes notifGlow {
+      0%,100% { box-shadow: 0 8px 30px rgba(0,0,0,0.5), 0 0 26px rgba(107,203,119,0.35); }
+      50% { box-shadow: 0 8px 30px rgba(0,0,0,0.5), 0 0 40px rgba(107,203,119,0.65); }
+    }
+    @keyframes notifGlowSab {
+      0%,100% { box-shadow: 0 8px 30px rgba(0,0,0,0.5), 0 0 26px rgba(255,107,107,0.4); }
+      50% { box-shadow: 0 8px 30px rgba(0,0,0,0.5), 0 0 42px rgba(255,107,107,0.7); }
+    }
+    .notif-popup .notif-emoji { font-size: 34px; flex-shrink: 0; line-height: 1; }
+    .notif-popup .notif-body { flex: 1; text-align: left; min-width: 0; }
+    .notif-popup .notif-label {
+      font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+      color: rgba(168,228,255,0.6); margin-bottom: 2px; font-weight: 700;
+    }
+    .notif-popup.sabotage .notif-label { color: rgba(255,150,150,0.8); }
+    .notif-popup .notif-name {
+      font-family:'Bangers',cursive; font-size: 20px; letter-spacing: 1.5px;
+      color: #a8e4ff; line-height:1.15; word-break: break-word;
+    }
+    .notif-popup.sabotage .notif-name { color: #ff8787; }
+    .notif-popup .notif-sub { font-size: 11px; color: rgba(168,228,255,0.5); margin-top: 3px; }
+    .notif-popup .notif-close {
+      flex-shrink:0; width:26px;height:26px;border-radius:8px;
+      border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.06);
+      color:rgba(255,255,255,0.65); cursor:pointer; font-size:13px;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .notif-popup .notif-close:hover { background: rgba(255,255,255,0.12); }
+
     /* ══ ACTIVE EFFECTS BARS ══ */
     .effects-bars { width:100%; max-width:480px; display:flex; flex-direction:column; gap:10px; }
     .effects-bar-section { display:none; }
@@ -713,6 +779,9 @@
   </div>
 </div>
 
+<!-- NEW-EFFECT POPUP NOTIFICATIONS -->
+<div class="notif-popup-stack" id="notifPopupStack"></div>
+
 <div class="team-name" id="title">Loading...</div>
 <div class="score" id="score">0</div>
 
@@ -940,6 +1009,37 @@ let sessionPurchaseLog=JSON.parse(sessionStorage.getItem('sessionPurchaseLog_'+t
 let shopRotationEnabled=false;
 let shopRotationItemIds=null; // null = show all (rotation disabled)
 let shopNextRotationAt=null;
+
+/* ─────────────── NEW-EFFECT POPUP NOTIFICATIONS ───────────────
+   Fires a slide-down popup the instant a power-up or sabotage newly
+   appears against this team, on top of the existing small status chips.
+   Namespaced by team in sessionStorage so switching teams (or a fresh
+   page load) doesn't wrongly re-fire for effects that were already
+   active before this session started. */
+let seenPowerupIds = new Set(JSON.parse(sessionStorage.getItem('seenPowerups_'+team)||'[]'));
+let seenSabotageIds = new Set(JSON.parse(sessionStorage.getItem('seenSabotages_'+team)||'[]'));
+let effectsFirstLoad = true; // suppress popups for effects already active on first load
+
+function spawnNotifPopup({emoji,label,name,sub,type}){
+  const stack=document.getElementById('notifPopupStack');
+  if(!stack)return;
+  const el=document.createElement('div');
+  el.className='notif-popup'+(type==='sabotage'?' sabotage':'');
+  el.innerHTML=`<div class="notif-emoji">${emoji}</div>
+    <div class="notif-body">
+      <div class="notif-label">${label}</div>
+      <div class="notif-name">${name}</div>
+      ${sub?`<div class="notif-sub">${sub}</div>`:''}
+    </div>
+    <button class="notif-close" onclick="this.parentElement.remove()">✕</button>`;
+  stack.appendChild(el);
+  requestAnimationFrame(()=>el.classList.add('show'));
+  const life = type==='sabotage' ? 7000 : 5500;
+  setTimeout(()=>{
+    el.classList.remove('show');
+    setTimeout(()=>el.remove(),400);
+  }, life);
+}
 
 /* ─────────────── ACTIVE EFFECTS STATE (power-ups on me, sabotages against me, my defenses) ───────────────
    /activePowerups/{team}/{id}   — power-ups THIS team bought that are still running (durationMinutes>0 only;
@@ -1742,6 +1842,41 @@ async function loadMyEffects(){
     myActivePowerups=Object.fromEntries(Object.entries(puData).filter(([id,p])=>!p.expiresAt||p.expiresAt>now));
     mySabotages=Object.fromEntries(Object.entries(saData).filter(([id,s])=>!s.expiresAt||s.expiresAt>now));
     myDefenses=defData;
+
+    // Fire a popup for anything new since the last check
+    Object.entries(myActivePowerups).forEach(([id,p])=>{
+      if(!seenPowerupIds.has(id)){
+        seenPowerupIds.add(id);
+        if(!effectsFirstLoad){
+          const minsLeft = p.expiresAt ? Math.max(1,Math.round((p.expiresAt-now)/60000)) : null;
+          spawnNotifPopup({
+            emoji:p.emoji||'⚡',
+            label:'⚡ Power-Up Activated!',
+            name:p.name,
+            sub:minsLeft?`Active for ~${minsLeft} more min`:'',
+            type:'powerup'
+          });
+        }
+      }
+    });
+    Object.entries(mySabotages).forEach(([id,s])=>{
+      if(!seenSabotageIds.has(id)){
+        seenSabotageIds.add(id);
+        if(!effectsFirstLoad){
+          spawnNotifPopup({
+            emoji:s.emoji||'💀',
+            label:'⚠️ Sabotage Incoming!',
+            name:s.name,
+            sub:`From ${allTeamNames[s.fromTeam]||s.fromTeam}`,
+            type:'sabotage'
+          });
+        }
+      }
+    });
+    sessionStorage.setItem('seenPowerups_'+team, JSON.stringify([...seenPowerupIds]));
+    sessionStorage.setItem('seenSabotages_'+team, JSON.stringify([...seenSabotageIds]));
+    effectsFirstLoad = false;
+
     renderMyEffects();
   }catch(e){}
 }
