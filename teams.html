@@ -1099,6 +1099,16 @@ function isFinsBlocked(){
   const now=Date.now();
   return Object.values(mySabotages).some(s=>s.sabotageEffect==='block_fins' && (!s.expiresAt || s.expiresAt>now));
 }
+/* ── NEW: one power-up / one sabotage-at-a-time limits ── */
+function hasActivePowerup(){
+  const now=Date.now();
+  return Object.values(myActivePowerups).some(p=>!p.expiresAt||p.expiresAt>now);
+}
+function teamHasActiveSabotage(sabData){
+  const now=Date.now();
+  if(!sabData) return false;
+  return Object.values(sabData).some(s=>!s.expiresAt||s.expiresAt>now);
+}
 
 async function loadAllTeamNames(){
   try{
@@ -2057,12 +2067,23 @@ async function performCancelCard(targetTeamKey,powerupId){
   return {name:data.name||'a power-up'};
 }
 
-/* Resolves a sabotage purchase against the target team's current defenses.
-   Priority: Super Shield (blocks everything, doesn't get consumed) >
-   Reflector (bounces it back onto the buyer, consumed) > Shield (blocks
-   it, consumed) > no defense (applies normally to the target). */
+/* Resolves a sabotage purchase against the target team's current defenses
+   AND their sabotage-immunity status. Priority:
+   0. Already-sabotaged immunity (blocks before defenses are even checked)
+   1. Super Shield (blocks everything, doesn't get consumed)
+   2. Reflector (bounces it back onto the buyer, consumed)
+   3. Shield (blocks it, consumed)
+   4. No defense (applies normally to the target) */
 async function resolveSabotagePurchase(item,targetTeam){
   const now=Date.now();
+
+  // Immunity check FIRST — a team already under a sabotage can't be hit again.
+  const existingRes=await fetch(FB+'/activeSabotages/'+targetTeam+'.json');
+  const existingSab=(await existingRes.json())||{};
+  if(teamHasActiveSabotage(existingSab)){
+    return {result:'already_sabotaged',targetTeam};
+  }
+
   const defRes=await fetch(FB+'/defenses/'+targetTeam+'.json');
   const def=(await defRes.json())||{};
 
@@ -2146,17 +2167,20 @@ function renderShop(){
     return;
   }
   const finsBlocked=isFinsBlocked();
+  const powerupLimitHit=hasActivePowerup();
   grid.innerHTML=shopItems.map(item=>{
     const typeClass=getItemTypeClass(item);
     const cantAfford=_makoBalance<(item.price||0);
     const owned=isAlreadyOwned(item);
     const blockedByFins=finsBlocked&&item.usesFins;
-    const disabled=cantAfford||owned||timerEnded||blockedByFins;
+    const blockedByPowerupLimit=item.type==='powerup'&&powerupLimitHit;
+    const disabled=cantAfford||owned||timerEnded||blockedByFins||blockedByPowerupLimit;
     let btnLabel='BUY!';
-    if(blockedByFins) btnLabel='🚫 NO FINS';
+    if(blockedByPowerupLimit) btnLabel='⚡ ALREADY ACTIVE';
+    else if(blockedByFins) btnLabel='🚫 NO FINS';
     else if(owned) btnLabel='OWNED';
     else if(cantAfford) btnLabel='NOT ENOUGH';
-    return `<div class="shop-item ${typeClass}${cantAfford&&!owned?' cant-afford':''}${owned?' already-owned':''}${blockedByFins?' cant-afford':''}" id="si_${item.id}">
+    return `<div class="shop-item ${typeClass}${(cantAfford&&!owned)||blockedByPowerupLimit?' cant-afford':''}${owned?' already-owned':''}${blockedByFins?' cant-afford':''}" id="si_${item.id}">
       ${owned?'<div class="owned-ribbon">OWNED</div>':''}
       <div class="shop-item-emoji">${item.emoji||'🛒'}</div>
       <div class="shop-item-name">${item.name}</div>
@@ -2175,18 +2199,21 @@ function renderShop(){
 
 function renderShopAffordability(){
   const finsBlocked=isFinsBlocked();
+  const powerupLimitHit=hasActivePowerup();
   shopItems.forEach(item=>{
     const el=document.getElementById('si_'+item.id);if(!el)return;
     const cantAfford=_makoBalance<(item.price||0);
     const owned=isAlreadyOwned(item);
     const blockedByFins=finsBlocked&&item.usesFins;
-    el.classList.toggle('cant-afford',(cantAfford&&!owned)||blockedByFins);
+    const blockedByPowerupLimit=item.type==='powerup'&&powerupLimitHit;
+    el.classList.toggle('cant-afford',(cantAfford&&!owned)||blockedByFins||blockedByPowerupLimit);
     el.classList.toggle('already-owned',owned);
     const btn=el.querySelector('.shop-buy-btn');
     if(btn){
-      btn.disabled=cantAfford||owned||timerEnded||blockedByFins;
+      btn.disabled=cantAfford||owned||timerEnded||blockedByFins||blockedByPowerupLimit;
       let lbl='BUY!';
-      if(blockedByFins) lbl='🚫 NO FINS';
+      if(blockedByPowerupLimit) lbl='⚡ ALREADY ACTIVE';
+      else if(blockedByFins) lbl='🚫 NO FINS';
       else if(owned) lbl='OWNED';
       else if(cantAfford) lbl='NOT ENOUGH';
       btn.querySelector('span').textContent=lbl;
@@ -2194,11 +2221,13 @@ function renderShopAffordability(){
   });
 }
 
-function openShopModal(itemId){
+async function openShopModal(itemId){
   const item=shopItems.find(i=>i.id===itemId);
   if(!item)return;
   if(_makoBalance<(item.price||0)||isAlreadyOwned(item))return;
   if(isFinsBlocked()&&item.usesFins){showToast('🚫 No Fins is active on you — this power-up is blocked!');return;}
+  if(item.type==='powerup'&&hasActivePowerup()){showToast('⚡ You already have a power-up active — wait for it to expire!');return;}
+
   pendingPurchase=item;
   const inner=document.getElementById('shopModalInner');
   inner.className='shop-modal '+getItemTypeClass(item);
@@ -2219,7 +2248,25 @@ function openShopModal(itemId){
 
   if(item.requiresTarget){
     targetSection.style.display='block';
-    targetSelect.innerHTML='<option value="">Select a team…</option>'+ALL_TEAMS.filter(t=>t!==team).map(t=>`<option value="${t}">${allTeamNames[t]||('Team '+t.replace('team',''))}</option>`).join('');
+    let eligibleTeams=ALL_TEAMS.filter(t=>t!==team);
+    if(item.type==='sabotage'){
+      // Exclude any team that already has an active sabotage — they're immune
+      // until it expires, so don't even let them be selected as a target.
+      try{
+        const res=await fetch(FB+'/activeSabotages.json');
+        const allSab=(await res.json())||{};
+        eligibleTeams=eligibleTeams.filter(t=>!teamHasActiveSabotage(allSab[t]));
+      }catch(e){}
+      if(eligibleTeams.length===0){
+        targetSelect.innerHTML='<option value="">— no valid targets —</option>';
+        noteEl.textContent='Every team currently has an active sabotage running — try again once one expires!';
+        noteEl.style.display='block';
+        confirmBtn.disabled=true;
+        document.getElementById('shopModal').classList.add('open');
+        return;
+      }
+    }
+    targetSelect.innerHTML='<option value="">Select a team…</option>'+eligibleTeams.map(t=>`<option value="${t}">${allTeamNames[t]||('Team '+t.replace('team',''))}</option>`).join('');
     targetSelect.value='';
     confirmBtn.disabled=true;
   } else {
@@ -2284,6 +2331,18 @@ async function confirmPurchase(){
   if(item.requiresTarget&&!targetTeam){showToast('Pick a target team first!');return;}
   if(item.effectKey==='cancel_card'&&!cancelPowerupId){showToast('Pick a power-up to cancel first!');return;}
 
+  // Final re-check right before spending coins — covers the race where this
+  // team already has a power-up active but the shop grid hasn't refreshed yet.
+  if(item.type==='powerup'){
+    const puRes=await fetch(FB+'/activePowerups/'+team+'.json');
+    const puData=(await puRes.json())||{};
+    if(Object.values(puData).some(p=>!p.expiresAt||p.expiresAt>Date.now())){
+      showToast('⚡ You already have a power-up active — wait for it to expire!');
+      closeShopModal();
+      return;
+    }
+  }
+
   closeShopModal();
 
   // Re-check balance
@@ -2317,6 +2376,16 @@ async function confirmPurchase(){
 
   if(item.type==='sabotage'){
     resultInfo=await resolveSabotagePurchase(item,targetTeam);
+    if(resultInfo.result==='already_sabotaged'){
+      // Target became immune (already sabotaged) between opening the modal
+      // and confirming — refund the coins already deducted above and bail.
+      await fetch(FB+'/currency/'+team+'/mako.json',{method:'PUT',body:JSON.stringify(currentMako)});
+      _makoBalance=currentMako;_lastMako=currentMako;
+      document.getElementById('makoCount').textContent=currentMako;
+      document.getElementById('shopBalanceCount').textContent=currentMako;
+      showToast(`${allTeamNames[targetTeam]||targetTeam} already has an active sabotage — refunded!`);
+      return;
+    }
     logExtra={targetTeam,result:resultInfo.result};
   } else if(item.type==='defensive'){
     if(item.effectKey==='shield'){
