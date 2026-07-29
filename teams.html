@@ -1006,11 +1006,11 @@ let startingBalance = 0; // this team's starting Rand balance, set by admin
 
 /* ── MAKO-PER-RAND-PER-LAP CONSTANT ──
    Swimmers who have a per-lap sponsor rate (R/lap) set also earn their
-   team Mako Coins for every lap they swim: 10 Mako Coins per Rand of
+   team Mako Coins for every lap they swim: 50 Mako Coins per Rand of
    their rate, per lap. e.g. a swimmer sponsored at R5/lap earns their
-   team 5 × 10 = 50 Mako Coins each time they log a lap (scaled the same
+   team 5 × 50 = 250 Mako Coins each time they log a lap (scaled the same
    way the lap count itself scales, e.g. with an active ×2 boost). */
-const MAKO_PER_RAND_PER_LAP = 10;
+const MAKO_PER_RAND_PER_LAP = 50;
 
 /* ─────────────── LAP BUTTON COOLDOWN ─────────────── */
 const LAP_COOLDOWN_MS = 25000;
@@ -1734,7 +1734,7 @@ async function onSpinComplete(){
     // Wheel wins/losses now affect this team's Mako Coin balance, NOT their
     // lap score — sponsors are paying per lap swum, so the wheel shouldn't
     // move that number up or down.
-    const res=await fetch(FB+'/currency/'+team+'/mako.json');let currentMako=await res.json();
+    const res=await fetch(FB+'/currency/'+team+'.json');let currentMako=await res.json();
     currentMako=Math.max(0,(currentMako||0)+delta); // clamp at 0, same floor as admin +/- buttons
     await fetch(FB+'/currency/'+team+'/mako.json',{method:'PUT',body:JSON.stringify(currentMako)});
     _makoBalance=currentMako;_lastMako=currentMako;
