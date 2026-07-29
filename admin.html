@@ -364,6 +364,17 @@
     .nav-link:hover{background:rgba(0,229,255,0.1);border-color:rgba(0,229,255,0.6)}
     .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:rgba(5,20,40,0.95);border:1px solid rgba(0,229,255,0.3);border-radius:12px;padding:12px 28px;font-size:14px;font-weight:700;color:#a8e4ff;z-index:100;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap}
     .toast.show{opacity:1}
+
+    /* MAKO RATE (coins per Rand/lap) */
+    .rate-card { border-color: rgba(240,192,64,0.35); }
+    .rate-row { display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom: 10px; }
+    .rate-row label { font-size:14px; color:rgba(168,228,255,0.7); white-space:nowrap; }
+    .rate-input { width:100px; padding:10px 12px; border-radius:10px; border:1px solid rgba(240,192,64,0.4); background:rgba(2,11,24,0.7); color:#f0c040; font-family:'Bangers',cursive; font-size:22px; text-align:center; outline:none; }
+    .rate-input:focus { border-color: rgba(240,192,64,0.8); }
+    .rate-save-btn { font-family:'Bangers',cursive; font-size:17px; letter-spacing:1px; padding:10px 22px; border-radius:10px; border:2px solid #f0c040; box-shadow:0 0 10px rgba(240,192,64,0.3); cursor:pointer; background:rgba(2,11,24,0.85); color:white; transition:transform 0.1s,box-shadow 0.2s; }
+    .rate-save-btn:hover { transform:translateY(-2px); box-shadow:0 0 20px rgba(240,192,64,0.6); }
+    .rate-example { font-size:12px; color:rgba(168,228,255,0.45); letter-spacing:0.5px; }
+    .rate-example b { color:#f0c040; }
   </style>
 </head>
 <body>
@@ -432,6 +443,18 @@
       <button class="fund-reset-all-btn" onclick="resetAllFundraising()">🗑 RESET ALL RAISED</button>
       <button class="fund-save-btn" onclick="saveFundraising()">💾 SAVE FUNDRAISING</button>
     </div>
+  </div>
+
+  <!-- MAKO COINS PER RAND/LAP -->
+  <div class="card rate-card">
+    <div class="card-title">🪙 Mako Coins per Rand/Lap</div>
+    <div class="fund-hint">Swimmers with a per-lap sponsor rate (set in Team Rosters) also earn their team Mako Coins for every lap they swim, on top of the money raised. This is the coin multiplier: coins earned per lap = the swimmer's R/lap rate × this number.</div>
+    <div class="rate-row">
+      <label>Coins per Rand, per lap:</label>
+      <input class="rate-input" type="number" id="makoRateInput" value="50" min="0" step="1">
+      <button class="rate-save-btn" onclick="saveMakoRate()">💾 Save</button>
+    </div>
+    <div class="rate-example" id="makoRateExample">Example: a swimmer sponsored at <b>R10/lap</b> earns their team <b>500</b> Mako Coins per lap swum.</div>
   </div>
 
   <!-- RANDOM EVENTS -->
@@ -981,6 +1004,35 @@ async function resetAllFundraising(){
   toast('🗑 All teams\' lap earnings reset (starting balances kept)');
 }
 
+/* ── MAKO COINS PER RAND/LAP (game-wide setting) ──
+   Controls how many Mako Coins a fundraising swimmer earns their team per
+   lap, per Rand of their sponsor rate. Stored at /gameSettings/makoPerRandPerLap
+   so every team page reads the live value instead of a hardcoded constant. */
+let makoPerRandPerLap = 50;
+async function loadMakoRate(){
+  try{
+    const res=await fetch(FB+'/gameSettings/makoPerRandPerLap.json');
+    const val=await res.json();
+    makoPerRandPerLap = (val===null||val===undefined) ? 50 : Number(val);
+    document.getElementById('makoRateInput').value = makoPerRandPerLap;
+    updateMakoRateExample();
+  }catch(e){}
+}
+function updateMakoRateExample(){
+  const el=document.getElementById('makoRateInput');
+  const rate = el ? (parseFloat(el.value)||0) : makoPerRandPerLap;
+  const exEl=document.getElementById('makoRateExample');
+  if(exEl) exEl.innerHTML = `Example: a swimmer sponsored at <b>R10/lap</b> earns their team <b>${Math.round(10*rate)}</b> Mako Coins per lap swum.`;
+}
+async function saveMakoRate(){
+  const el=document.getElementById('makoRateInput');
+  const val=Math.max(0,parseFloat(el.value)||0);
+  makoPerRandPerLap=val;
+  await fetch(FB+'/gameSettings/makoPerRandPerLap.json',{method:'PUT',body:JSON.stringify(val)});
+  updateMakoRateExample();
+  toast('✅ Mako coin rate saved!');
+}
+
 /* ── TEAM SUMMARY (bottom-of-page rollup) ──
    Pulls together everything already loaded elsewhere on this page — scores,
    rosters, per-swimmer laps/rates, starting balances, and the flat no-roster
@@ -1032,25 +1084,56 @@ function renderTeamSummary(){
 }
 
 function copySummaryTSV(){
-  let tsv="Team\tScore\tSwimmer\tCaptain\tLaps\tRate (R per lap)\tRaised (R)\tStarting Balance (R)\tTeam Total Balance (R)\n";
+  const now=new Date();
+  const stamp=now.toLocaleDateString()+' '+now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  let grandLaps=0,grandRaised=0,grandStart=0;
+
+  // ── SECTION 1: TEAM TOTALS — one clean row per team, consistent columns ──
+  let teamRows='';
+  TEAMS.forEach(k=>{
+    const name=teamNames[k]||'Team '+k.replace('team','');
+    const laps=teamLapsTotal(k);
+    const startBal=startingBalances[k]||0;
+    const totalBal=teamRaisedTotal(k);
+    const lapRaised=totalBal-startBal;
+    grandLaps+=laps;grandRaised+=lapRaised;grandStart+=startBal;
+    teamRows+=`${name}\t${scores[k]||0}\t${laps}\t${startBal.toFixed(2)}\t${lapRaised.toFixed(2)}\t${totalBal.toFixed(2)}\r\n`;
+  });
+
+  // ── SECTION 2: SWIMMER DETAIL — one row per swimmer, own consistent columns ──
+  let swimmerRows='';
   TEAMS.forEach(k=>{
     const name=teamNames[k]||'Team '+k.replace('team','');
     const roster=rosters[k]||[];
-    const startBal=startingBalances[k]||0;
-    const totalBal=teamRaisedTotal(k);
     if(roster.length>0){
       roster.forEach((m,i)=>{
         const l=(allSwimmerLaps[k]&&allSwimmerLaps[k][i])||0;
         const rate=m.rate||0;const r=l*rate;
-        tsv+=`${name}\t${scores[k]||0}\t${m.name}\t${m.captain?'Yes':'No'}\t${l}\t${rate.toFixed(2)}\t${r.toFixed(2)}\t${startBal.toFixed(2)}\t${totalBal.toFixed(2)}\n`;
+        swimmerRows+=`${name}\t${m.name}\t${m.captain?'Yes':'No'}\t${l}\t${rate.toFixed(2)}\t${r.toFixed(2)}\r\n`;
       });
     } else {
       const laps=teamLaps[k]||0;
       const f=fundraising[k]||{enabled:false,rate:0};
       const raised=f.enabled?laps*(f.rate||0):0;
-      tsv+=`${name}\t${scores[k]||0}\t(flat team rate — no roster)\t\t${laps}\t${(f.rate||0).toFixed(2)}\t${raised.toFixed(2)}\t${startBal.toFixed(2)}\t${totalBal.toFixed(2)}\n`;
+      swimmerRows+=`${name}\t(no roster — flat team rate)\t—\t${laps}\t${(f.rate||0).toFixed(2)}\t${raised.toFixed(2)}\r\n`;
     }
   });
+
+  let tsv='';
+  tsv+=`Mako Swimathon — Team Summary Export\r\n`;
+  tsv+=`Generated\t${stamp}\r\n`;
+  tsv+=`\r\n`;
+  tsv+=`TEAM TOTALS\r\n`;
+  tsv+=`Team\tScore\tTotal Laps\tStarting Balance (R)\tRaised From Laps (R)\tTeam Total Balance (R)\r\n`;
+  tsv+=teamRows;
+  tsv+=`\r\n`;
+  tsv+=`GRAND TOTAL\t\t${grandLaps}\t${grandStart.toFixed(2)}\t${grandRaised.toFixed(2)}\t${(grandStart+grandRaised).toFixed(2)}\r\n`;
+  tsv+=`\r\n`;
+  tsv+=`\r\n`;
+  tsv+=`SWIMMER DETAIL\r\n`;
+  tsv+=`Team\tSwimmer\tCaptain\tLaps\tRate (R per lap)\tRaised (R)\r\n`;
+  tsv+=swimmerRows;
+
   if(navigator.clipboard&&navigator.clipboard.writeText){
     navigator.clipboard.writeText(tsv).then(()=>toast('📋 Summary copied — paste into a spreadsheet!')).catch(()=>toast('⚠️ Copy failed — clipboard blocked by browser'));
   } else {
@@ -1830,6 +1913,7 @@ async function init(){
   await loadShopData();
   loadShopLog();loadFundraising();loadWheelLog();loadEffectsBoard();
   await loadShopRotationSettings();
+  await loadMakoRate();
   onNewSiTypeChange();
   setInterval(loadScores,3000);setInterval(loadSlots,3000);setInterval(syncTimerUI,1000);
   setInterval(updateNextEventRow,1000);setInterval(loadCompletionsLog,3000);
