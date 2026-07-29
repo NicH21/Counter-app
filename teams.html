@@ -1006,6 +1006,14 @@ let fundSettings = { enabled:false, rate:0 }; // flat fallback only
 let teamLapCount = 0; // flat fallback lap counter only
 let startingBalance = 0; // this team's starting Rand balance, set by admin
 
+/* ── MAKO-PER-RAND-PER-LAP CONSTANT ──
+   Swimmers who have a per-lap sponsor rate (R/lap) set also earn their
+   team Mako Coins for every lap they swim: 10 Mako Coins per Rand of
+   their rate, per lap. e.g. a swimmer sponsored at R5/lap earns their
+   team 5 × 10 = 50 Mako Coins each time they log a lap (scaled the same
+   way the lap count itself scales, e.g. with an active ×2 boost). */
+const MAKO_PER_RAND_PER_LAP = 10;
+
 /* ─────────────── LAP BUTTON COOLDOWN ─────────────── */
 const LAP_COOLDOWN_MS = 25000;
 let lapCooldownUntil = 0;
@@ -1304,15 +1312,7 @@ function renderSwimmers(){
   document.getElementById('activeSwimmerName').innerHTML = active ? (active.name + (active.captain ? ' <span style="display:inline-block;font-size:11px;font-weight:700;letter-spacing:1px;color:#f0c040;background:rgba(240,192,64,0.15);border:1px solid rgba(240,192,64,0.4);border-radius:6px;padding:2px 8px;vertical-align:middle;font-family:Nunito,sans-serif;">★ CAPTAIN</span>' : '')) : '—';
   document.getElementById('activeSwimmerLaps').textContent = swimmerLaps[activeSwimmerIdx] || 0;
 
-  const activeRate = (fundRoster[activeSwimmerIdx] && fundRoster[activeSwimmerIdx].rate) || 0;
-  const raisedEl = document.getElementById('activeSwimmerRaised');
-  if(activeRate>0){
-    const raised = (swimmerLaps[activeSwimmerIdx]||0) * activeRate;
-    raisedEl.textContent = `💵 ${fmtRand(raised)} raised (${fmtRand(activeRate)}/lap)`;
-    raisedEl.style.display = 'block';
-  } else {
-    raisedEl.style.display = 'none';
-  }
+  updateActiveSwimmerRaisedDisplay(activeSwimmerIdx, swimmerLaps[activeSwimmerIdx] || 0);
 
   document.getElementById('swimmerUndoBtn').style.display = lastSwimmerAction ? 'inline-block' : 'none';
 
@@ -1321,7 +1321,7 @@ function renderSwimmers(){
     if(i===activeSwimmerIdx) return ''; // active swimmer shown big above, not duplicated here
     const laps = swimmerLaps[i]||0;
     const rate = (fundRoster[i] && fundRoster[i].rate) || 0;
-    const raisedTag = rate>0 ? `<span class="swimmer-row-raised">${fmtRand(laps*rate)}</span>` : '';
+    const raisedTag = rate>0 ? `<span class="swimmer-row-raised" title="Also earns the team ${Math.round(rate*MAKO_PER_RAND_PER_LAP)} Mako Coins per lap">${fmtRand(laps*rate)}</span>` : '';
     return `<div class="swimmer-row" onclick="selectSwimmer(${i})">
       <span class="swimmer-row-name">${m.name}</span>
       ${m.captain?'<span class="swimmer-row-captain">★ CAPT</span>':''}
@@ -1357,9 +1357,32 @@ async function addLapToActiveSwimmer(){
   // Refresh this swimmer's individual fundraising total (per-swimmer R/lap)
   renderFundBannerFromRoster();
 
+  // ── NEW: swimmers with a per-lap sponsor rate also earn their team Mako
+  // Coins — MAKO_PER_RAND_PER_LAP coins per Rand of their rate, per lap
+  // just swum (scaled by any active score-multiplier boost, same as the
+  // lap count and Rand amount are). Swimmers with no rate set (rate===0)
+  // earn nothing here — only fundraising swimmers do.
+  const rate = (fundRoster[idx] && fundRoster[idx].rate) || 0;
+  let makoEarned = 0;
+  if(rate>0){
+    makoEarned = Math.round(amount * rate * MAKO_PER_RAND_PER_LAP);
+    if(makoEarned>0){
+      const makoRes=await fetch(FB+'/currency/'+team+'/mako.json');
+      let currentMako=await makoRes.json();
+      currentMako=Math.max(0,(currentMako||0)+makoEarned);
+      await fetch(FB+'/currency/'+team+'/mako.json',{method:'PUT',body:JSON.stringify(currentMako)});
+      _makoBalance=currentMako;_lastMako=currentMako;
+      document.getElementById('makoCount').textContent=currentMako;
+      document.getElementById('shopBalanceCount').textContent=currentMako;
+      bump('makoBadge');
+      renderShopAffordability();
+      showToast(`🪙 +${makoEarned} Mako Coins earned from fundraising laps!`);
+    }
+  }
+
   if(mult>1) showToast(`⚡ ×${mult} BOOST — +${amount} laps & score!`);
 
-  lastSwimmerAction = {idx, amount, scoreDelta};
+  lastSwimmerAction = {idx, amount, scoreDelta, makoEarned};
   document.getElementById('swimmerUndoBtn').style.display='inline-block';
   renderSwimmerRowLaps(idx);
   startLapCooldown();
@@ -1367,7 +1390,7 @@ async function addLapToActiveSwimmer(){
 
 async function undoLapForActiveSwimmer(){
   if(!lastSwimmerAction || lastSwimmerAction.idx!==activeSwimmerIdx) return;
-  const {idx, amount, scoreDelta} = lastSwimmerAction;
+  const {idx, amount, scoreDelta, makoEarned} = lastSwimmerAction;
 
   const newLaps = Math.max(0,(swimmerLaps[idx]||0) - amount);
   swimmerLaps[idx] = newLaps;
@@ -1383,6 +1406,19 @@ async function undoLapForActiveSwimmer(){
   // Refresh this swimmer's individual fundraising total (per-swimmer R/lap)
   renderFundBannerFromRoster();
 
+  // ── NEW: claw back any Mako Coins that were awarded for this undone lap ──
+  if(makoEarned){
+    const makoRes=await fetch(FB+'/currency/'+team+'/mako.json');
+    let currentMako=await makoRes.json();
+    currentMako=Math.max(0,(currentMako||0)-makoEarned);
+    await fetch(FB+'/currency/'+team+'/mako.json',{method:'PUT',body:JSON.stringify(currentMako)});
+    _makoBalance=currentMako;_lastMako=currentMako;
+    document.getElementById('makoCount').textContent=currentMako;
+    document.getElementById('shopBalanceCount').textContent=currentMako;
+    bump('makoBadge');
+    renderShopAffordability();
+  }
+
   lastSwimmerAction = null;
   document.getElementById('swimmerUndoBtn').style.display='none';
   renderSwimmerRowLaps(idx);
@@ -1391,11 +1427,14 @@ async function undoLapForActiveSwimmer(){
 function updateActiveSwimmerRaisedDisplay(idx, laps){
   // Called right when a swimmer's own lap count changes, so their "raised so
   // far" text jumps by the full 2 laps worth of money the moment the button
-  // is pressed, instead of waiting for the next full re-render.
+  // is pressed, instead of waiting for the next full re-render. Also shows
+  // how many Mako Coins per lap this swimmer earns their team, for any
+  // swimmer with a per-lap sponsor rate set.
   const rate = (fundRoster[idx] && fundRoster[idx].rate) || 0;
   const raisedEl = document.getElementById('activeSwimmerRaised');
   if(rate>0){
-    raisedEl.textContent = `💵 ${fmtRand(laps*rate)} raised (${fmtRand(rate)}/lap)`;
+    const makoPerLap = Math.round(rate*MAKO_PER_RAND_PER_LAP);
+    raisedEl.innerHTML = `💵 ${fmtRand(laps*rate)} raised (${fmtRand(rate)}/lap) · 🪙 earns ${makoPerLap}/lap`;
     raisedEl.style.display = 'block';
   } else {
     raisedEl.style.display = 'none';
