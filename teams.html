@@ -2231,7 +2231,17 @@ async function loadShop(){
 }
 
 function isAlreadyOwned(item){
-  // Only block repurchase if repurchasable===false AND this team bought it this session
+  // When shop rotation is ON, every item — regardless of its repurchasable
+  // flag — can only be bought once per team per rotation cycle. The flag
+  // stops mattering here because rotateShop's cycle reset (see loadShop())
+  // already clears this team's purchased-items set whenever the shop
+  // refreshes to a new selection, so "buy once, then again once it rotates
+  // back in" applies uniformly.
+  if(shopRotationEnabled){
+    return sessionPurchasedIds.has(item.id);
+  }
+  // No rotation running — fall back to the admin's per-item flag: only
+  // "one-time only" (repurchasable===false) items lock after one purchase.
   return item.repurchasable===false && sessionPurchasedIds.has(item.id);
 }
 
@@ -2502,8 +2512,11 @@ async function confirmPurchase(){
   };
   await fetch(FB+'/shopPurchases/'+Date.now()+'_'+team+'.json',{method:'PUT',body:JSON.stringify(logEntry)});
 
-  // Track session purchase — keyed by team so it doesn't affect other teams
-  if(item.repurchasable===false){
+  // Track session purchase — keyed by team so it doesn't affect other teams.
+  // With rotation ON, every purchase is tracked (all items are capped at one
+  // per rotation cycle). With rotation OFF, only "one-time only" items are
+  // tracked, matching the admin's per-item flag.
+  if(shopRotationEnabled||item.repurchasable===false){
     sessionPurchasedIds.add(item.id);
     sessionStorage.setItem('sessionPurchasedIds_'+team,JSON.stringify([...sessionPurchasedIds]));
   }
