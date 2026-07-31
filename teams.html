@@ -90,6 +90,18 @@
       0%,100% { box-shadow: 0 8px 30px rgba(0,0,0,0.5), 0 0 26px rgba(255,107,107,0.4); }
       50% { box-shadow: 0 8px 30px rgba(0,0,0,0.5), 0 0 42px rgba(255,107,107,0.7); }
     }
+    /* ══ NEW: RANDOM-EVENT / CHALLENGE POPUP STYLE ══ */
+    .notif-popup.challenge {
+      border-color: rgba(255,165,0,0.7);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5), 0 0 26px rgba(255,165,0,0.45);
+      animation-name: notifGlowChallenge;
+    }
+    @keyframes notifGlowChallenge {
+      0%,100% { box-shadow: 0 8px 30px rgba(0,0,0,0.5), 0 0 26px rgba(255,165,0,0.4); }
+      50% { box-shadow: 0 8px 30px rgba(0,0,0,0.5), 0 0 42px rgba(255,165,0,0.7); }
+    }
+    .notif-popup.challenge .notif-label { color: rgba(255,169,77,0.85); }
+    .notif-popup.challenge .notif-name { color: #ffa94d; }
     .notif-popup .notif-emoji { font-size: 34px; flex-shrink: 0; line-height: 1; }
     .notif-popup .notif-body { flex: 1; text-align: left; min-width: 0; }
     .notif-popup .notif-label {
@@ -1077,11 +1089,18 @@ let seenPowerupIds = new Set(JSON.parse(sessionStorage.getItem('seenPowerups_'+t
 let seenSabotageIds = new Set(JSON.parse(sessionStorage.getItem('seenSabotages_'+team)||'[]'));
 let effectsFirstLoad = true; // suppress popups for effects already active on first load
 
+/* ─────────────── NEW: RANDOM-EVENT / CHALLENGE POPUP STATE ───────────────
+   Fires a popup the instant a NEW random challenge begins, using the same
+   spawnNotifPopup() mechanism as the power-up/sabotage popups above.
+   Namespaced by team in sessionStorage, same pattern as seenPowerupIds. */
+let seenEventKeys = new Set(JSON.parse(sessionStorage.getItem('seenEvents_'+team)||'[]'));
+let challengeFirstLoad = true; // suppress a popup for a challenge already active on page load
+
 function spawnNotifPopup({emoji,label,name,sub,type}){
   const stack=document.getElementById('notifPopupStack');
   if(!stack)return;
   const el=document.createElement('div');
-  el.className='notif-popup'+(type==='sabotage'?' sabotage':'');
+  el.className='notif-popup'+(type==='sabotage'?' sabotage':(type==='challenge'?' challenge':''));
   el.innerHTML=`<div class="notif-emoji">${emoji}</div>
     <div class="notif-body">
       <div class="notif-label">${label}</div>
@@ -1091,7 +1110,7 @@ function spawnNotifPopup({emoji,label,name,sub,type}){
     <button class="notif-close" onclick="this.parentElement.remove()">✕</button>`;
   stack.appendChild(el);
   requestAnimationFrame(()=>el.classList.add('show'));
-  const life = type==='sabotage' ? 7000 : 5500;
+  const life = type==='sabotage' ? 7000 : (type==='challenge' ? 6500 : 5500);
   setTimeout(()=>{
     el.classList.remove('show');
     setTimeout(()=>el.remove(),400);
@@ -1492,12 +1511,32 @@ async function pollChallenge(){
     const banner=document.getElementById('challengeBanner');
     const now=Date.now();const expired=ev.expiresAt&&now>ev.expiresAt;
     if(ev&&ev.active&&ev.id&&!expired){
-      const alreadyDone=completedEventIds.includes(ev.id+'_'+ev.firedAt);
+      const key=ev.id+'_'+ev.firedAt;
+      const alreadyDone=completedEventIds.includes(key);
       document.getElementById('challengeName').textContent=ev.name||'Challenge';
       document.getElementById('completeBtn').disabled=alreadyDone||timerEnded;
       document.getElementById('doneFlash').classList.toggle('show',alreadyDone);
       banner.classList.add('visible');
       lastEventId={id:ev.id,name:ev.name,points:ev.points||1,firedAt:ev.firedAt};
+
+      // ── NEW: pop a notification the moment a fresh challenge begins ──
+      if(!seenEventKeys.has(key)){
+        seenEventKeys.add(key);
+        sessionStorage.setItem('seenEvents_'+team, JSON.stringify([...seenEventKeys]));
+        if(!challengeFirstLoad){
+          let sub = `+${ev.points||1} Mako Coin${(ev.points||1)!==1?'s':''} for completing!`;
+          if(ev.durationMinutes){ sub += ` · ⏱ ${ev.durationMinutes} min`; }
+          spawnNotifPopup({
+            emoji:'⚡',
+            label:'🎲 New Challenge!',
+            name:ev.name||'Challenge',
+            sub,
+            type:'challenge'
+          });
+        }
+      }
+      challengeFirstLoad = false;
+
       if(ev.expiresAt){
         const secsLeft=Math.max(0,Math.round((ev.expiresAt-now)/1000));
         const m=Math.floor(secsLeft/60);const s=secsLeft%60;
@@ -1507,6 +1546,7 @@ async function pollChallenge(){
       }
     } else {
       banner.classList.remove('visible');lastEventId=null;
+      challengeFirstLoad = false; // so the very first challenge fired after load still pops
     }
   }catch(e){}
 }
