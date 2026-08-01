@@ -647,6 +647,7 @@
       <button class="ctrl-btn btn-reset" style="font-size:18px" onclick="resetAllScores()">🗑 RESET ALL SCORES</button>
       <button class="ctrl-btn btn-reset" style="font-size:18px;border-color:#cc5de8;box-shadow:0 0 16px rgba(204,93,232,0.3)" onclick="freeAllSlots()">🔓 FREE ALL SLOTS</button>
       <button class="ctrl-btn btn-reset" style="font-size:18px;border-color:#4d96ff;box-shadow:0 0 16px rgba(77,150,255,0.3)" onclick="resetAllCurrency()">🪙 RESET ALL MAKO COINS</button>
+      <button class="ctrl-btn btn-reset" style="font-size:18px;border-color:#6bcb77;box-shadow:0 0 16px rgba(107,203,119,0.3)" onclick="resetAllTrueLaps()">🏊 RESET ALL TRUE LAPS</button>
     </div>
   </div>
 
@@ -1010,8 +1011,51 @@ async function resetAllFundraising(){
   toast('🗑 All teams\' lap earnings reset (starting balances kept)');
 }
 
+/* ── RESET TRUE (ACTUAL SWUM) LAP COUNTER ──
+   The TRUE lap counter (/swimmerTrueLaps/{team}/{idx} for roster teams,
+   /teamTrueLaps/{team} for flat no-roster teams) is completely separate
+   from the scored lap count — it never scales with a multiplier and isn't
+   touched by "Reset" in the Fundraising card above (that only zeroes the
+   SCORED laps used for money). This gives it its own reset, per-team (via
+   the ↺ True Laps button in the Team Summary card) or for everyone at once
+   (via Danger Zone). */
+async function resetTrueLaps(team){
+  const name=teamNames[team]||'Team '+team.replace('team','');
+  if(!confirm(`Reset ${name}'s TRUE (actual swum) lap counter to 0? This does not affect their score or fundraising — only the real-laps-swum tracker.`))return;
+  const roster=rosters[team]||[];
+  if(roster.length>0){
+    const zeroed={};roster.forEach((m,i)=>{zeroed[i]=0;});
+    await fetch(FB+'/swimmerTrueLaps/'+team+'.json',{method:'PUT',body:JSON.stringify(zeroed)});
+    allSwimmerTrueLaps[team]=zeroed;
+  } else {
+    await fetch(FB+'/teamTrueLaps/'+team+'.json',{method:'PUT',body:JSON.stringify(0)});
+  }
+  renderTeamSummary();
+  toast(`↺ ${name}'s true lap counter reset to 0`);
+}
+async function resetAllTrueLaps(){
+  if(!confirm('Reset the TRUE (actual swum) lap counter to 0 for EVERY team? This does not affect scores or fundraising — only the real-laps-swum tracker.'))return;
+  const swimmerUpdates={};const flatUpdates={};
+  TEAMS.forEach(k=>{
+    const roster=rosters[k]||[];
+    if(roster.length>0){
+      const zeroed={};roster.forEach((m,i)=>{zeroed[i]=0;});
+      swimmerUpdates[k]=zeroed;allSwimmerTrueLaps[k]=zeroed;
+    } else {
+      flatUpdates[k]=0;
+    }
+  });
+  const tasks=[];
+  if(Object.keys(swimmerUpdates).length>0) tasks.push(fetch(FB+'/swimmerTrueLaps.json',{method:'PATCH',body:JSON.stringify(swimmerUpdates)}));
+  if(Object.keys(flatUpdates).length>0) tasks.push(fetch(FB+'/teamTrueLaps.json',{method:'PATCH',body:JSON.stringify(flatUpdates)}));
+  await Promise.all(tasks);
+  renderTeamSummary();
+  toast('🗑 All teams\' true lap counters reset to 0');
+}
+
 /* ── MAKO COINS PER RAND/LAP (game-wide setting) ──
    Controls how many Mako Coins a fundraising swimmer earns their team per
+
    lap, per Rand of their sponsor rate. Stored at /gameSettings/makoPerRandPerLap
    so every team page reads the live value instead of a hardcoded constant. */
 let makoPerRandPerLap = 50;
@@ -1082,6 +1126,7 @@ function renderTeamSummary(){
         <span class="summary-team-score">Score: ${scores[k]||0}</span>
         <span class="summary-team-laps">🏊 ${laps} laps</span>
         <span class="summary-team-raised">${fmtRand(raised)}</span>
+        <button class="fund-reset-btn" onclick="event.stopPropagation();resetTrueLaps('${k}')" title="Reset this team's TRUE (actual swum) lap counter back to 0">↺ True Laps</button>
       </div>
       <div class="summary-swimmer-list">${swimmerRowsHTML}</div>
     </div>`;
