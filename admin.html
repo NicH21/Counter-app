@@ -339,7 +339,7 @@
     .fund-reset-all-btn:hover{ transform:translateY(-2px); box-shadow:0 0 26px rgba(255,107,107,0.6); }
     .fund-grand-total { text-align:center; font-size: 13px; color: rgba(240,192,64,0.7); letter-spacing:1px; margin-bottom: 16px; }
     .fund-grand-total b { font-family:'Bangers',cursive; font-size: 22px; color: #f0c040; letter-spacing: 1px; }
-    .fund-hint { font-size:11px;color:rgba(168,228,255,0.3);margin-top:4px;margin-bottom:14px;letter-spacing:1px; }
+    .fund-hint { font-size:11px; color:rgba(168,228,255,0.3); margin-top:4px; margin-bottom:14px; letter-spacing:1px; }
 
     /* TEAM SUMMARY */
     .summary-team-block { background: rgba(2,11,24,0.55); border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 10px; overflow: hidden; }
@@ -837,15 +837,21 @@ async function saveStartingBalances(){
 let fundraising={}; // { teamKey: { enabled: bool, rate: number } } — flat fallback only
 let teamLaps={};    // { teamKey: number } — real lap count for flat-fallback teams
 let allSwimmerLaps={}; // { teamKey: { idx: number } } — real lap counts per roster swimmer
+let allSwimmerTrueLaps={}; // { teamKey: { idx: number } } — TRUE (never-boosted) lap counts per roster swimmer
 
 async function loadFundraising(){
-  const [fRes,lRes,slRes]=await Promise.all([fetch(FB+'/fundraising.json'),fetch(FB+'/teamLaps.json'),fetch(FB+'/swimmerLaps.json')]);
-  const fData=(await fRes.json())||{};const lData=(await lRes.json())||{};const slData=(await slRes.json())||{};
-  fundraising={};teamLaps={};allSwimmerLaps={};
+  const [fRes,lRes,slRes,stlRes]=await Promise.all([
+    fetch(FB+'/fundraising.json'),fetch(FB+'/teamLaps.json'),
+    fetch(FB+'/swimmerLaps.json'),fetch(FB+'/swimmerTrueLaps.json')
+  ]);
+  const fData=(await fRes.json())||{};const lData=(await lRes.json())||{};
+  const slData=(await slRes.json())||{};const stlData=(await stlRes.json())||{};
+  fundraising={};teamLaps={};allSwimmerLaps={};allSwimmerTrueLaps={};
   TEAMS.forEach(k=>{
     fundraising[k]={enabled:!!(fData[k]&&fData[k].enabled),rate:(fData[k]&&fData[k].rate)||0};
     teamLaps[k]=lData[k]||0;
     allSwimmerLaps[k]=slData[k]||{};
+    allSwimmerTrueLaps[k]=stlData[k]||{};
   });
   renderFundGrid();
   renderTeamSummary();
@@ -1053,10 +1059,12 @@ function renderTeamSummary(){
     if(roster.length>0){
       roster.forEach((m,i)=>{
         const l=(allSwimmerLaps[k]&&allSwimmerLaps[k][i])||0;
+        const trueL=(allSwimmerTrueLaps[k]&&allSwimmerTrueLaps[k][i])||0;
         const rate=m.rate||0;
         const r=l*rate;
         laps+=l;raised+=r;
-        swimmerRowsHTML+=`<div class="summary-swimmer-row"><span class="summary-swimmer-name">${m.name||'(unnamed)'}${m.captain?' ★':''}</span><span class="summary-swimmer-laps">${l} laps</span><span class="summary-swimmer-raised">${rate>0?fmtRand(r):'—'}</span></div>`;
+        const lapsDisplay = trueL!==l ? `${l} <span style="opacity:0.5;font-weight:400">(🏊 ${trueL} actual)</span>` : `${l} laps`;
+        swimmerRowsHTML+=`<div class="summary-swimmer-row"><span class="summary-swimmer-name">${m.name||'(unnamed)'}${m.captain?' ★':''}</span><span class="summary-swimmer-laps">${lapsDisplay}</span><span class="summary-swimmer-raised">${rate>0?fmtRand(r):'—'}</span></div>`;
       });
       if(swimmerRowsHTML==='') swimmerRowsHTML='<div class="summary-swimmer-row"><span class="summary-swimmer-name" style="opacity:0.4">No members yet</span></div>';
       swimmerRowsHTML=startRowHTML+swimmerRowsHTML;
@@ -1108,14 +1116,15 @@ function copySummaryTSV(){
     if(roster.length>0){
       roster.forEach((m,i)=>{
         const l=(allSwimmerLaps[k]&&allSwimmerLaps[k][i])||0;
+        const trueL=(allSwimmerTrueLaps[k]&&allSwimmerTrueLaps[k][i])||0;
         const rate=m.rate||0;const r=l*rate;
-        swimmerRows+=`${name}\t${m.name}\t${m.captain?'Yes':'No'}\t${l}\t${rate.toFixed(2)}\t${r.toFixed(2)}\r\n`;
+        swimmerRows+=`${name}\t${m.name}\t${m.captain?'Yes':'No'}\t${l}\t${trueL}\t${rate.toFixed(2)}\t${r.toFixed(2)}\r\n`;
       });
     } else {
       const laps=teamLaps[k]||0;
       const f=fundraising[k]||{enabled:false,rate:0};
       const raised=f.enabled?laps*(f.rate||0):0;
-      swimmerRows+=`${name}\t(no roster — flat team rate)\t—\t${laps}\t${(f.rate||0).toFixed(2)}\t${raised.toFixed(2)}\r\n`;
+      swimmerRows+=`${name}\t(no roster — flat team rate)\t—\t${laps}\t—\t${(f.rate||0).toFixed(2)}\t${raised.toFixed(2)}\r\n`;
     }
   });
 
@@ -1131,7 +1140,7 @@ function copySummaryTSV(){
   tsv+=`\r\n`;
   tsv+=`\r\n`;
   tsv+=`SWIMMER DETAIL\r\n`;
-  tsv+=`Team\tSwimmer\tCaptain\tLaps\tRate (R per lap)\tRaised (R)\r\n`;
+  tsv+=`Team\tSwimmer\tCaptain\tLaps (Scored)\tLaps (Actual Swum)\tRate (R per lap)\tRaised (R)\r\n`;
   tsv+=swimmerRows;
 
   if(navigator.clipboard&&navigator.clipboard.writeText){
