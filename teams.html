@@ -2186,7 +2186,9 @@ async function performCancelCard(targetTeamKey,powerupId){
    AND their sabotage-immunity status. Priority:
    0. Already-sabotaged immunity (blocks before defenses are even checked)
    1. Super Shield (blocks everything, doesn't get consumed)
-   2. Reflector (bounces it back onto the buyer, consumed)
+   2. Reflector (bounces it back onto the buyer, consumed) — and if it
+      bounces back, the BUYER's own defenses (Super Shield / Shield) are
+      then checked before the reflected sabotage actually lands on them.
    3. Shield (blocks it, consumed)
    4. No defense (applies normally to the target) */
 async function resolveSabotagePurchase(item,targetTeam){
@@ -2207,6 +2209,22 @@ async function resolveSabotagePurchase(item,targetTeam){
   }
   if((def.reflectorCount||0)>0){
     await fetch(FB+'/defenses/'+targetTeam+'/reflectorCount.json',{method:'PUT',body:JSON.stringify(Math.max(0,(def.reflectorCount||0)-1))});
+
+    // The sabotage now bounces back onto the original buyer (this team) —
+    // so check the BUYER's own defenses before it actually lands on them.
+    // Previously this went straight to addActiveSabotage(team,...) with no
+    // check at all, so a Shield/Super Shield on the buyer was ignored for
+    // reflected sabotages even though it would have blocked the exact same
+    // sabotage if it had been aimed at them directly.
+    const buyerDefRes=await fetch(FB+'/defenses/'+team+'.json');
+    const buyerDef=(await buyerDefRes.json())||{};
+    if(buyerDef.superShieldExpiresAt&&buyerDef.superShieldExpiresAt>now){
+      return {result:'reflected_blocked',blockedBy:'super_shield',targetTeam};
+    }
+    if((buyerDef.shieldCount||0)>0){
+      await fetch(FB+'/defenses/'+team+'/shieldCount.json',{method:'PUT',body:JSON.stringify(Math.max(0,(buyerDef.shieldCount||0)-1))});
+      return {result:'reflected_blocked',blockedBy:'shield',targetTeam};
+    }
     await addActiveSabotage(team,item,targetTeam,true);
     return {result:'reflected',targetTeam};
   }
@@ -2612,6 +2630,10 @@ function showPurchaseSuccess(item,resultInfo){
     emojiEl.textContent='🔄';
     titleEl.textContent='REFLECTED!';
     nameEl.textContent=`${allTeamNames[resultInfo.targetTeam]||resultInfo.targetTeam}'s Reflector bounced ${item.name} back at YOU!`;
+  } else if(resultInfo&&resultInfo.result==='reflected_blocked'){
+    emojiEl.textContent=resultInfo.blockedBy==='super_shield'?'🛡️🛡️':'🛡️';
+    titleEl.textContent='SHIELD SAVED YOU!';
+    nameEl.textContent=`${allTeamNames[resultInfo.targetTeam]||resultInfo.targetTeam}'s Reflector bounced ${item.name} back, but your own ${resultInfo.blockedBy==='super_shield'?'Super Shield':'Shield'} blocked it!`;
   } else if(resultInfo&&resultInfo.result==='cancelled'){
     emojiEl.textContent='❌';
     titleEl.textContent='CANCELLED!';
