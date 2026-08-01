@@ -269,6 +269,7 @@
       margin-top: -10px;
       margin-bottom: 14px;
     }
+    .active-swimmer-true-laps{font-size:12px;color:rgba(168,228,255,0.45);margin-top:-10px;margin-bottom:14px;letter-spacing:0.5px}
     .active-swimmer-raised {
       display: none;
       font-size: 13px;
@@ -862,6 +863,7 @@
     <div class="active-swimmer-name" id="activeSwimmerName">—</div>
     <div class="active-swimmer-laps" id="activeSwimmerLaps">0</div>
     <div class="active-swimmer-laps-label">laps</div>
+    <div class="active-swimmer-true-laps" id="activeSwimmerTrueLaps"></div>
     <div class="active-swimmer-raised" id="activeSwimmerRaised"></div>
     <div class="boost-badge" id="swimmerBoostBadge">⚡ SCORE BOOST ACTIVE</div>
     <button class="swimmer-big-btn" id="swimmerBigBtn" onclick="addLapToActiveSwimmer()"><span>+2 LAPS</span></button>
@@ -1006,6 +1008,7 @@ let currentAngle=0;
 /* ─────────────── SWIMMER LAPS STATE ─────────────── */
 let roster=[]; // [{name, captain}]
 let swimmerLaps={}; // { idx: lapCount }
+let swimmerTrueLaps={}; // REAL laps physically swum — never scaled by a multiplier
 // Active swimmer is remembered per-team in sessionStorage so a refresh mid-event doesn't lose it,
 // but it's namespaced by team and never persists into another team's session.
 let activeSwimmerIdx = sessionStorage.getItem('activeSwimmerIdx_'+team);
@@ -1246,6 +1249,7 @@ async function update(){
   await fetch(FB+"/teams/"+team+".json",{method:"PUT",body:JSON.stringify(value)});
   document.getElementById("score").innerText=value;
   await bumpTeamLaps(amount); // flat fallback fundraising counter — scales with the boost too
+  await bumpTeamTrueLaps(2); // flat fallback TRUE lap counter — always +2, never boosted
   if(mult>1) showToast(`⚡ ×${mult} BOOST — +${amount} laps & score!`);
   startLapCooldown();
 }
@@ -1266,6 +1270,16 @@ async function bumpTeamLaps(delta){
     await fetch(FB+'/teamLaps/'+team+'.json',{method:'PUT',body:JSON.stringify(laps)});
     teamLapCount=laps;
     renderFundBannerFlat();
+  }catch(e){}
+}
+async function bumpTeamTrueLaps(delta){
+  // Flat-fallback path only (teams with no roster). TRUE lap count — always
+  // the real physical amount (2 per tap), never scaled by a score multiplier.
+  try{
+    const res=await fetch(FB+'/teamTrueLaps/'+team+'.json');
+    let laps=(await res.json())||0;
+    laps=Math.max(0,laps+delta);
+    await fetch(FB+'/teamTrueLaps/'+team+'.json',{method:'PUT',body:JSON.stringify(laps)});
   }catch(e){}
 }
 async function loadFundraising(){
@@ -1323,12 +1337,16 @@ function renderFundBannerFlat(){
 /* ─────────────── SWIMMER LAPS ENGINE ─────────────── */
 async function loadSwimmerLaps(){
   try{
-    const res=await fetch(FB+'/swimmerLaps/'+team+'.json');
+    const [res,trueRes]=await Promise.all([
+      fetch(FB+'/swimmerLaps/'+team+'.json'),
+      fetch(FB+'/swimmerTrueLaps/'+team+'.json')
+    ]);
     const data=(await res.json())||{};
-    swimmerLaps={};
-    roster.forEach((m,i)=>{ swimmerLaps[i]=data[i]||0; });
+    const trueData=(await trueRes.json())||{};
+    swimmerLaps={};swimmerTrueLaps={};
+    roster.forEach((m,i)=>{ swimmerLaps[i]=data[i]||0; swimmerTrueLaps[i]=trueData[i]||0; });
   }catch(e){
-    roster.forEach((m,i)=>{ if(swimmerLaps[i]===undefined) swimmerLaps[i]=0; });
+    roster.forEach((m,i)=>{ if(swimmerLaps[i]===undefined) swimmerLaps[i]=0; if(swimmerTrueLaps[i]===undefined) swimmerTrueLaps[i]=0; });
   }
 }
 
@@ -1361,6 +1379,9 @@ function renderSwimmers(){
   document.getElementById('activeSwimmerName').innerHTML = active ? (active.name + (active.captain ? ' <span style="display:inline-block;font-size:11px;font-weight:700;letter-spacing:1px;color:#f0c040;background:rgba(240,192,64,0.15);border:1px solid rgba(240,192,64,0.4);border-radius:6px;padding:2px 8px;vertical-align:middle;font-family:Nunito,sans-serif;">★ CAPTAIN</span>' : '')) : '—';
   document.getElementById('activeSwimmerLaps').textContent = swimmerLaps[activeSwimmerIdx] || 0;
 
+  const trueEl=document.getElementById('activeSwimmerTrueLaps');
+  if(trueEl) trueEl.textContent = `🏊 ${swimmerTrueLaps[activeSwimmerIdx]||0} actual laps swum`;
+
   updateActiveSwimmerRaisedDisplay(activeSwimmerIdx, swimmerLaps[activeSwimmerIdx] || 0);
 
   document.getElementById('swimmerUndoBtn').style.display = lastSwimmerAction ? 'inline-block' : 'none';
@@ -1375,7 +1396,7 @@ function renderSwimmers(){
       <span class="swimmer-row-name">${m.name}</span>
       ${m.captain?'<span class="swimmer-row-captain">★ CAPT</span>':''}
       ${raisedTag}
-      <span class="swimmer-row-laps">${laps}</span>
+      <span class="swimmer-row-laps" title="${swimmerTrueLaps[i]||0} actual laps swum">${laps}</span>
       <span class="swimmer-row-select">Select</span>
     </div>`;
   }).join('');
@@ -1396,6 +1417,13 @@ async function addLapToActiveSwimmer(){
   document.getElementById('activeSwimmerLaps').textContent = newLaps;
   updateActiveSwimmerRaisedDisplay(idx, newLaps); // reflects the full boosted laps worth of money, right away
   await fetch(FB+'/swimmerLaps/'+team+'/'+idx+'.json',{method:'PUT',body:JSON.stringify(newLaps)});
+
+  // TRUE lap count — always +2, regardless of any active score multiplier
+  const newTrueLaps = (swimmerTrueLaps[idx]||0) + 2;
+  swimmerTrueLaps[idx] = newTrueLaps;
+  const trueEl=document.getElementById('activeSwimmerTrueLaps');
+  if(trueEl) trueEl.textContent = `🏊 ${newTrueLaps} actual laps swum`;
+  await fetch(FB+'/swimmerTrueLaps/'+team+'/'+idx+'.json',{method:'PUT',body:JSON.stringify(newTrueLaps)});
 
   // Add to the team's grand total (competitive score), same as the original whole-team button did
   const res=await fetch(FB+"/teams/"+team+".json");let value=await res.json();
@@ -1431,7 +1459,7 @@ async function addLapToActiveSwimmer(){
 
   if(mult>1) showToast(`⚡ ×${mult} BOOST — +${amount} laps & score!`);
 
-  lastSwimmerAction = {idx, amount, scoreDelta, makoEarned};
+  lastSwimmerAction = {idx, amount, scoreDelta, makoEarned, trueAmount:2};
   document.getElementById('swimmerUndoBtn').style.display='inline-block';
   renderSwimmerRowLaps(idx);
   startLapCooldown();
@@ -1439,13 +1467,19 @@ async function addLapToActiveSwimmer(){
 
 async function undoLapForActiveSwimmer(){
   if(!lastSwimmerAction || lastSwimmerAction.idx!==activeSwimmerIdx) return;
-  const {idx, amount, scoreDelta, makoEarned} = lastSwimmerAction;
+  const {idx, amount, scoreDelta, makoEarned, trueAmount} = lastSwimmerAction;
 
   const newLaps = Math.max(0,(swimmerLaps[idx]||0) - amount);
   swimmerLaps[idx] = newLaps;
   document.getElementById('activeSwimmerLaps').textContent = newLaps;
   updateActiveSwimmerRaisedDisplay(idx, newLaps);
   await fetch(FB+'/swimmerLaps/'+team+'/'+idx+'.json',{method:'PUT',body:JSON.stringify(newLaps)});
+
+  const newTrueLaps = Math.max(0,(swimmerTrueLaps[idx]||0) - (trueAmount||2));
+  swimmerTrueLaps[idx] = newTrueLaps;
+  const trueEl=document.getElementById('activeSwimmerTrueLaps');
+  if(trueEl) trueEl.textContent = `🏊 ${newTrueLaps} actual laps swum`;
+  await fetch(FB+'/swimmerTrueLaps/'+team+'/'+idx+'.json',{method:'PUT',body:JSON.stringify(newTrueLaps)});
 
   const res=await fetch(FB+"/teams/"+team+".json");let value=await res.json();
   value=Math.max(0,(value||0) - (scoreDelta!==undefined?scoreDelta:amount));
