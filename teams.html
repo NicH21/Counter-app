@@ -1806,10 +1806,13 @@ async function onSpinComplete(){
   const winner=wheelItems[spinTargetIdx];
   const delta=winner.points||0;
   if(delta!==0){
-    // Wheel wins/losses now affect this team's Mako Coin balance, NOT their
-    // lap score — sponsors are paying per lap swum, so the wheel shouldn't
-    // move that number up or down.
-    const res=await fetch(FB+'/currency/'+team+'.json');let currentMako=await res.json();
+    // FIX: fetch the mako value directly (not the parent /currency/{team}
+    // object). Previously this fetched the whole {mako:X} object, then did
+    // `object + delta`, which JS coerces into NaN — Math.max(0,NaN) is
+    // still NaN, and JSON.stringify(NaN) writes `null` to Firebase, wiping
+    // the team's coin balance to 0 on any nonzero-point wheel result.
+    const res=await fetch(FB+'/currency/'+team+'/mako.json');
+    let currentMako=await res.json();
     currentMako=Math.max(0,(currentMako||0)+delta); // clamp at 0, same floor as admin +/- buttons
     await fetch(FB+'/currency/'+team+'/mako.json',{method:'PUT',body:JSON.stringify(currentMako)});
     _makoBalance=currentMako;_lastMako=currentMako;
