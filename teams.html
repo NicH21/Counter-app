@@ -1049,7 +1049,7 @@ async function loadMakoRate(){
 }
 
 /* ─────────────── LAP BUTTON COOLDOWN ─────────────── */
-const LAP_COOLDOWN_MS = 25000;
+const LAP_COOLDOWN_MS = 20000;
 let lapCooldownUntil = 0;
 let lapCooldownInterval = null;
 
@@ -1242,6 +1242,7 @@ function updateLapCooldownUI(){
 
 async function update(){
   if(timerEnded||isLapOnCooldown()||isLapsLocked())return;
+  startLapCooldown(); // fire immediately — before any network awaits — so the button disables the instant it's tapped, not after the round-trip finishes
   const mult=getActiveScoreMultiplier();
   const amount=2*mult; // both the score AND the lap count now scale with an active boost
   let res=await fetch(FB+"/teams/"+team+".json");let value=await res.json();
@@ -1251,7 +1252,6 @@ async function update(){
   await bumpTeamLaps(amount); // flat fallback fundraising counter — scales with the boost too
   await bumpTeamTrueLaps(2); // flat fallback TRUE lap counter — always +2, never boosted
   if(mult>1) showToast(`⚡ ×${mult} BOOST — +${amount} laps & score!`);
-  startLapCooldown();
 }
 async function loadScore(){
   const res=await fetch(FB+"/teams/"+team+".json");const value=await res.json();
@@ -1406,6 +1406,7 @@ function renderSwimmers(){
 
 async function addLapToActiveSwimmer(){
   if(timerEnded || isLapOnCooldown() || isLapsLocked() || activeSwimmerIdx===null || !roster[activeSwimmerIdx]) return;
+  startLapCooldown(); // fire immediately — before any network awaits — so the button disables the instant it's tapped, not after the round-trip finishes
   const idx = activeSwimmerIdx;
   const mult = getActiveScoreMultiplier();
   const amount = 2 * mult; // both this swimmer's own lap count AND the team score scale with an active boost
@@ -1462,7 +1463,6 @@ async function addLapToActiveSwimmer(){
   lastSwimmerAction = {idx, amount, scoreDelta, makoEarned, trueAmount:2};
   document.getElementById('swimmerUndoBtn').style.display='inline-block';
   renderSwimmerRowLaps(idx);
-  startLapCooldown();
 }
 
 async function undoLapForActiveSwimmer(){
